@@ -95,15 +95,16 @@ export default function UsersPage() {
         
         let userList = Array.isArray(data) ? data : (data.data || data.items || []);
         
-        // Map dữ liệu để đảm bảo các trường không bị undefined (hỗ trợ PascalCase từ backend)
+        // Map dữ liệu từ API: { id, email, phoneNumber, firstName, lastName, userName }
         const mappedUsers = userList.map(u => ({
-          id: u.id || u.Id,
-          fullName: u.fullName || u.FullName || u.name || 'N/A',
-          username: u.username || u.Username || u.userName || u.UserName || 'N/A',
-          email: u.email || u.Email || '',
-          role: u.role || u.Role || 'staff',
-          roleLabel: u.roleLabel || u.RoleLabel || (u.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'),
-          isActive: u.isActive !== undefined ? u.isActive : (u.IsActive !== undefined ? u.IsActive : true)
+          id: u.id,
+          fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'N/A',
+          username: u.userName || 'N/A',
+          email: u.email || '',
+          phoneNumber: u.phoneNumber || '',
+          role: u.role || 'staff',
+          roleLabel: u.roleLabel || (u.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'),
+          isActive: u.isActive !== undefined ? u.isActive : true
         }));
 
         console.log('[UsersPage] Danh sách user sau khi map:', mappedUsers);
@@ -124,11 +125,13 @@ export default function UsersPage() {
     const searchLower = search.toLowerCase();
     const fullName = (u.fullName || '').toLowerCase();
     const username = (u.username || '').toLowerCase();
-    const roleLabel = (u.roleLabel || '').toLowerCase();
+    const email = (u.email || '').toLowerCase();
+    const phoneNumber = (u.phoneNumber || '').toLowerCase();
 
     return fullName.includes(searchLower) || 
            username.includes(searchLower) || 
-           roleLabel.includes(searchLower);
+           email.includes(searchLower) ||
+           phoneNumber.includes(searchLower);
   });
 
   if (loading) return <Loading text="Đang tải danh sách người dùng..." />;
@@ -183,6 +186,7 @@ export default function UsersPage() {
               <tr className="bg-slate-50 border-b border-slate-200">
                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Người dùng</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tên đăng nhập</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Số điện thoại</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Vai trò</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Trạng thái</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Thao tác</th>
@@ -294,6 +298,11 @@ function UserRow({ user }) {
       {/* Tên đăng nhập */}
       <td className="px-6 py-4 text-sm font-medium text-slate-600">
         {user.username}
+      </td>
+
+      {/* Số điện thoại */}
+      <td className="px-6 py-4 text-sm text-slate-600">
+        {user.phoneNumber || '—'}
       </td>
 
       {/* Vai trò */}
