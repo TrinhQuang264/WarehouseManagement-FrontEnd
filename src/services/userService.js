@@ -17,7 +17,7 @@ const userService = {
    * @returns {Promise<{ data: Array, total: number }>}
    */
   async getAll(params = {}) {
-    const response = await api.get('/users', { params });
+    const response = await api.get('/Users', { params });
     return response.data;
   },
 
@@ -28,7 +28,7 @@ const userService = {
    * @returns {Promise<object>}
    */
   async getById(id) {
-    const response = await api.get(`/users/${id}`);
+    const response = await api.get(`/Users/${id}`);
     return response.data;
   },
 
@@ -39,7 +39,7 @@ const userService = {
    * @returns {Promise<object>}
    */
   async create(userData) {
-    const response = await api.post('/users', userData);
+    const response = await api.post('/Users', userData);
     return response.data;
   },
 
@@ -51,7 +51,7 @@ const userService = {
    * @returns {Promise<object>}
    */
   async update(id, userData) {
-    const response = await api.put(`/users/${id}`, userData);
+    const response = await api.put(`/Users/${id}`, userData);
     return response.data;
   },
 
@@ -62,7 +62,7 @@ const userService = {
    * @returns {Promise<object>}
    */
   async toggleStatus(id) {
-    const response = await api.patch(`/users/${id}/toggle-status`);
+    const response = await api.patch(`/Users/${id}/toggle-status`);
     return response.data;
   },
 
@@ -73,7 +73,7 @@ const userService = {
    * @returns {Promise<void>}
    */
   async delete(id) {
-    await api.delete(`/users/${id}`);
+    await api.delete(`/Users/${id}`);
   },
 };
 
