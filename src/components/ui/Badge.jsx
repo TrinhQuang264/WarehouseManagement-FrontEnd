@@ -1,11 +1,3 @@
-/**
- * Badge.jsx — Component nhãn trạng thái
- *
- * Props:
- *  - variant: 'green' | 'red' | 'orange' | 'blue' | 'gray' (màu sắc)
- *  - children: nội dung text của badge
- */
-
 // Map variant → className (bg + text)
 const variantStyles = {
   green: 'bg-emerald-100 text-emerald-700',

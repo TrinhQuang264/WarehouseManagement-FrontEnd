@@ -1,16 +1,3 @@
-/**
- * Header.jsx — Component thanh tiêu đề phía trên
- *
- * Hiển thị:
- * - Ô tìm kiếm linh kiện
- * - Nút thông báo (bell icon)
- * - Nút trợ giúp
- * - Nút "Nhập mới" (CTA chính)
- *
- * Props:
- *  - searchValue: string
- *  - onSearchChange: function
- */
 import { Bell, HelpCircle, Plus } from 'lucide-react';
 import SearchBar from '../ui/SearchBar';
 import Button from '../ui/Button';

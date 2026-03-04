@@ -1,16 +1,3 @@
-/**
- * LoginPage/LoginPage.jsx — Trang đăng nhập hệ thống
- *
- * LUỒNG:
- * 1. User nhập username + password
- * 2. Submit form → gọi useAuth().login()
- * 3. Nếu thành công → redirect về Dashboard (/)
- * 4. Nếu thất bại → hiện thông báo lỗi
- *
- * GHI CHÚ:
- * - Khi chưa có backend, hệ thống sử dụng MOCK DATA để demo
- * - Tài khoản demo: admin / admin123
- */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -23,16 +10,12 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Form state
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  /**
-   * Xử lý submit form đăng nhập
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('[LoginPage] Người dùng nhấn Đăng nhập. Username:', username);
@@ -40,14 +23,9 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      console.log('[LoginPage] Gọi login(username, password)...');
       await login(username, password);
-      // Đăng nhập thành công → chuyển về Dashboard
-      console.log('[LoginPage] Đăng nhập xong, gọi navigate("/") để chuyển hướng...');
       navigate('/', { replace: true });
     } catch (err) {
-      console.error('[LoginPage] Lỗi trong handleSubmit:', err);
-      // Xử lý lỗi từ API hoặc lỗi mạng
       const message =
         err.response?.data?.message ||
         err.message ||
@@ -102,7 +80,6 @@ export default function LoginPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              icon={<User size={20} />}
               placeholder="nhanvien@waresmart.vn"
               required
             />
@@ -135,7 +112,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Ghi nhớ + Quên mật khẩu */}
+            {/* Ghi nhớ mật khẩu */}
             <div className="flex items-center justify-between">
               <label className="flex items-center cursor-pointer">
                 <input
@@ -146,12 +123,6 @@ export default function LoginPage() {
                   Ghi nhớ đăng nhập
                 </span>
               </label>
-              <a
-                href="#"
-                className="text-sm font-medium text-primary hover:text-primary-dark"
-              >
-                Quên mật khẩu?
-              </a>
             </div>
 
             {/* Nút đăng nhập */}
@@ -182,15 +153,6 @@ export default function LoginPage() {
               Liên hệ hỗ trợ kỹ thuật
             </button>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-xs text-slate-400">
-            © 2024 WareSmart — Warehouse Management System.
-            <br />
-            Được bảo mật và giám sát 24/7.
-          </p>
         </div>
       </motion.div>
     </div>

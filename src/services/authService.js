@@ -1,21 +1,6 @@
-/**
- * authService.js — Service xử lý xác thực người dùng
- *
- * Đây là bản đã chuyển từ utils/ sang services/ (nơi tập trung các service)
- *
- * API ENDPOINTS (ASP.NET Core):
- *  - POST /api/auth/login   → Đăng nhập, trả về { token, user }
- *  - GET  /api/auth/me      → Lấy thông tin user hiện tại (từ token)
- */
 import api from '../utils/api';
 
 const authService = {
-  /**
-   * Đăng nhập
-   * @param {string} username - Tên đăng nhập
-   * @param {string} password - Mật khẩu
-   * @returns {Promise<{ token: string, user: object }>}
-   */
   async login(username, password) {
     console.log('[authService] Bắt đầu gọi API login cho user:', username);
     try {

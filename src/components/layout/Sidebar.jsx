@@ -1,17 +1,3 @@
-/**
- * Sidebar.jsx — Component thanh điều hướng bên trái
- *
- * Hiển thị:
- * - Logo WareSmart
- * - Danh sách menu chính (Dashboard, Sản phẩm, Nhập kho, Xuất kho, Tồn kho, Nhà cung cấp)
- * - Danh sách menu hệ thống (Báo cáo, Người dùng, Cài đặt)
- * - Thông tin user đang đăng nhập ở cuối
- *
- * Props:
- *  - currentPath: string (đường dẫn hiện tại để highlight menu active)
- *  - user: object (thông tin user: { fullName, role, avatar })
- *  - onLogout: function (callback khi nhấn đăng xuất)
- */
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -104,10 +90,6 @@ export default function Sidebar({ user, onLogout }) {
   );
 }
 
-/**
- * SidebarLink — Link điều hướng trong sidebar
- * Dùng NavLink của react-router để tự động thêm class active
- */
 function SidebarLink({ item }) {
   const Icon = item.icon;
 

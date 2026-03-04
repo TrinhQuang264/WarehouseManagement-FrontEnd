@@ -1,16 +1,3 @@
-/**
- * DashboardPage.jsx — Trang tổng quan (Dashboard)
- *
- * Hiển thị:
- * 1. 4 thẻ thống kê (Tổng tồn kho, Sản phẩm sắp hết, Nhập hôm nay, Xuất hôm nay)
- * 2. Biểu đồ cột: Xu hướng Nhập/Xuất 7 ngày
- * 3. Biểu đồ vòng: Phân bổ tồn kho
- * 4. Bảng: Top sản phẩm bán chạy
- *
- * DATA:
- * - Gọi API lấy dữ liệu thật từ backend ASP.NET Core
- * - Nếu API lỗi → sử dụng MOCK DATA (dữ liệu mẫu) để demo
- */
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Package, AlertTriangle, LogIn, LogOut } from 'lucide-react';
@@ -20,9 +7,7 @@ import Loading from '../../components/ui/Loading';
 import dashboardService from '../../services/dashboardService';
 import { formatNumber, formatCurrency } from '../../helpers/formatNumber';
 
-// ============================================
 // MOCK DATA — Dùng khi chưa có backend
-// ============================================
 const MOCK_STATS = {
   totalInventory: 24510,
   lowStockCount: 18,
