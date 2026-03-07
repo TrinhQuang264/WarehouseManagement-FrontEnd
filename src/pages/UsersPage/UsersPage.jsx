@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+
 import {
   Plus,
   Filter,
@@ -123,10 +123,8 @@ export default function UsersPage() {
   if (loading) return <Loading text="Đang tải danh sách người dùng..." />;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+    <div
+      className="space-y-6 animate-fadeInUp"
     >
       {/* ===== HEADER ===== */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -256,7 +254,7 @@ export default function UsersPage() {
           titleColorClass="text-amber-600"
         />
       </div>
-    </motion.div>
+    </div>
   );
 }
 

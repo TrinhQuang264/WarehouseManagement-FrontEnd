@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+
 import { User, Lock, Eye, EyeOff, Box, AlertCircle, Headphones } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import Input from '../../components/ui/Input';
@@ -52,11 +52,8 @@ export default function LoginPage() {
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
 
       {/* ===== Login Card ===== */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md p-6 relative z-10"
+      <div
+        className="w-full max-w-md p-6 relative z-10 animate-fadeInUp"
       >
         <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 sm:p-10">
           {/* Header */}
@@ -154,7 +151,7 @@ export default function LoginPage() {
             </button>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
