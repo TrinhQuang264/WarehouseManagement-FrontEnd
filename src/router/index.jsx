@@ -1,16 +1,3 @@
-/**
- * router/index.jsx — Cấu hình Router tập trung
- *
- * Tách riêng cấu hình routing ra khỏi App.jsx
- * để dễ quản lý khi thêm route mới.
- *
- * CẤU TRÚC:
- *   /login          → LoginPage       (trang công khai)
- *   /               → MainLayout      (cần đăng nhập)
- *     ├── /         → DashboardPage
- *     ├── /users    → UsersPage
- *     └── /*        → Redirect về /
- */
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';

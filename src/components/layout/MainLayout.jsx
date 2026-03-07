@@ -1,18 +1,3 @@
-/**
- * MainLayout.jsx — Layout chính cho các trang sau khi đăng nhập
- *
- * Cấu trúc:
- *  ┌────────────┬──────────────────────────┐
- *  │            │   Header (sticky top)    │
- *  │  Sidebar   ├──────────────────────────┤
- *  │  (fixed)   │   <Outlet /> (content)   │
- *  │            │                          │
- *  └────────────┴──────────────────────────┘
- *
- * - Sidebar cố định bên trái (w-64)
- * - Header dính trên cùng
- * - Nội dung trang hiển thị qua <Outlet /> của react-router
- */
 import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
 import Sidebar from './Sidebar';

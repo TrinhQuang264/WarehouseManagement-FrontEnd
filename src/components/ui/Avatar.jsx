@@ -1,14 +1,3 @@
-/**
- * Avatar.jsx — Component hiển thị ảnh đại diện hoặc chữ viết tắt
- *
- * Props:
- *  - src: string (URL ảnh, nếu có)
- *  - alt: string (alt text cho ảnh)
- *  - name: string (tên người dùng — dùng để tạo chữ viết tắt nếu không có ảnh)
- *  - size: 'sm' | 'md' | 'lg' (kích thước)
- *  - className: string (class bổ sung)
- */
-
 // Map size → className
 const sizeStyles = {
   sm: 'w-8 h-8 text-xs',

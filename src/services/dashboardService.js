@@ -1,21 +1,6 @@
-/**
- * dashboardService.js — Service gọi API cho trang Dashboard
- *
- * Tách riêng logic gọi API ra khỏi component.
- * Component chỉ cần gọi service, không cần biết chi tiết API endpoint.
- *
- * CÁCH DÙNG:
- *   import dashboardService from '../services/dashboardService';
- *   const stats = await dashboardService.getStats();
- */
 import api from '../utils/api';
 
 const dashboardService = {
-  /**
-   * Lấy thống kê tổng quan
-   * GET /api/dashboard/stats
-   * @returns {Promise<{ totalInventory, lowStockCount, todayImport, todayExport }>}
-   */
   async getStats() {
     const response = await api.get('/dashboard/stats');
     return response.data;

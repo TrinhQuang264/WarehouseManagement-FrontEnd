@@ -1,13 +1,3 @@
-/**
- * useAuth.js — Custom hook quản lý xác thực người dùng
- *
- * LUỒNG:
- * 1. AuthProvider bọc toàn bộ app, cung cấp context
- * 2. Khi app khởi động → kiểm tra localStorage
- * 3. Component con gọi useAuth() để lấy { user, login, logout, isAuthenticated }
- *
- * IMPORT: Sử dụng authService từ folder services/ (không phải utils/)
- */
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import authService from '../services/authService';
 

@@ -1,12 +1,3 @@
-/**
- * ProtectedRoute.jsx — Bảo vệ các trang cần đăng nhập
- *
- * LUỒNG:
- * 1. Kiểm tra isAuthenticated từ useAuth()
- * 2. Đang loading → hiện spinner
- * 3. Chưa đăng nhập → redirect về /login
- * 4. Đã đăng nhập → render children
- */
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Loading from '../components/ui/Loading';

@@ -1,12 +1,3 @@
-/**
- * userService.js — Service gọi API cho quản lý người dùng
- *
- * Tách riêng logic gọi API ra khỏi component.
- *
- * CÁCH DÙNG:
- *   import userService from '../services/userService';
- *   const users = await userService.getAll();
- */
 import api from '../utils/api';
 
 const userService = {

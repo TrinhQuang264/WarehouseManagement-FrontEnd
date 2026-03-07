@@ -1,18 +1,5 @@
-/**
- * DashboardPage.jsx — Trang tổng quan (Dashboard)
- *
- * Hiển thị:
- * 1. 4 thẻ thống kê (Tổng tồn kho, Sản phẩm sắp hết, Nhập hôm nay, Xuất hôm nay)
- * 2. Biểu đồ cột: Xu hướng Nhập/Xuất 7 ngày
- * 3. Biểu đồ vòng: Phân bổ tồn kho
- * 4. Bảng: Top sản phẩm bán chạy
- *
- * DATA:
- * - Gọi API lấy dữ liệu thật từ backend ASP.NET Core
- * - Nếu API lỗi → sử dụng MOCK DATA (dữ liệu mẫu) để demo
- */
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+
 import { Package, AlertTriangle, LogIn, LogOut } from 'lucide-react';
 import StatCard from '../../components/ui/StatCard';
 import Badge from '../../components/ui/Badge';
@@ -20,9 +7,7 @@ import Loading from '../../components/ui/Loading';
 import dashboardService from '../../services/dashboardService';
 import { formatNumber, formatCurrency } from '../../helpers/formatNumber';
 
-// ============================================
 // MOCK DATA — Dùng khi chưa có backend
-// ============================================
 const MOCK_STATS = {
   totalInventory: 24510,
   lowStockCount: 18,
@@ -109,10 +94,8 @@ export default function DashboardPage() {
   if (loading) return <Loading text="Đang tải dữ liệu dashboard..." />;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
+    <div
+      className="space-y-8 animate-fadeInUp"
     >
       {/* ===== 1. SUMMARY CARDS ===== */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -305,6 +288,6 @@ export default function DashboardPage() {
           </table>
         </div>
       </section>
-    </motion.div>
+    </div>
   );
 }

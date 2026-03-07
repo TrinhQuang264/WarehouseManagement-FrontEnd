@@ -1,19 +1,5 @@
-/**
- * UsersPage.jsx — Trang quản lý người dùng
- *
- * Hiển thị:
- * 1. Header: Breadcrumb + nút "Thêm người dùng"
- * 2. Thanh tìm kiếm + bộ lọc + xuất Excel
- * 3. Bảng danh sách người dùng
- * 4. Phân trang
- * 5. Thẻ thông tin hệ thống (bảo mật, online, nhật ký)
- *
- * DATA:
- * - Gọi API: GET /api/users
- * - Nếu API lỗi → dùng MOCK DATA
- */
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+
 import {
   Plus,
   Filter,
@@ -137,10 +123,8 @@ export default function UsersPage() {
   if (loading) return <Loading text="Đang tải danh sách người dùng..." />;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+    <div
+      className="space-y-6 animate-fadeInUp"
     >
       {/* ===== HEADER ===== */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -270,7 +254,7 @@ export default function UsersPage() {
           titleColorClass="text-amber-600"
         />
       </div>
-    </motion.div>
+    </div>
   );
 }
 
