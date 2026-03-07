@@ -53,8 +53,7 @@ export default function LoginPage() {
 
       {/* Login Card */}
       <div className="login-card-wrapper">
-        <div className="login-card">
-          {/* Header */}
+        <div className="login-card">          {/* Header */}
           <div className="login-header">
             <div className="login-logo-box">
               <Box size={32} />
