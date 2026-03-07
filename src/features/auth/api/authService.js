@@ -1,4 +1,8 @@
+<<<<<<< HEAD:src/features/auth/api/authService.js
 import api from '../../../lib/axios';
+=======
+import api from '../utils/api';
+>>>>>>> ef55497 (Develop (#2)):src/services/authService.js
 
 const authService = {
   async login(username, password) {
