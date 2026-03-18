@@ -16,11 +16,11 @@ const variantStyles = {
   primary:
     'bg-primary hover:bg-primary-dark text-white shadow-sm shadow-primary/20',
   secondary:
-    'border border-slate-200 text-slate-600 hover:bg-slate-50',
+    'border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800',
   danger:
     'bg-accent-red hover:bg-red-600 text-white',
   ghost:
-    'text-slate-600 hover:bg-slate-100',
+    'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
 };
 
 // Map size → className

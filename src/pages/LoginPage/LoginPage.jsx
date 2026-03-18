@@ -10,8 +10,8 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('admin');
+  const [password, setPassword] = useState('123456');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-light flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center relative overflow-hidden">
       {/* ===== Decorative Background ===== */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div
@@ -55,13 +55,13 @@ export default function LoginPage() {
       <div
         className="w-full max-w-md p-6 relative z-10 animate-fadeInUp"
       >
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 sm:p-10">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-8 sm:p-10">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-light text-primary mb-4">
               <Box size={32} />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
               Đăng nhập hệ thống
             </h1>
             <p className="text-slate-500 text-sm">
@@ -139,7 +139,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-slate-500">Hoặc</span>
+              <span className="px-2 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400">Hoặc</span>
             </div>
           </div>
 

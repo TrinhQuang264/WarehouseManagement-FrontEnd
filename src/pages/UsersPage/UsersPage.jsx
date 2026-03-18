@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import {
   Plus,
@@ -107,18 +107,20 @@ export default function UsersPage() {
   }, []);
 
   // Lọc user theo search (Thêm bảo vệ tránh crash khi trường dữ liệu bị null)
-  const filteredUsers = users.filter((u) => {
-    const searchLower = search.toLowerCase();
-    const fullName = (u.fullName || '').toLowerCase();
-    const username = (u.username || '').toLowerCase();
-    const email = (u.email || '').toLowerCase();
-    const phoneNumber = (u.phoneNumber || '').toLowerCase();
+  const filteredUsers = useMemo(() => {
+    return users.filter((u) => {
+      const searchLower = search.toLowerCase();
+      const fullName = (u.fullName || '').toLowerCase();
+      const username = (u.username || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const phoneNumber = (u.phoneNumber || '').toLowerCase();
 
-    return fullName.includes(searchLower) || 
-           username.includes(searchLower) || 
-           email.includes(searchLower) ||
-           phoneNumber.includes(searchLower);
-  });
+      return fullName.includes(searchLower) || 
+             username.includes(searchLower) || 
+             email.includes(searchLower) ||
+             phoneNumber.includes(searchLower);
+    });
+  }, [users, search]);
 
   if (loading) return <Loading text="Đang tải danh sách người dùng..." />;
 
@@ -133,9 +135,9 @@ export default function UsersPage() {
           <nav className="flex text-sm text-slate-500 mb-2">
             <a href="#" className="hover:text-primary">Trang chủ</a>
             <span className="mx-2">/</span>
-            <span className="text-slate-900 font-medium">Người dùng</span>
+            <span className="text-slate-900 dark:text-white font-medium">Người dùng</span>
           </nav>
-          <h1 className="text-3xl font-bold text-slate-900">Quản lý Người dùng</h1>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Quản lý Người dùng</h1>
         </div>
         <Button icon={<Plus size={18} />}>
           Thêm người dùng
@@ -143,7 +145,7 @@ export default function UsersPage() {
       </div>
 
       {/* ===== SEARCH & FILTER BAR ===== */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <SearchBar
             value={search}
@@ -163,11 +165,11 @@ export default function UsersPage() {
       </div>
 
       {/* ===== USER TABLE ===== */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
+              <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Người dùng</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tên đăng nhập</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Số điện thoại</th>
@@ -185,18 +187,18 @@ export default function UsersPage() {
         </div>
 
         {/* ===== PAGINATION ===== */}
-        <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="px-6 py-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-sm text-slate-500">
             Hiển thị{' '}
-            <span className="font-medium text-slate-900">1 - {filteredUsers.length}</span>{' '}
+            <span className="font-medium text-slate-900 dark:text-white">1 - {filteredUsers.length}</span>{' '}
             trong tổng số{' '}
-            <span className="font-medium text-slate-900">{totalUsers}</span> người dùng
+            <span className="font-medium text-slate-900 dark:text-white">{totalUsers}</span> người dùng
           </span>
           <div className="flex items-center gap-2">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 hover:bg-white disabled:opacity-50 transition-all"
+              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-50 transition-all"
             >
               <ChevronLeft size={16} />
             </button>
@@ -207,7 +209,7 @@ export default function UsersPage() {
                 className={`px-3.5 py-1.5 rounded-lg font-medium text-sm transition-all ${
                   currentPage === page
                     ? 'bg-primary text-white shadow-sm'
-                    : 'text-slate-600 hover:bg-slate-100'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 {page}
@@ -216,13 +218,13 @@ export default function UsersPage() {
             <span className="text-slate-400 mx-1">...</span>
             <button
               onClick={() => setCurrentPage(6)}
-              className="px-3.5 py-1.5 rounded-lg text-slate-600 font-medium text-sm hover:bg-slate-100 transition-all"
+              className="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 font-medium text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             >
               6
             </button>
             <button
               onClick={() => setCurrentPage((p) => p + 1)}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-white transition-all"
+              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-all"
             >
               <ChevronRight size={16} />
             </button>
@@ -267,25 +269,25 @@ export default function UsersPage() {
  */
 function UserRow({ user }) {
   return (
-    <tr className="hover:bg-slate-50/50 transition-colors">
+    <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
       {/* Người dùng */}
       <td className="px-6 py-4">
         <div className="flex items-center gap-3">
           <Avatar name={user.fullName} size="sm" />
           <div>
-            <p className="text-sm font-medium text-slate-900">{user.fullName}</p>
-            <p className="text-xs text-slate-500">{user.email}</p>
+            <p className="text-sm font-medium text-slate-900 dark:text-white">{user.fullName}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
           </div>
         </div>
       </td>
 
       {/* Tên đăng nhập */}
-      <td className="px-6 py-4 text-sm font-medium text-slate-600">
+      <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">
         {user.username}
       </td>
 
       {/* Số điện thoại */}
-      <td className="px-6 py-4 text-sm text-slate-600">
+      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
         {user.phoneNumber || '—'}
       </td>
 
@@ -353,7 +355,7 @@ function InfoCard({ icon, title, description, colorClass, titleColorClass }) {
       {icon}
       <div>
         <h4 className={`text-sm font-semibold ${titleColorClass}`}>{title}</h4>
-        <p className="text-xs text-slate-600 mt-1">{description}</p>
+        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{description}</p>
       </div>
     </div>
   );

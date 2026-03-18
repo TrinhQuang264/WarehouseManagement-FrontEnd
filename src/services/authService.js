@@ -3,6 +3,17 @@ import api from '../utils/api';
 const authService = {
   async login(username, password) {
     console.log('[authService] Bắt đầu gọi API login cho user:', username);
+
+    // FIX CỨNG: Nếu là admin/123456 thì cho đăng nhập ngay bằng mock data
+    if (username === 'admin' && password === '123456') {
+      console.log('[authService] Bypass login bằng tài khoản admin mock.');
+      const token = 'mock_admin_token_do_not_use_in_prod';
+      const user = { username: 'admin', fullName: 'Nguyễn Văn An', role: 'Quản lý kho', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBw2aqesUY60aEk721ehQYmqYVqVDEJjW3hjZPjorwqulh-dGnDlhyx4Pe5XuIpr4W-QkQ0G6cTTQTWv-78XEm99L_vcr2TSVUxgxSV1DycA-EsSEtmCkQFN3sjtUZ2SAkWM-dTRxr--CnS1KlI3ZWtn1M5SNxtXhL-EwpNiyF_N18ChDS6OLbnzysGtPinpUhT0ony22hA3A3lDb6ZAmPZ6u1XREyG8tHCrUxY-xxbAaNaSzA_T7KsUVs33raV5BVc8UuTibvNmXU' };
+      localStorage.setItem('accessToken', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return { token, user };
+    }
+
     try {
       const response = await api.post('/Authentication/Login', { userName: username, password });
       console.log('[authService] API login thành công. Toàn bộ response.data:', response.data);
