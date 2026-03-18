@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Thiết lập Dark Mode dạng class cho Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================
    CUSTOM THEME — Tailwind CSS v4 @theme block
    Định nghĩa các biến thiết kế dùng chung
@@ -34,8 +37,12 @@
 /* ============================================
    BASE STYLES
    ============================================ */
+html {
+  font-size: 12.8px; /* Giảm root size thêm ~10% nữa để thu nhỏ giao diện toàn bộ UI (khoảng 80% so với 16px) */
+}
+
 body {
-  @apply bg-bg-light text-slate-900 antialiased;
+  @apply bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-slate-200 antialiased;
   font-family: var(--font-sans);
 }
 

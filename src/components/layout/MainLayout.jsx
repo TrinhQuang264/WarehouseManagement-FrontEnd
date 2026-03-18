@@ -14,7 +14,7 @@ export default function MainLayout() {
       <Sidebar user={user} onLogout={logout} />
 
       {/* ===== Khu vực chính (Header + Content) ===== */}
-      <main className="flex-1 overflow-y-auto bg-bg-light custom-scrollbar">
+      <main className="flex-1 overflow-y-auto bg-bg-light dark:bg-bg-dark custom-scrollbar">
         {/* Header dính trên */}
         <Header
           searchValue={searchValue}

@@ -18,7 +18,7 @@ export default function StatCard({
   subtitle,
 }) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
       {/* Hàng trên: icon + trend */}
       <div className="flex items-center justify-between mb-4">
         <div className={`p-2 rounded-lg ${iconBgClass}`}>
@@ -31,7 +31,7 @@ export default function StatCard({
       <p className="text-slate-500 text-sm font-medium">{title}</p>
 
       {/* Giá trị lớn */}
-      <h3 className="text-2xl font-bold mt-1 text-slate-900">{value}</h3>
+      <h3 className="text-2xl font-bold mt-1 text-slate-900 dark:text-white">{value}</h3>
 
       {/* Mô tả phụ */}
       {subtitle && (
