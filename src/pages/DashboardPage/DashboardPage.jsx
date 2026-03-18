@@ -128,7 +128,9 @@ export default function DashboardPage() {
   if (loading) return <Loading text="Đang tải dữ liệu dashboard..." />;
 
   return (
-    <div className="space-y-8 animate-fadeInUp">
+    <div
+      className="space-y-8 animate-fadeInUp"
+    >
       {/* ===== 1. SUMMARY CARDS ===== */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard

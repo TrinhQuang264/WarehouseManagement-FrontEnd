@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import AppRouter from './router';
 import { ThemeProvider } from './contexts/ThemeContext';
 
