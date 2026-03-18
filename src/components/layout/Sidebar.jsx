@@ -111,4 +111,3 @@ function SidebarLink({ item }) {
       {item.label}
     </NavLink>
   );
-}
