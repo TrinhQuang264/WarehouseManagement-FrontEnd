@@ -1,0 +1,42 @@
+/* Categories Page Styles */
+.categories-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.category-table-wrapper {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .category-table-wrapper {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+.category-table-wrapper:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.category-icon-box {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background-color: rgba(19, 127, 236, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  transition: all 0.3s;
+}
+
+.group:hover .category-icon-box {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}

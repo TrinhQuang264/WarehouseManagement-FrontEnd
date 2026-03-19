@@ -1,14 +1,5 @@
-/**
- * StatCard.jsx — Component thẻ thống kê trên Dashboard
- *
- * Props:
- *  - title: string (tên chỉ số, VD: "Tổng tồn kho")
- *  - value: string | number (giá trị hiển thị)
- *  - icon: ReactNode (icon minh họa)
- *  - iconBgClass: string (class cho nền icon, VD: "bg-primary/10")
- *  - trend: ReactNode | string (phần xu hướng bên phải, VD: badge "+12%")
- *  - subtitle: string (mô tả phụ bên dưới)
- */
+// StatCard.jsx — Component thẻ thống kê trên Dashboard
+// Params: title, value, icon, iconBgClass, trend, subtitle
 export default function StatCard({
   title,
   value,

@@ -1,28 +1,28 @@
 import { Outlet } from 'react-router-dom';
-import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
+import ToastContainer from '../ui/ToastContainer';
+import '../../styles/global.css';
 
 export default function MainLayout() {
   const { user, logout } = useAuth();
-  const [searchValue, setSearchValue] = useState('');
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* ===== Sidebar bên trái ===== */}
+    <div className="layout-wrapper">
+      // Toast Notifications
+      <ToastContainer />
+
+      // Sidebar bên trái
       <Sidebar user={user} onLogout={logout} />
 
-      {/* ===== Khu vực chính (Header + Content) ===== */}
-      <main className="flex-1 overflow-y-auto bg-bg-light dark:bg-bg-dark custom-scrollbar">
-        {/* Header dính trên */}
-        <Header
-          searchValue={searchValue}
-          onSearchChange={setSearchValue}
-        />
+      // Khu vực chính (Header + Content)
+      <main className="main-content">
+        // Header dính trên
+        <Header />
 
-        {/* Nội dung trang — được render bởi react-router */}
-        <div className="p-8">
+        // Nội dung trang — được render bởi react-router
+        <div className="page-container">
           <Outlet />
         </div>
       </main>

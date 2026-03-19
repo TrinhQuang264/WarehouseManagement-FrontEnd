@@ -1,14 +1,5 @@
-/**
- * Button.jsx — Component nút bấm tái sử dụng
- *
- * Props:
- *  - variant: 'primary' | 'secondary' | 'danger' | 'ghost' (kiểu hiển thị)
- *  - size: 'sm' | 'md' | 'lg' (kích thước)
- *  - loading: boolean (hiển thị spinner khi đang xử lý)
- *  - icon: ReactNode (icon bên trái)
- *  - children: nội dung nút
- *  - ...rest: các props HTML button khác (onClick, disabled, type, v.v.)
- */
+// Button.jsx — Component nút bấm tái sử dụng
+// Params: variant, size, loading, icon, children, rest
 import { Loader2 } from 'lucide-react';
 
 // Map variant → className

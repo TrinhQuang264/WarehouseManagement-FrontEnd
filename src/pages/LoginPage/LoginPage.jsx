@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { User, Lock, Eye, EyeOff, Box, AlertCircle, Headphones } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
+import '../../styles/Login.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -37,9 +37,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center relative overflow-hidden">
-      {/* ===== Decorative Background ===== */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
+    <div className="login-container">
+      // Decorative Background
+      <div className="login-bg-dots">
         <div
           className="absolute top-0 left-0 w-full h-full"
           style={{
@@ -48,30 +48,28 @@ export default function LoginPage() {
           }}
         />
       </div>
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+      <div className="login-bg-blur-1" />
+      <div className="login-bg-blur-2" />
 
-      {/* ===== Login Card ===== */}
-      <div
-        className="w-full max-w-md p-6 relative z-10 animate-fadeInUp"
-      >
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-8 sm:p-10">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-light text-primary mb-4">
+      // Login Card
+      <div className="login-card-wrapper">
+        <div className="login-card">
+          // Header
+          <div className="login-header">
+            <div className="login-logo-box">
               <Box size={32} />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+            <h1 className="login-title">
               Đăng nhập hệ thống
             </h1>
-            <p className="text-slate-500 text-sm">
+            <p className="login-subtitle">
               Quản lý kho linh kiện điện thoại
             </p>
           </div>
 
-          {/* Form */}
+          // Form
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Tên đăng nhập */}
+            // Tên đăng nhập
             <Input
               label="Tên đăng nhập"
               type="text"
@@ -81,7 +79,7 @@ export default function LoginPage() {
               required
             />
 
-            {/* Mật khẩu */}
+            // Mật khẩu
             <Input
               label="Mật khẩu"
               type={showPassword ? 'text' : 'password'}
@@ -101,15 +99,15 @@ export default function LoginPage() {
               }
             />
 
-            {/* Thông báo lỗi */}
+            // Thông báo lỗi
             {error && (
-              <div className="flex items-center gap-2 text-accent-red text-sm bg-red-50 p-3 rounded-lg">
+              <div className="login-error-box">
                 <AlertCircle size={16} />
                 <span>{error}</span>
               </div>
             )}
 
-            {/* Ghi nhớ mật khẩu */}
+            // Ghi nhớ mật khẩu
             <div className="flex items-center justify-between">
               <label className="flex items-center cursor-pointer">
                 <input
@@ -122,7 +120,7 @@ export default function LoginPage() {
               </label>
             </div>
 
-            {/* Nút đăng nhập */}
+            // Nút đăng nhập
             <Button
               type="submit"
               loading={loading}
@@ -133,19 +131,19 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Divider */}
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
+          // Divider
+          <div className="login-divider">
+            <div className="login-divider-line">
               <div className="w-full border-t border-slate-200" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400">Hoặc</span>
+            <div className="login-divider-text-wrapper">
+              <span className="login-divider-text">Hoặc</span>
             </div>
           </div>
 
-          {/* Liên hệ hỗ trợ */}
+          // Liên hệ hỗ trợ
           <div className="text-center">
-            <button className="inline-flex items-center text-sm text-slate-500 hover:text-primary transition-colors">
+            <button className="login-support-btn">
               <Headphones size={18} className="mr-2" />
               Liên hệ hỗ trợ kỹ thuật
             </button>

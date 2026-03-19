@@ -2,9 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
-/**
- * Modal - Thành phần cửa sổ bật lên dùng chung
- */
+// Modal - Thành phần cửa sổ bật lên dùng chung
 export default function Modal({ 
   isOpen, 
   onClose, 
