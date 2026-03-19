@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
   Smartphone,
@@ -37,7 +37,7 @@ const systemMenu = [
 export default function Sidebar({ user, onLogout }) {
   return (
     <aside className="sidebar">
-      // Logo
+      {/* Logo */}
       <div className="sidebar-logo-container">
         <div className="sidebar-logo-icon">
           <span className="material-icons">inventory_2</span>
@@ -47,25 +47,25 @@ export default function Sidebar({ user, onLogout }) {
         </span>
       </div>
 
-      // Navigation
+      {/* Navigation */}
       <nav className="sidebar-nav">
-        // Menu chính
+        {/* Menu chính */}
         {mainMenu.map((item) => (
           <SidebarLink key={item.to} item={item} />
         ))}
 
-        // Phân cách hệ thống
+        {/* Phân cách hệ thống */}
         <div className="sidebar-section-title">
           Hệ thống
         </div>
 
-        // Menu hệ thống
+        {/* Menu hệ thống */}
         {systemMenu.map((item) => (
           <SidebarLink key={item.to} item={item} />
         ))}
       </nav>
 
-      // User Info
+      {/* User Info */}
       <div className="sidebar-user">
         <div className="flex items-center gap-3 px-2 py-2">
           <Link to="/profile" className="flex items-center gap-3 flex-1 overflow-hidden group cursor-pointer">
