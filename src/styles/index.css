@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./global.css";
 
 /* Thiết lập Dark Mode dạng class cho Tailwind v4 */
 @custom-variant dark (&:where(.dark, .dark *));

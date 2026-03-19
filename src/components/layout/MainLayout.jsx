@@ -1,27 +1,26 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { useAuth } from '../../hooks/useAuth.jsx';
+import { useAuth } from '../../features/auth/hooks/useAuth.jsx';
 import ToastContainer from '../ui/ToastContainer';
-import '../../styles/global.css';
 
 export default function MainLayout() {
   const { user, logout } = useAuth();
 
   return (
     <div className="layout-wrapper">
-      // Toast Notifications
+      {/* Toast Notifications */}
       <ToastContainer />
 
-      // Sidebar bên trái
+      {/* Sidebar bên trái */}
       <Sidebar user={user} onLogout={logout} />
 
-      // Khu vực chính (Header + Content)
+      {/* Khu vực chính (Header + Content) */}
       <main className="main-content">
-        // Header dính trên
+        {/* Header dính trên */}
         <Header />
 
-        // Nội dung trang — được render bởi react-router
+        {/* Nội dung trang — được render bởi react-router */}
         <div className="page-container">
           <Outlet />
         </div>

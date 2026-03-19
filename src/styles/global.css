@@ -1,4 +1,3 @@
-@import "index.css";
 
 /* Shared Layout Classes */
 .layout-wrapper {
@@ -278,7 +277,7 @@
 
 .table {
   width: 100%;
-  text-left;
+  text-align: left;
   border-collapse: collapse;
 }
 
