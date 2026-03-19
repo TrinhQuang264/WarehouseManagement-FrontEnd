@@ -41,6 +41,40 @@ const CustomPieTooltip = ({ active, payload }) => {
   return null;
 };
 
+// Custom Tooltip components for Recharts
+const CustomBarTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 text-sm">
+        <p className="font-bold text-slate-800 dark:text-slate-100 mb-2">{label}</p>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+            <span className="text-slate-600 dark:text-slate-300">Nhập: <span className="font-semibold text-slate-900 dark:text-white">{payload[1].value}</span></span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-600" />
+            <span className="text-slate-600 dark:text-slate-300">Xuất: <span className="font-semibold text-slate-900 dark:text-white">{payload[0].value}</span></span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomPieTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 text-sm font-medium">
+        <span className="text-slate-600 dark:text-slate-300">{payload[0].name}: </span>
+        <span className="text-slate-900 dark:text-white">{payload[0].value}%</span>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function DashboardPage() {
   const {
     stats,
