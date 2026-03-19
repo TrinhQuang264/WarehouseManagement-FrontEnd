@@ -42,8 +42,16 @@ html {
 }
 
 body {
-  @apply bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-slate-200 antialiased;
+  background-color: var(--color-bg-light);
+  color: #0f172a; /* slate-900 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-family: var(--font-sans);
+}
+
+.dark body {
+  background-color: var(--color-bg-dark);
+  color: #e2e8f0; /* slate-200 */
 }
 
 /* ============================================
@@ -59,11 +67,12 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full;
+  background-color: #cbd5e1; /* slate-300 */
+  border-radius: 9999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400;
+  background-color: #94a3b8; /* slate-400 */
 }
 
 /* ============================================

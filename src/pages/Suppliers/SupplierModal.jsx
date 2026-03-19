@@ -4,9 +4,6 @@ import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
-/**
- * SupplierModal - Modal dùng chung cho Thêm và Sửa nhà cung cấp
- */
 export default function SupplierModal({
   isOpen,
   onClose,

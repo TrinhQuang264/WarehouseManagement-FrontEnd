@@ -15,10 +15,8 @@ const bgColors = [
   'bg-rose-100 text-rose-600',
 ];
 
-/**
- * Lấy chữ viết tắt từ tên
- * VD: "Nguyễn Văn An" → "NA"
- */
+// Lấy chữ viết tắt từ tên
+// VD: "Nguyễn Văn An" → "NA"
 function getInitials(name) {
   if (!name) return '?';
   const words = name.trim().split(' ');
@@ -26,9 +24,7 @@ function getInitials(name) {
   return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
 }
 
-/**
- * Chọn màu nền dựa trên tên (luôn cố định cho cùng 1 tên)
- */
+// Chọn màu nền dựa trên tên (luôn cố định cho cùng 1 tên)
 function getColorFromName(name) {
   if (!name) return bgColors[0];
   let hash = 0;

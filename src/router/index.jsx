@@ -5,14 +5,14 @@ import Loading from '../components/ui/Loading';
 
 // Lazy load components for code splitting and faster initial load
 const MainLayout = lazy(() => import('../components/layout/MainLayout'));
-const LoginPage = lazy(() => import('../pages/LoginPage'));
-const DashboardPage = lazy(() => import('../pages/DashboardPage'));
-const UsersPage = lazy(() => import('../pages/UsersPage'));
+const LoginPage = lazy(() => import('../pages/LoginPage/LoginPage'));
+const DashboardPage = lazy(() => import('../pages/DashboardPage/DashboardPage'));
+const UsersPage = lazy(() => import('../pages/UsersPage/UsersPage'));
 const ProductsPage = lazy(() => import('../pages/ProductsPage/ProductsPage'));
 const CategoriesPage = lazy(() => import('../pages/CategoriesPage/CategoriesPage'));
-const InventoryPage = lazy(() => import('../pages/InventoryPage'));
-const SuppliersPage = lazy(() => import('../pages/Suppliers'));
-const CustomersPage = lazy(() => import('../pages/Customers'));
+const InventoryPage = lazy(() => import('../pages/InventoryPage/InventoryPage'));
+const SuppliersPage = lazy(() => import('../pages/Suppliers/SuppliersPage'));
+const CustomersPage = lazy(() => import('../pages/Customers/CustomersPage'));
 const ProfilePage = lazy(() => import('../pages/ProfilePage'));
 const SettingsPage = lazy(() => import('../pages/SettingsPage'));
 

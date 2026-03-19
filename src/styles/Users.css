@@ -1,0 +1,45 @@
+/* Users Page Styles */
+.users-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.users-table-wrapper {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.dark .users-table-wrapper {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+.users-info-cards {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .users-info-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.info-card {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.dark .info-card {
+  border-color: #1e293b;
+}

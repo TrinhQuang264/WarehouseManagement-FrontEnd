@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import {
   Plus,
@@ -18,135 +18,44 @@ import SearchBar from '../../components/ui/SearchBar';
 import Badge from '../../components/ui/Badge';
 import Avatar from '../../components/ui/Avatar';
 import Loading from '../../components/ui/Loading';
-import userService from '../../services/userService';
-
-// ============================================
-// MOCK DATA — Dùng khi chưa có backend
-// ============================================
-const MOCK_USERS = [
-  {
-    id: 1,
-    fullName: 'Nguyễn Văn Khải',
-    email: 'khai.nv@msparts.vn',
-    username: 'admin_kho',
-    role: 'admin',
-    roleLabel: 'Quản trị viên',
-    isActive: true,
-  },
-  {
-    id: 2,
-    fullName: 'Lê Minh Tú',
-    email: 'tu.lm@msparts.vn',
-    username: 'nv_kho_01',
-    role: 'staff',
-    roleLabel: 'Nhân viên',
-    isActive: true,
-  },
-  {
-    id: 3,
-    fullName: 'Phạm Thu Hà',
-    email: 'ha.pt@msparts.vn',
-    username: 'nv_banhang_02',
-    role: 'staff',
-    roleLabel: 'Nhân viên',
-    isActive: false,
-  },
-  {
-    id: 4,
-    fullName: 'Trần Đức Duy',
-    email: 'duy.td@msparts.vn',
-    username: 'duy_warehouse',
-    role: 'staff',
-    roleLabel: 'Nhân viên',
-    isActive: true,
-  },
-];
+import { useUsers } from '../../hooks/useUsers.jsx';
+import '../../styles/Users.css';
 
 export default function UsersPage() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalUsers = 24; // Giả lập tổng số user
-
-  /**
-   * Gọi API lấy danh sách user
-   */
-  useEffect(() => {
-    const fetchUsers = async () => {
-      console.log('[UsersPage] Bắt đầu lấy danh sách người dùng...');
-      try {
-        const data = await userService.getAll();
-        console.log('[UsersPage] Dữ liệu nhận được từ userService:', data);
-        
-        let userList = Array.isArray(data) ? data : (data.data || data.items || []);
-        
-        // Map dữ liệu từ API: { id, email, phoneNumber, firstName, lastName, userName }
-        const mappedUsers = userList.map(u => ({
-          id: u.id,
-          fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'N/A',
-          username: u.userName || 'N/A',
-          email: u.email || '',
-          phoneNumber: u.phoneNumber || '',
-          role: u.role || 'staff',
-          roleLabel: u.roleLabel || (u.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'),
-          isActive: u.isActive !== undefined ? u.isActive : true
-        }));
-
-        console.log('[UsersPage] Danh sách user sau khi map:', mappedUsers);
-        setUsers(mappedUsers);
-      } catch (error) {
-        console.error('[UsersPage] Lỗi khi lấy danh sách user:', error);
-        console.info('👤 Sử dụng mock data cho Users (API lỗi hoặc chưa kết nối)');
-        setUsers(MOCK_USERS);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
-  }, []);
-
-  // Lọc user theo search (Thêm bảo vệ tránh crash khi trường dữ liệu bị null)
-  const filteredUsers = useMemo(() => {
-    return users.filter((u) => {
-      const searchLower = search.toLowerCase();
-      const fullName = (u.fullName || '').toLowerCase();
-      const username = (u.username || '').toLowerCase();
-      const email = (u.email || '').toLowerCase();
-      const phoneNumber = (u.phoneNumber || '').toLowerCase();
-
-      return fullName.includes(searchLower) || 
-             username.includes(searchLower) || 
-             email.includes(searchLower) ||
-             phoneNumber.includes(searchLower);
-    });
-  }, [users, search]);
+  const {
+    users,
+    loading,
+    search,
+    setSearch,
+    currentPage,
+    setCurrentPage,
+    totalUsers
+  } = useUsers();
 
   if (loading) return <Loading text="Đang tải danh sách người dùng..." />;
 
   return (
-    <div
-      className="space-y-6 animate-fadeInUp"
-    >
-      {/* ===== HEADER ===== */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="users-page">
+      // HEADER
+      <div className="page-header">
         <div>
-          {/* Breadcrumb */}
+          // Breadcrumb
           <nav className="flex text-sm text-slate-500 mb-2">
-            <a href="#" className="hover:text-primary">Trang chủ</a>
-            <span className="mx-2">/</span>
+            <a href="/" className="hover:text-primary transition-colors">Trang chủ</a>
+            <span className="mx-2 text-slate-300">/</span>
             <span className="text-slate-900 dark:text-white font-medium">Người dùng</span>
           </nav>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Quản lý Người dùng</h1>
+          <h1 className="page-title">Quản lý Người dùng</h1>
+          <p className="page-subtitle">Quản lý tài khoản, phân quyền và trạng thái hoạt động của nhân viên.</p>
         </div>
         <Button icon={<Plus size={18} />}>
           Thêm người dùng
         </Button>
       </div>
 
-      {/* ===== SEARCH & FILTER BAR ===== */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      // SEARCH & FILTER BAR
+      <div className="search-filter-bar">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
           <SearchBar
             value={search}
             onChange={setSearch}
@@ -164,41 +73,38 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* ===== USER TABLE ===== */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+      // USER TABLE
+      <div className="users-table-wrapper">
+        <div className="table-wrapper">
+          <table className="table">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Người dùng</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tên đăng nhập</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Số điện thoại</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Vai trò</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Trạng thái</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Thao tác</th>
+                <th className="table-th px-6">Người dùng</th>
+                <th className="table-th px-6">Tên đăng nhập</th>
+                <th className="table-th px-6">Số điện thoại</th>
+                <th className="table-th px-6">Vai trò</th>
+                <th className="table-th px-6">Trạng thái</th>
+                <th className="table-th px-6 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredUsers.map((user) => (
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+              {users.map((user) => (
                 <UserRow key={user.id} user={user} />
               ))}
             </tbody>
           </table>
         </div>
 
-        {/* ===== PAGINATION ===== */}
-        <div className="px-6 py-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-center justify-between gap-4">
-          <span className="text-sm text-slate-500">
-            Hiển thị{' '}
-            <span className="font-medium text-slate-900 dark:text-white">1 - {filteredUsers.length}</span>{' '}
-            trong tổng số{' '}
-            <span className="font-medium text-slate-900 dark:text-white">{totalUsers}</span> người dùng
+        // PAGINATION
+        <div className="pagination-container">
+          <span className="pagination-info">
+            Hiển thị <span className="font-medium text-slate-900 dark:text-white">1 - {users.length}</span> trong tổng số <span className="font-medium text-slate-900 dark:text-white">{totalUsers}</span> người dùng
           </span>
-          <div className="flex items-center gap-2">
+          <div className="pagination-controls">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-50 transition-all"
+              className="pagination-btn"
             >
               <ChevronLeft size={16} />
             </button>
@@ -206,11 +112,7 @@ export default function UsersPage() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`px-3.5 py-1.5 rounded-lg font-medium text-sm transition-all ${
-                  currentPage === page
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
+                className={`pagination-page-btn ${currentPage === page ? 'pagination-page-btn-active' : ''}`}
               >
                 {page}
               </button>
@@ -218,13 +120,13 @@ export default function UsersPage() {
             <span className="text-slate-400 mx-1">...</span>
             <button
               onClick={() => setCurrentPage(6)}
-              className="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 font-medium text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+              className="pagination-page-btn"
             >
               6
             </button>
             <button
               onClick={() => setCurrentPage((p) => p + 1)}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-all"
+              className="pagination-btn"
             >
               <ChevronRight size={16} />
             </button>
@@ -232,8 +134,8 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* ===== SYSTEM INFO CARDS ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      // SYSTEM INFO CARDS
+      <div className="users-info-cards">
         <InfoCard
           icon={<Shield size={20} className="text-primary" />}
           title="Bảo mật hệ thống"
@@ -269,8 +171,8 @@ export default function UsersPage() {
  */
 function UserRow({ user }) {
   return (
-    <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
-      {/* Người dùng */}
+    <tr className="table-row-hover">
+      // Người dùng
       <td className="px-6 py-4">
         <div className="flex items-center gap-3">
           <Avatar name={user.fullName} size="sm" />
@@ -281,24 +183,24 @@ function UserRow({ user }) {
         </div>
       </td>
 
-      {/* Tên đăng nhập */}
+      // Tên đăng nhập
       <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">
         {user.username}
       </td>
 
-      {/* Số điện thoại */}
+      // Số điện thoại
       <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
         {user.phoneNumber || '—'}
       </td>
 
-      {/* Vai trò */}
+      // Vai trò
       <td className="px-6 py-4">
         <Badge variant={user.role === 'admin' ? 'blue' : 'gray'}>
           {user.roleLabel}
         </Badge>
       </td>
 
-      {/* Trạng thái */}
+      // Trạng thái
       <td className="px-6 py-4">
         <div className="flex items-center gap-2">
           <span
@@ -316,25 +218,25 @@ function UserRow({ user }) {
         </div>
       </td>
 
-      {/* Thao tác */}
+      // Thao tác
       <td className="px-6 py-4 text-right">
-        <div className="flex justify-end gap-2">
+        <div className="action-buttons-group justify-end">
           <button
-            className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+            className="action-btn text-slate-400 hover:text-primary"
             title="Chỉnh sửa"
           >
             <Edit size={18} />
           </button>
           {user.isActive ? (
             <button
-              className="p-1.5 text-slate-400 hover:text-accent-red hover:bg-red-50 rounded-lg transition-all"
+              className="action-btn text-slate-400 hover:text-accent-red hover:bg-red-50"
               title="Vô hiệu hóa"
             >
               <Ban size={18} />
             </button>
           ) : (
             <button
-              className="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-all"
+              className="action-btn text-primary hover:bg-primary/10"
               title="Kích hoạt"
             >
               <CheckCircle size={18} />
@@ -351,7 +253,7 @@ function UserRow({ user }) {
  */
 function InfoCard({ icon, title, description, colorClass, titleColorClass }) {
   return (
-    <div className={`p-4 border rounded-xl flex items-start gap-3 ${colorClass}`}>
+    <div className={`info-card ${colorClass}`}>
       {icon}
       <div>
         <h4 className={`text-sm font-semibold ${titleColorClass}`}>{title}</h4>

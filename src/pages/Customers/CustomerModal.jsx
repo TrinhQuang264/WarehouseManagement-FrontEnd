@@ -4,9 +4,6 @@ import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
-/**
- * CustomerModal - Modal dùng chung cho Thêm và Sửa khách hàng
- */
 export default function CustomerModal({
   isOpen,
   onClose,
@@ -23,6 +20,7 @@ export default function CustomerModal({
   });
   const [errors, setErrors] = useState({});
 
+  // Reset form khi mở modal hoặc thay đổi khách hàng đang sửa
   useEffect(() => {
     if (editingCustomer) {
       setFormData({

@@ -1,29 +1,23 @@
 import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 
-/**
- * SupplierTable - Thành phần hiển thị danh sách nhà cung cấp
- * @param {Array} suppliers - Danh sách nhà cung cấp
- * @param {function} onEdit - Hàm khi click sửa
- * @param {function} onDelete - Hàm khi click xóa
- */
 export default function SupplierTable({ suppliers, onEdit, onDelete }) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-all hover:shadow-md">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+    <div className="supplier-table-card">
+      <div className="table-wrapper">
+        <table className="table">
           <thead>
             <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.1em]">Tên Nhà Cung Cấp</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.1em]">Mã NCC</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.1em]">Số Điện Thoại</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.1em]">Địa Chỉ</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.1em] text-center">Thao Tác</th>
+              <th className="table-th px-6">Tên Nhà Cung Cấp</th>
+              <th className="table-th px-6">Mã NCC</th>
+              <th className="table-th px-6">Số Điện Thoại</th>
+              <th className="table-th px-6">Địa Chỉ</th>
+              <th className="table-th px-6 text-center">Thao Tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
             {suppliers.length > 0 ? suppliers.map((supplier) => (
-              <tr key={supplier.id} className="group hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-300">
+              <tr key={supplier.id} className="group table-row-hover">
                 <td className="px-6 py-4">
                   <div>
                     <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
@@ -35,7 +29,7 @@ export default function SupplierTable({ suppliers, onEdit, onDelete }) {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-mono font-bold tracking-wider border border-slate-200 dark:border-slate-700">
+                  <span className="supplier-code-badge">
                     {supplier.code}
                   </span>
                 </td>
@@ -48,16 +42,16 @@ export default function SupplierTable({ suppliers, onEdit, onDelete }) {
                   </p>
                 </td>
                 <td className="px-6 py-4 text-center">
-                  <div className="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <div className="action-buttons-group">
                     <button 
                       onClick={() => onEdit(supplier)}
-                      className="p-2 text-slate-400 hover:text-primary hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Sửa"
+                      className="action-btn text-slate-400 hover:text-primary" title="Sửa"
                     >
                       <Edit size={18} />
                     </button>
                     <button 
                       onClick={() => onDelete(supplier)}
-                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg shadow-sm border border-transparent hover:border-slate-100 dark:hover:border-slate-700 transition-all" title="Xóa"
+                      className="action-btn text-slate-400 hover:text-red-500" title="Xóa"
                     >
                       <Trash2 size={18} />
                     </button>
