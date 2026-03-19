@@ -115,7 +115,7 @@ export default function CategoriesPage() {
           </table>
         </div>
 
-        // PAGINATION
+        {/* PAGINATION */}
         <div className="pagination-container">
           <span className="pagination-info">
             Hiển thị <span className="font-bold text-slate-900 dark:text-white">

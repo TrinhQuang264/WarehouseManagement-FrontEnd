@@ -29,6 +29,18 @@ const CustomBarTooltip = ({ active, payload, label }) => {
   return null;
 };
 
+const CustomPieTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 text-sm font-medium">
+        <span className="text-slate-600 dark:text-slate-300">{payload[0].name}: </span>
+        <span className="text-slate-900 dark:text-white">{payload[0].value}%</span>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function DashboardPage() {
   const {
     stats,

@@ -60,7 +60,7 @@ export default function ProfilePage() {
               </div>
               
               <div className="profile-input-grid">
-                // TODO: Load dữ liệu từ state/form data khi tích hợp API
+                {/* TODO: Load dữ liệu từ state/form data khi tích hợp API */}
                 <div className="profile-input-group">
                   <label className="profile-label">Họ và tên</label>
                   <input 
@@ -100,10 +100,10 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-            // Chỉ hiển thị nút Cập nhật khi ở chế độ Chỉnh sửa
+            {/* Chỉ hiển thị nút Cập nhật khi ở chế độ Chỉnh sửa */}
             {isEditing && (
               <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-                // TODO: Thêm hàm xử lý onClick submit data lên API
+                {/* TODO: Thêm hàm xử lý onClick submit data lên API */}
                 <button 
                   onClick={() => setIsEditing(false)}
                   className="px-6 py-2 bg-primary text-white rounded-lg shadow-sm shadow-primary/20 hover:bg-blue-600 transition-colors font-semibold text-sm"
@@ -115,14 +115,14 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        // Change Password Section
+        {/* Change Password Section */}
         <section className="profile-section">
           <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
             <span className="material-icons text-primary">lock_open</span>
             <h3 className="font-bold text-lg text-slate-900 dark:text-white">Đổi mật khẩu</h3>
           </div>
           <div className="p-8">
-            // TODO: Wrap bằng form onChange handling khi có API
+            {/* TODO: Wrap bằng form onChange handling khi có API */}
             <div className="password-input-grid">
               <div className="profile-input-group">
                 <label className="profile-label">Mật khẩu hiện tại</label>

@@ -70,7 +70,7 @@ export default function SuppliersPage() {
         </div>
       </div>
 
-      // MODAL FORM
+      {/* MODAL FORM */}
       <SupplierModal 
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
@@ -79,7 +79,7 @@ export default function SuppliersPage() {
         nextCode={nextCode}
       />
 
-      // MODAL XÁC NHẬN XÓA
+      {/* MODAL XÁC NHẬN XÓA */}
       <ConfirmModal 
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}

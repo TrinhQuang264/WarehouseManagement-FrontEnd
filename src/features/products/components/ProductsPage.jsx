@@ -93,7 +93,7 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          // Nút lọc mở rộng & Xuất file
+          {/* Nút lọc mở rộng & Xuất file */}
           <div className="flex items-center gap-3 w-full lg:w-auto lg:ml-auto">
             <Button variant="secondary" icon={<Filter size={18} className="text-slate-500" />}>
               Bộ lọc nâng cao
