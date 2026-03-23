@@ -1,12 +1,3 @@
-/**
- * SearchBar.jsx — Component thanh tìm kiếm
- *
- * Props:
- *  - value: string (giá trị hiện tại)
- *  - onChange: function (callback khi nhập)
- *  - placeholder: string (gợi ý trong ô input)
- *  - className: string (class bổ sung)
- */
 import { Search } from 'lucide-react';
 
 export default function SearchBar({

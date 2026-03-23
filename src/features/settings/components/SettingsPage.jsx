@@ -2,37 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { Link, useBlocker } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
 import '../styles/Settings.css';
+import Breadcrumbs from '../../../components/ui/Breadcrumbs';
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
-  
-  // Local state for settings preview
-  const [localTheme, setLocalTheme] = useState(theme);
+  const [localTheme, setLocalTheme] = useState('system');
   const [localLang, setLocalLang] = useState('vi');
-  
-  // To highlight save button
   const [shake, setShake] = useState(false);
 
-  // Check if there are unsaved changes
   const hasChanges = localTheme !== theme || localLang !== 'vi';
 
-  // Navigation Blocker
   let blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       hasChanges && currentLocation.pathname !== nextLocation.pathname
   );
 
   useEffect(() => {
-    if (blocker.state === 'blocked') {
-      setShake(true);
-      setTimeout(() => setShake(false), 1000);
+  if (blocker.state === 'blocked') {
+    setShake(true);
+    setTimeout(() => {
+      setShake(false); // ✅ reset để lần sau vẫn animate được
       blocker.reset();
-    }
-  }, [blocker]);
+    }, 500);
+  }
+  }, [blocker.state]);
 
   const handleSave = () => {
     setTheme(localTheme);
-    // if there was a global lang context, set it here
   };
 
   const handleCancel = () => {
@@ -42,21 +38,8 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page">
-      {/* Breadcrumb */}
-      <nav className="flex text-sm text-slate-500 dark:text-slate-400 mb-2">
-        <ol className="flex items-center space-x-2">
-          <li><Link to="/" className="cursor-pointer hover:text-primary transition-colors">Trang chủ</Link></li>
-          <li><span className="material-icons text-xs">chevron_right</span></li>
-          <li className="font-medium text-slate-900 dark:text-white">Cài đặt</li>
-        </ol>
-      </nav>
-
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Cài đặt hệ thống</h2>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Quản lý các tùy chỉnh giao diện và ngôn ngữ của bạn.</p>
-      </div>
-
       <div className="space-y-6">
+        <Breadcrumbs />
         <div className="settings-section">
           <div className="p-6 border-b border-slate-100 dark:border-slate-800">
             <h3 className="text-lg font-semibold flex items-center gap-2 text-slate-900 dark:text-white">
@@ -161,9 +144,10 @@ export default function SettingsPage() {
             </button>
             <button 
               onClick={handleSave}
-              className={`px-6 py-2.5 rounded-lg text-white text-sm font-semibold shadow-lg transition-all font-bold ${
-                shake ? 'bg-indigo-500 shadow-indigo-500/50 animate-[shake_0.4s_ease-in-out_2]' : 'bg-primary shadow-blue-500/20 hover:bg-blue-600'
-              }`}
+              className={`px-6 py-2.5 rounded-lg text-white text-sm font-semibold shadow-lg transition-all font-bold ${ shake 
+                          ? 'bg-red-500 shadow-indigo-500/50 animate-shake' 
+                          : 'bg-primary shadow-blue-500/20 hover:bg-blue-600'
+                        }`}
             >
                 Lưu thay đổi
             </button>

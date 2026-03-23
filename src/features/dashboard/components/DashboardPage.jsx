@@ -3,11 +3,11 @@ import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 import StatCard from '../../../components/ui/StatCard';
 import Badge from '../../../components/ui/Badge';
 import Loading from '../../../components/ui/Loading';
+import DataTableCard from '../../../components/ui/DataTableCard.jsx';
 import { formatNumber, formatCurrency } from '../../../utils/util';
 import { useDashboard } from '../hooks/useDashboard.jsx';
 import '../styles/Dashboard.css';
 
-// Custom Tooltip components for Recharts
 const CustomBarTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -184,50 +184,52 @@ export default function DashboardPage() {
             Xem tất cả
           </button>
         </div>
-        <div className="table-wrapper">
-          <table className="table">
-            <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/80">
-                <th className="table-th px-6">Sản phẩm</th>
-                <th className="table-th px-6">Mã SKU</th>
-                <th className="table-th px-6">Đã bán</th>
-                <th className="table-th px-6">Tồn kho</th>
-                <th className="table-th px-6">Doanh thu</th>
-                <th className="table-th px-6">Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-              {topProducts.map((product) => (
-                <tr key={product.id} className="table-row-hover">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="product-thumb">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">{product.name}</p>
-                        <p className="text-xs text-slate-500">Loại: {product.type}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm font-mono text-slate-600 dark:text-slate-400">{product.sku}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{formatNumber(product.sold)}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{formatNumber(product.stock)}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-primary">{formatCurrency(product.revenue)}</td>
-                  <td className="px-6 py-4">
-                    <Badge variant={product.status === 'selling' ? 'green' : 'orange'}>
-                      {product.status === 'selling' ? 'Đang bán tốt' : 'Sắp hết'}
-                    </Badge>
-                  </td>
+        <DataTableCard>
+          <div className="table-wrapper">
+            <table className="table">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-slate-800/80">
+                  <th className="table-th px-6">Sản phẩm</th>
+                  <th className="table-th px-6">Mã SKU</th>
+                  <th className="table-th px-6">Đã bán</th>
+                  <th className="table-th px-6">Tồn kho</th>
+                  <th className="table-th px-6">Doanh thu</th>
+                  <th className="table-th px-6">Trạng thái</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                {topProducts.map((product) => (
+                  <tr key={product.id} className="table-row-hover">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="product-thumb">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">{product.name}</p>
+                          <p className="text-xs text-slate-500">Loại: {product.type}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-mono text-slate-600 dark:text-slate-400">{product.sku}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{formatNumber(product.sold)}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{formatNumber(product.stock)}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-primary">{formatCurrency(product.revenue)}</td>
+                    <td className="px-6 py-4">
+                      <Badge variant={product.status === 'selling' ? 'green' : 'orange'}>
+                        {product.status === 'selling' ? 'Đang bán tốt' : 'Sắp hết'}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DataTableCard>
       </section>
     </div>
   );

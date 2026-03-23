@@ -10,15 +10,6 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page">
-      {/* Breadcrumb */}
-      <nav className="flex text-sm text-slate-500 dark:text-slate-400 mb-2">
-        <ol className="flex items-center space-x-2">
-          <li><Link to="/" className="cursor-pointer hover:text-primary transition-colors">Trang chủ</Link></li>
-          <li><span className="material-icons text-xs">chevron_right</span></li>
-          <li className="font-medium text-slate-900 dark:text-white">Thông tin cá nhân</li>
-        </ol>
-      </nav>
-
       <div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Cài đặt Hồ sơ Cá nhân</h2>
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">

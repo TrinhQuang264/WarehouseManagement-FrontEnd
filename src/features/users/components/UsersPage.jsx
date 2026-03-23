@@ -1,5 +1,3 @@
-import { useState, useEffect, useMemo } from 'react';
-
 import {
   Plus,
   Filter,
@@ -12,69 +10,80 @@ import {
   History,
   ChevronLeft,
   ChevronRight,
-} from 'lucide-react';
-import Button from '../../../components/ui/Button';
-import SearchBar from '../../../components/ui/SearchBar';
-import Badge from '../../../components/ui/Badge';
-import Avatar from '../../../components/ui/Avatar';
-import Loading from '../../../components/ui/Loading';
-import { useUsers } from '../hooks/useUsers.jsx';
-import '../styles/Users.css';
+} from "lucide-react";
+import { useEffect } from "react";
+import Button from "../../../components/ui/Button";
+import Badge from "../../../components/ui/Badge";
+import Avatar from "../../../components/ui/Avatar";
+import Loading from "../../../components/ui/Loading";
+import DataTableCard from "../../../components/ui/DataTableCard.jsx";
+import PaginationBar from "../../../components/ui/PaginationBar.jsx";
+import { useUsers } from "../hooks/useUsers.jsx";
+import { useHeader } from "../../../contexts/HeaderContext";
+import "../styles/Users.css";
+import { Link } from "react-router-dom";
 
 export default function UsersPage() {
-  const {
-    users,
-    loading,
-    search,
-    setSearch,
-    currentPage,
-    setCurrentPage,
-    totalUsers
-  } = useUsers();
+  const { users, loading, setSearch, currentPage, setCurrentPage, totalUsers } =
+    useUsers();
+
+  const { setActionButton, setOnSearch, resetHeader } = useHeader();
+
+  // Set header configuration on mount
+  useEffect(() => {
+    setActionButton({
+      label: "Thêm người dùng",
+      icon: <Plus size={18} />,
+      onClick: () => alert("Chức năng thêm người dùng"),
+      searchPlaceholder: "Tìm kiếm theo tên đăng nhập hoặc vai trò...",
+      className:
+        "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
+    });
+
+    setOnSearch(setSearch);
+
+    // Cleanup on unmount
+    return () => resetHeader();
+  }, [setActionButton, setOnSearch, setSearch, resetHeader]);
 
   if (loading) return <Loading text="Đang tải danh sách người dùng..." />;
 
   return (
     <div className="users-page">
-      // HEADER
       <div className="page-header">
         <div>
-          // Breadcrumb
           <nav className="flex text-sm text-slate-500 mb-2">
-            <a href="/" className="hover:text-primary transition-colors">Trang chủ</a>
+            <Link to="/" className="hover:text-primary transition-colors">
+              Trang chủ
+            </Link>
             <span className="mx-2 text-slate-300">/</span>
-            <span className="text-slate-900 dark:text-white font-medium">Người dùng</span>
+            <span className="text-slate-900 dark:text-white font-medium">
+              Tài khoản
+            </span>
           </nav>
-          <h1 className="page-title">Quản lý Người dùng</h1>
-          <p className="page-subtitle">Quản lý tài khoản, phân quyền và trạng thái hoạt động của nhân viên.</p>
         </div>
-        <Button icon={<Plus size={18} />}>
-          Thêm người dùng
-        </Button>
       </div>
 
-      // SEARCH & FILTER BAR
       <div className="search-filter-bar">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Tìm kiếm theo tên đăng nhập hoặc vai trò..."
-            className="w-full md:w-96"
-          />
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <Button variant="secondary" icon={<Filter size={18} className="text-slate-400" />}>
+            <Button
+              variant="secondary"
+              icon={<Filter size={18} className="text-slate-400" />}
+            >
               Bộ lọc
             </Button>
-            <Button variant="secondary" icon={<FileDown size={18} className="text-slate-400" />}>
+            <Button
+              variant="secondary"
+              icon={<FileDown size={18} className="text-slate-400" />}
+            >
               Xuất Excel
             </Button>
           </div>
         </div>
       </div>
 
-      // USER TABLE
-      <div className="users-table-wrapper">
+      <DataTableCard>
         <div className="table-wrapper">
           <table className="table">
             <thead>
@@ -94,45 +103,55 @@ export default function UsersPage() {
             </tbody>
           </table>
         </div>
+      </DataTableCard>
 
-        // PAGINATION
-        <div className="pagination-container">
+      <PaginationBar
+        info={
           <span className="pagination-info">
-            Hiển thị <span className="font-medium text-slate-900 dark:text-white">1 - {users.length}</span> trong tổng số <span className="font-medium text-slate-900 dark:text-white">{totalUsers}</span> người dùng
+            Hiển thị{" "}
+            <span className="font-medium text-slate-900 dark:text-white">
+              1 - {users.length}
+            </span>{" "}
+            trong tổng số{" "}
+            <span className="font-medium text-slate-900 dark:text-white">
+              {totalUsers}
+            </span>{" "}
+            người dùng
           </span>
-          <div className="pagination-controls">
+        }
+      >
+        <div className="pagination-controls">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+            className="pagination-btn"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          {[1, 2, 3].map((page) => (
             <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
-              className="pagination-btn"
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`pagination-page-btn ${currentPage === page ? "pagination-page-btn-active" : ""}`}
             >
-              <ChevronLeft size={16} />
+              {page}
             </button>
-            {[1, 2, 3].map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`pagination-page-btn ${currentPage === page ? 'pagination-page-btn-active' : ''}`}
-              >
-                {page}
-              </button>
-            ))}
-            <span className="text-slate-400 mx-1">...</span>
-            <button
-              onClick={() => setCurrentPage(6)}
-              className="pagination-page-btn"
-            >
-              6
-            </button>
-            <button
-              onClick={() => setCurrentPage((p) => p + 1)}
-              className="pagination-btn"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
+          ))}
+          <span className="text-slate-400 mx-1">...</span>
+          <button
+            onClick={() => setCurrentPage(6)}
+            className="pagination-page-btn"
+          >
+            6
+          </button>
+          <button
+            onClick={() => setCurrentPage((p) => p + 1)}
+            className="pagination-btn"
+          >
+            <ChevronRight size={16} />
+          </button>
         </div>
-      </div>
+      </PaginationBar>
 
       <div className="users-info-cards">
         <InfoCard
@@ -161,13 +180,6 @@ export default function UsersPage() {
   );
 }
 
-// ============================================
-// SUB-COMPONENTS
-// ============================================
-
-/**
- * UserRow — Một dòng trong bảng user
- */
 function UserRow({ user }) {
   return (
     <tr className="table-row-hover">
@@ -175,8 +187,12 @@ function UserRow({ user }) {
         <div className="flex items-center gap-3">
           <Avatar name={user.fullName} size="sm" />
           <div>
-            <p className="text-sm font-medium text-slate-900 dark:text-white">{user.fullName}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
+            <p className="text-sm font-medium text-slate-900 dark:text-white">
+              {user.fullName}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {user.email}
+            </p>
           </div>
         </div>
       </td>
@@ -184,14 +200,14 @@ function UserRow({ user }) {
       <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">
         {user.username}
       </td>
-i
+
       <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
-        {user.phoneNumber || '—'}
+        {user.phoneNumber || "—"}
       </td>
 
       {/* Vai trò */}
       <td className="px-6 py-4">
-        <Badge variant={user.role === 'admin' ? 'blue' : 'gray'}>
+        <Badge variant={user.role === "admin" ? "blue" : "gray"}>
           {user.roleLabel}
         </Badge>
       </td>
@@ -201,15 +217,15 @@ i
         <div className="flex items-center gap-2">
           <span
             className={`w-2 h-2 rounded-full ${
-              user.isActive ? 'bg-emerald-500' : 'bg-slate-300'
+              user.isActive ? "bg-emerald-500" : "bg-slate-300"
             }`}
           />
           <span
             className={`text-sm font-medium ${
-              user.isActive ? 'text-emerald-600' : 'text-slate-500'
+              user.isActive ? "text-emerald-600" : "text-slate-500"
             }`}
           >
-            {user.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+            {user.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
           </span>
         </div>
       </td>
@@ -253,7 +269,9 @@ function InfoCard({ icon, title, description, colorClass, titleColorClass }) {
       {icon}
       <div>
         <h4 className={`text-sm font-semibold ${titleColorClass}`}>{title}</h4>
-        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{description}</p>
+        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+          {description}
+        </p>
       </div>
     </div>
   );

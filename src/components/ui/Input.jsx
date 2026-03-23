@@ -1,13 +1,3 @@
-/**
- * Input.jsx — Component ô nhập liệu tái sử dụng
- *
- * Props:
- *  - label: string (nhãn hiển thị phía trên)
- *  - icon: ReactNode (icon bên trái)
- *  - error: string (thông báo lỗi)
- *  - rightElement: ReactNode (phần tử bên phải, VD: nút show/hide password)
- *  - ...rest: các props HTML input khác (type, value, onChange, placeholder, v.v.)
- */
 export default function Input({
   label,
   icon,

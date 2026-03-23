@@ -20,7 +20,6 @@ export default function CustomerModal({
   });
   const [errors, setErrors] = useState({});
 
-  // Reset form khi mở modal hoặc thay đổi khách hàng đang sửa
   useEffect(() => {
     if (editingCustomer) {
       setFormData({

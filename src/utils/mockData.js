@@ -84,73 +84,115 @@ export const products = [
     "id": 1,
     "isDefault": true,
     "price": 1500000,
+    "importPrice": 1200000,
     "quantity": 110,
     "imageUrl": "/images/products/man-hinh-001.jpg",
     "name": "Màn hình Dell 24 inch",
     "description": "Sản phẩm màn hình Dell độ phân giải FHD",
     "categoryId": 2,
     "code": "MAN-HINH-001",
-    "isActive": true
+    "isActive": true,
+    "specs": [
+      { "key": "Resolution", "value": "1920 x 1080 px" },
+      { "key": "Panel Type", "value": "IPS" },
+      { "key": "Refresh Rate", "value": "60Hz" },
+      { "key": "Response Time", "value": "5ms" }
+    ]
   },
   {
     "id": 2,
     "isDefault": false,
     "price": 3500000,
+    "importPrice": 2800000,
     "quantity": 50,
     "imageUrl": "/images/products/man-hinh-002.jpg",
     "name": "Màn hình LG 27 inch 4K",
     "description": "Sản phẩm màn hình LG độ phân giải 4K",
     "categoryId": 2,
     "code": "MAN-HINH-002",
-    "isActive": true
+    "isActive": true,
+    "specs": [
+      { "key": "Resolution", "value": "3840 x 2160 px" },
+      { "key": "Panel Type", "value": "IPS" },
+      { "key": "Refresh Rate", "value": "60Hz" },
+      { "key": "Color Accuracy", "value": "Delta E <2" }
+    ]
   },
   {
     "id": 3,
     "isDefault": true,
     "price": 500000,
+    "importPrice": 350000,
     "quantity": 200,
     "imageUrl": "/images/products/ban-phim-001.jpg",
     "name": "Bàn phím cơ Logitech",
     "description": "Bàn phím cơ gaming Logitech",
     "categoryId": 3,
     "code": "BAN-PHIM-001",
-    "isActive": true
+    "isActive": true,
+    "specs": [
+      { "key": "Switch Type", "value": "Mechanical (Romer-G)" },
+      { "key": "Backlight", "value": "RGB LED" },
+      { "key": "Connection", "value": "USB/Wireless" },
+      { "key": "Key Lifespan", "value": "50 Million Clicks" }
+    ]
   },
   {
     "id": 4,
     "isDefault": false,
     "price": 250000,
+    "importPrice": 180000,
     "quantity": 150,
     "imageUrl": "/images/products/chuot-001.jpg",
     "name": "Chuột không dây Razer",
     "description": "Chuột không dây gaming tốc độ cao",
     "categoryId": 3,
     "code": "CHUOT-001",
-    "isActive": true
+    "isActive": true,
+    "specs": [
+      { "key": "DPI", "value": "8000 DPI" },
+      { "key": "Buttons", "value": "8 Programmable" },
+      { "key": "Connection", "value": "2.4GHz Wireless" },
+      { "key": "Battery Life", "value": "30 Hours" }
+    ]
   },
   {
     "id": 5,
     "isDefault": true,
     "price": 1200000,
+    "importPrice": 900000,
     "quantity": 80,
     "imageUrl": "/images/products/linh-kien-001.jpg",
     "name": "Ổ cứng SSD 512GB",
     "description": "Ổ cứng SSD tốc độ cao 512GB",
     "categoryId": 1,
     "code": "LINH-KIEN-001",
-    "isActive": true
+    "isActive": true,
+    "specs": [
+      { "key": "Capacity", "value": "512GB" },
+      { "key": "Interface", "value": "M.2 NVMe" },
+      { "key": "Speed", "value": "3500 MB/s Read" },
+      { "key": "Form Factor", "value": "2280" }
+    ]
   },
   {
     "id": 6,
     "isDefault": true,
     "price": 850000,
+    "importPrice": 600000,
     "quantity": 300,
     "imageUrl": "/images/products/phu-kien-001.jpg",
     "name": "Tai nghe Over-ear Sony",
     "description": "Tai nghe chống ồn chủ động",
     "categoryId": 4,
     "code": "PHU-KIEN-001",
-    "isActive": true
+    "isActive": true,
+    "specs": [
+      { "key": "Driver Size", "value": "40mm" },
+      { "key": "Frequency", "value": "20Hz - 20kHz" },
+      { "key": "Noise Cancellation", "value": "Active ANC" },
+      { "key": "Battery", "value": "24 Hours" }
+    ]
   }
 ];
 

@@ -1,25 +1,53 @@
-import { Bell, HelpCircle } from 'lucide-react';
-import Breadcrumbs from '../ui/Breadcrumbs';
+import { Bell, HelpCircle, Search } from 'lucide-react';
+import { useHeader } from '../../contexts/HeaderContext';
+import SearchBar from '../ui/SearchBar';
+import Button from '../ui/Button';
 
 export default function Header() {
+  const { searchValue, setSearchValue, actionButton, onSearch, title, subtitle } = useHeader();
+
+  const handleSearchChange = (value) => {
+    setSearchValue(value);
+    if (onSearch) {
+      onSearch(value);
+    }
+  };
+
   return (
     <header className="header">
-      {/* Breadcrumbs thay cho Ô tìm kiếm */}
-      <Breadcrumbs />
+      <div className="header-content">
+        {title && (
+          <div className="header-title-block">
+            <h1 className="header-title">{title}</h1>
+          </div>
+        )}
 
-      {/* Các nút hành động bên phải */}
-      <div className="header-actions">
-        {/* Nút trợ giúp */}
-        <button className="header-icon-btn" title="Trợ giúp">
-          <HelpCircle size={20} />
-        </button>
+        {!title && actionButton && (
+          <div className="header-search">
+            <SearchBar
+              value={searchValue}
+              onChange={handleSearchChange}
+              placeholder={actionButton.searchPlaceholder || "Tìm kiếm..."}
+              className="w-full md:w-80"
+            />
+          </div>
+        )}
 
-        {/* Nút thông báo - Chuyển ra ngoài cùng bên phải */}
-        <button className="header-icon-btn relative" title="Thông báo">
-          <Bell size={20} />
-          {/* Chấm đỏ báo có thông báo mới */}
-          <span className="notification-badge" />
-        </button>
+        {actionButton && (
+          <div className="header-action">
+            {actionButton.render ? (
+              actionButton.render()
+            ) : (
+              <Button
+                onClick={actionButton.onClick}
+                icon={actionButton.icon}
+                className={actionButton.className || "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"}
+              >
+                {actionButton.label}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

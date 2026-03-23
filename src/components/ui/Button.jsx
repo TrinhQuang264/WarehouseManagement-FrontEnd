@@ -1,8 +1,5 @@
-// Button.jsx — Component nút bấm tái sử dụng
-// Params: variant, size, loading, icon, children, rest
 import { Loader2 } from 'lucide-react';
 
-// Map variant → className
 const variantStyles = {
   primary:
     'bg-primary hover:bg-primary-dark text-white shadow-sm shadow-primary/20',
@@ -14,7 +11,6 @@ const variantStyles = {
     'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
 };
 
-// Map size → className
 const sizeStyles = {
   sm: 'px-3 py-1.5 text-xs gap-1.5',
   md: 'px-4 py-2 text-sm gap-2',

@@ -16,7 +16,6 @@ const bgColors = [
 ];
 
 // Lấy chữ viết tắt từ tên
-// VD: "Nguyễn Văn An" → "NA"
 function getInitials(name) {
   if (!name) return '?';
   const words = name.trim().split(' ');
@@ -43,7 +42,6 @@ export default function Avatar({
 }) {
   const sizeClass = sizeStyles[size] || sizeStyles.md;
 
-  // Nếu có ảnh → hiển thị ảnh
   if (src) {
     return (
       <img
@@ -54,7 +52,6 @@ export default function Avatar({
     );
   }
 
-  // Không có ảnh → hiển thị chữ viết tắt
   return (
     <div
       className={`${sizeClass} rounded-full flex items-center justify-center font-bold ${getColorFromName(name)} ${className}`}

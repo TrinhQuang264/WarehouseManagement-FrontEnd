@@ -1,29 +1,34 @@
-import {
-  Plus,
-  Edit,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  FolderOpen
-} from 'lucide-react';
+import { Plus, Edit, Trash2, ChevronLeft, ChevronRight, FolderOpen } from 'lucide-react';
+import { useEffect } from 'react';
 import Button from '../../../components/ui/Button';
 import SearchBar from '../../../components/ui/SearchBar';
 import Loading from '../../../components/ui/Loading';
+import DataTableCard from '../../../components/ui/DataTableCard.jsx';
+import PaginationBar from '../../../components/ui/PaginationBar.jsx';
 import { useCategories } from '../hooks/useCategories.jsx';
+import { useHeader } from '../../../contexts/HeaderContext';
 import '../styles/Categories.css';
+import Breadcrumbs from '../../../components/ui/Breadcrumbs.jsx';
 
 export default function CategoriesPage() {
-  const {
-    categories,
-    loading,
-    isFirstFetch,
-    search,
-    setSearch,
-    currentPage,
-    setCurrentPage,
-    pageSize,
-    totalCount
-  } = useCategories();
+  const { categories, loading, isFirstFetch, search, setSearch, currentPage, setCurrentPage, pageSize, totalCount } = useCategories();
+  const { setActionButton, setOnSearch, resetHeader } = useHeader();
+
+  // Set header configuration on mount
+  useEffect(() => {
+    setActionButton({
+      label: 'Thêm danh mục',
+      icon: <Plus size={18} />,
+      onClick: () => alert('Chức năng thêm danh mục'),
+      searchPlaceholder: 'Tìm kiếm tên danh mục...',
+      className: 'shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]'
+    });
+
+    setOnSearch(setSearch);
+
+    // Cleanup on unmount
+    return () => resetHeader();
+  }, [setActionButton, setOnSearch, setSearch, resetHeader]);
 
   if (isFirstFetch && loading) return <Loading text="Đang tải danh mục..." />;
 
@@ -31,34 +36,11 @@ export default function CategoriesPage() {
     <div className="categories-page">
       {/* HEADER */}
       <div className="page-header">
-        <div>
-          <nav className="flex text-sm text-slate-500 mb-2">
-            <a href="/" className="hover:text-primary transition-colors">Trang chủ</a>
-            <span className="mx-2 text-slate-300">/</span>
-            <span className="text-slate-900 dark:text-white font-medium">Danh mục</span>
-          </nav>
-          <h1 className="page-title">Danh mục Linh kiện</h1>
-          <p className="page-subtitle">Quản lý các nhóm sản phẩm và linh kiện trong hệ thống</p>
-        </div>
-        <Button icon={<Plus size={18} />} className="shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]">
-          Thêm danh mục
-        </Button>
-      </div>
-
-      {/* SEARCH BAR */}
-      <div className="search-filter-bar">
-        <div className="flex items-center gap-4">
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Tìm kiếm tên danh mục..."
-            className="w-full md:w-1/2"
-          />
-        </div>
+        <Breadcrumbs/>
       </div>
 
       {/* CATEGORY TABLE */}
-      <div className="category-table-wrapper">
+      <DataTableCard>
         <div className="table-wrapper">
           <table className="table">
             <thead>
@@ -114,43 +96,46 @@ export default function CategoriesPage() {
             </tbody>
           </table>
         </div>
+      </DataTableCard>
 
-        {/* PAGINATION */}
-        <div className="pagination-container">
+      {/* PAGINATION */}
+      <PaginationBar
+        info={
           <span className="pagination-info">
-            Hiển thị <span className="font-bold text-slate-900 dark:text-white">
-              {totalCount > 0 ? (currentPage - 1) * pageSize + 1 : 0} - {Math.min(currentPage * pageSize, totalCount)}
-            </span> trên <span className="font-bold text-slate-900 dark:text-white">{totalCount}</span> danh mục
-          </span>
-          <div className="pagination-controls">
-            <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="pagination-btn"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <div className="pagination-page-list">
-              {Array.from({ length: Math.min(5, Math.ceil(totalCount / pageSize)) }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  className={`pagination-page-btn ${currentPage === page ? 'pagination-page-btn-active' : ''}`}
-                  onClick={() => setCurrentPage(page)}
-                >
-                  {page}
-                </button>
-              ))}
-            </div>
-            <button 
-              onClick={() => setCurrentPage(p => Math.min(Math.ceil(totalCount / pageSize), p + 1))}
-              disabled={currentPage >= Math.ceil(totalCount / pageSize) || totalCount === 0}
-              className="pagination-btn"
-            >
-              <ChevronRight size={18} />
-            </button>
+          Hiển thị <span className="font-bold text-slate-900 dark:text-white">
+            {totalCount > 0 ? (currentPage - 1) * pageSize + 1 : 0} - {Math.min(currentPage * pageSize, totalCount)}
+          </span> trên <span className="font-bold text-slate-900 dark:text-white">{totalCount}</span> danh mục
+        </span>
+        }
+      >
+        <div className="pagination-controls">
+          <button 
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <div className="pagination-page-list">
+            {Array.from({ length: Math.min(5, Math.ceil(totalCount / pageSize)) }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                className={`pagination-page-btn ${currentPage === page ? 'pagination-page-btn-active' : ''}`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
           </div>
+          <button 
+            onClick={() => setCurrentPage(p => Math.min(Math.ceil(totalCount / pageSize), p + 1))}
+            disabled={currentPage >= Math.ceil(totalCount / pageSize) || totalCount === 0}
+            className="pagination-btn"
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
-      </div>
+      </PaginationBar>
     </div>
   );
 }

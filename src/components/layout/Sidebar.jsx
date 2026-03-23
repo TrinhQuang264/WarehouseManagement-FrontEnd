@@ -1,40 +1,42 @@
+import { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  Smartphone,
-  Download,
-  Upload,
-  Package,
-  Store,
-  BarChart3,
-  Users,
-  Settings,
-  LogOut,
-  FolderTree,
-  Users2
-} from 'lucide-react';
+import { LayoutDashboard, Smartphone, Download, Upload, Package, Store, BarChart3, Users, Settings, LogOut, FolderTree, Users2, ChevronRight, ChevronDown } from 'lucide-react';
 import Avatar from '../ui/Avatar';
 
 // Danh sách menu chính
 const mainMenu = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/products', icon: Smartphone, label: 'Sản phẩm' },
-  { to: '/categories', icon: FolderTree, label: 'Danh mục' },
   { to: '/import', icon: Download, label: 'Nhập kho' },
   { to: '/export', icon: Upload, label: 'Xuất kho' },
   { to: '/inventory', icon: Package, label: 'Tồn kho' },
-  { to: '/suppliers', icon: Store, label: 'Nhà cung cấp' },
-  { to: '/customers', icon: Users2, label: 'Khách hàng' },
-];
-
-// Danh sách menu hệ thống
-const systemMenu = [
-  { to: '/reports', icon: BarChart3, label: 'Báo cáo' },
-  { to: '/users', icon: Users, label: 'Người dùng' },
   { to: '/settings', icon: Settings, label: 'Cài đặt' },
 ];
 
+const managerMenu = [
+  { to: '/products', icon: Smartphone, label: 'Sản phẩm' },
+  { to: '/categories', icon: FolderTree, label: 'Danh mục' },
+  { to: '/customers', icon: Users2, label: 'Khách hàng' },
+  { to: '/suppliers', icon: Store, label: 'Nhà cung cấp' },
+];
+// Danh sách menu hệ thống
+const systemMenu = [
+  { to: '/users', icon: Users, label: 'Người dùng' },
+  { to: '/reports', icon: BarChart3, label: 'Báo cáo' },
+];
+
 export default function Sidebar({ user, onLogout }) {
+  const [expandedSections, setExpandedSections] = useState({
+    manager: false,
+    system: false,
+  });
+
+  const toggleSection = (section) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
   return (
     <aside className="sidebar">
       {/* Logo */}
@@ -47,22 +49,40 @@ export default function Sidebar({ user, onLogout }) {
         </span>
       </div>
 
-      {/* Navigation */}
       <nav className="sidebar-nav">
-        {/* Menu chính */}
         {mainMenu.map((item) => (
           <SidebarLink key={item.to} item={item} />
         ))}
 
-        {/* Phân cách hệ thống */}
-        <div className="sidebar-section-title">
-          Hệ thống
+        <div
+          className="sidebar-section-title flex justify-between items-center"
+          onClick={() => toggleSection('manager')}
+          aria-expanded={expandedSections.manager}
+        >
+          <span>Quản lý</span>
+          <span className="icon-box">
+            {expandedSections.manager ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </span>
         </div>
+        {expandedSections.manager &&
+          managerMenu.map((item) => (
+            <SidebarLink key={item.to} item={item} />
+          ))}
 
-        {/* Menu hệ thống */}
-        {systemMenu.map((item) => (
-          <SidebarLink key={item.to} item={item} />
-        ))}
+        <div
+          className="sidebar-section-title flex justify-between items-center"
+          onClick={() => toggleSection('system')}
+          aria-expanded={expandedSections.system}
+        >
+          <span>Hệ thống</span>
+          <span className="icon-box">
+            {expandedSections.system ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </span>
+        </div>
+        {expandedSections.system &&
+          systemMenu.map((item) => (
+            <SidebarLink key={item.to} item={item} />
+          ))}
       </nav>
 
       {/* User Info */}

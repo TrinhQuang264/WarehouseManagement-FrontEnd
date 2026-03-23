@@ -1,24 +1,15 @@
-import {
-  FileDown,
-  Plus,
-  ChevronLeft,
-  ChevronRight,
-  MoreVertical,
-  Smartphone,
-  BatteryCharging,
-  Camera,
-  Cpu,
-  Layers,
-  Filter
-} from 'lucide-react';
+import { FileDown, Plus, ChevronLeft, ChevronRight, MoreVertical, Smartphone, BatteryCharging, Camera, Cpu, Layers, Filter } from 'lucide-react';
+import { useEffect } from 'react';
 import Button from '../../../components/ui/Button';
 import SearchBar from '../../../components/ui/SearchBar';
 import Badge from '../../../components/ui/Badge';
 import Loading from '../../../components/ui/Loading';
+import DataTableCard from '../../../components/ui/DataTableCard.jsx';
+import PaginationBar from '../../../components/ui/PaginationBar.jsx';
 import { useInventory } from '../hooks/useInventory.jsx';
+import { useHeader } from '../../../contexts/HeaderContext';
 import { formatNumber } from '../../../utils/util';
 import '../styles/Inventory.css';
-
 
 export default function InventoryPage() {
   const {
@@ -39,6 +30,24 @@ export default function InventoryPage() {
     totalCount
   } = useInventory();
 
+  const { setActionButton, setOnSearch, resetHeader } = useHeader();
+
+  // Set header configuration on mount
+  useEffect(() => {
+    setActionButton({
+      label: 'Nhập hàng mới',
+      icon: <Plus size={18} />,
+      onClick: () => alert('Chức năng nhập hàng mới'),
+      searchPlaceholder: 'Tìm kiếm sản phẩm...',
+      className: 'shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]'
+    });
+
+    setOnSearch(setSearch);
+
+    // Cleanup on unmount
+    return () => resetHeader();
+  }, [setActionButton, setOnSearch, setSearch, resetHeader]);
+
   if (isFirstFetch && loading) return <Loading text="Đang tải dữ liệu kiểm kê..." />;
 
   const getCategoryIcon = (catId) => {
@@ -56,20 +65,12 @@ export default function InventoryPage() {
       {/* HEADER */}
       <div className="page-header">
         <div>
-          <nav className="flex text-sm text-slate-500 mb-2">
-            <a href="/" className="hover:text-primary transition-colors">Trang chủ</a>
-            <span className="mx-2 text-slate-300">/</span>
-            <span className="text-slate-900 dark:text-white font-medium">Tồn kho</span>
-          </nav>
           <h1 className="page-title">Kiểm kê Tồn kho</h1>
           <p className="page-subtitle">Quản lý và theo dõi số lượng linh kiện điện thoại thực tế.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="secondary" icon={<FileDown size={18} />}>
             Xuất báo cáo
-          </Button>
-          <Button icon={<Plus size={18} />}>
-            Nhập hàng mới
           </Button>
         </div>
       </div>
@@ -140,7 +141,7 @@ export default function InventoryPage() {
       </div>
 
       {/* DATA TABLE */}
-      <div className="inventory-table-wrapper">
+      <DataTableCard>
         <div className="table-wrapper">
           <table className="table">
             <thead>
@@ -212,41 +213,44 @@ export default function InventoryPage() {
             </tbody>
           </table>
         </div>
+      </DataTableCard>
 
-        {/* PAGINATION */}
-        <div className="pagination-container">
+      {/* PAGINATION */}
+      <PaginationBar
+        info={
           <p className="pagination-info">
-            Hiển thị <span className="font-bold text-slate-900 dark:text-white">{(currentPage - 1) * pageSize + 1}</span> đến <span className="font-bold text-slate-900 dark:text-white">{Math.min(currentPage * pageSize, totalCount)}</span> trong số <span className="font-bold text-slate-900 dark:text-white">{totalCount}</span> sản phẩm
-          </p>
-          <div className="pagination-controls">
-            <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="pagination-btn"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <div className="pagination-page-list">
-              {[1, 2, 3].map((page) => (
-                <button
-                  key={page}
-                  className={`pagination-page-btn ${currentPage === page ? 'pagination-page-btn-active' : ''}`}
-                  onClick={() => setCurrentPage(page)}
-                >
-                  {page}
-                </button>
-              ))}
-            </div>
-            <button 
-              onClick={() => setCurrentPage(p => p + 1)}
-              disabled={currentPage * pageSize >= totalCount}
-              className="pagination-btn"
-            >
-              <ChevronRight size={18} />
-            </button>
+          Hiển thị <span className="font-bold text-slate-900 dark:text-white">{(currentPage - 1) * pageSize + 1}</span> đến <span className="font-bold text-slate-900 dark:text-white">{Math.min(currentPage * pageSize, totalCount)}</span> trong số <span className="font-bold text-slate-900 dark:text-white">{totalCount}</span> sản phẩm
+        </p>
+        }
+      >
+        <div className="pagination-controls">
+          <button 
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <div className="pagination-page-list">
+            {[1, 2, 3].map((page) => (
+              <button
+                key={page}
+                className={`pagination-page-btn ${currentPage === page ? 'pagination-page-btn-active' : ''}`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
           </div>
+          <button 
+            onClick={() => setCurrentPage(p => p + 1)}
+            disabled={currentPage * pageSize >= totalCount}
+            className="pagination-btn"
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
-      </div>
+      </PaginationBar>
     </div>
   );
 }

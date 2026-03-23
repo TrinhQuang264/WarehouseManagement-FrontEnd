@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import userService from '../api/usersService';
 
-// MOCK DATA — Dùng khi chưa có backend
 const MOCK_USERS = [
   {
     id: 1,
@@ -46,15 +45,15 @@ export function useUsers() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const totalUsers = 24; // Giả lập tổng số user
+  const totalUsers = 24;
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const data = await userService.getAll();
-        let userList = Array.isArray(data) ? data : (data.data || data.items || []);
-        
-        const mappedUsers = userList.map(u => ({
+        const userList = Array.isArray(data) ? data : (data.data || data.items || []);
+
+        const mappedUsers = userList.map((u) => ({
           id: u.id,
           fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'N/A',
           username: u.userName || 'N/A',
@@ -62,7 +61,7 @@ export function useUsers() {
           phoneNumber: u.phoneNumber || '',
           role: u.role || 'staff',
           roleLabel: u.roleLabel || (u.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'),
-          isActive: u.isActive !== undefined ? u.isActive : true
+          isActive: u.isActive !== undefined ? u.isActive : true,
         }));
 
         setUsers(mappedUsers);
@@ -73,26 +72,34 @@ export function useUsers() {
         setLoading(false);
       }
     };
+
     fetchUsers();
   }, []);
 
   const filteredUsers = useMemo(() => {
+    const searchLower = String(search ?? '').trim().toLowerCase();
+
+    if (!searchLower) {
+      return users;
+    }
+
     return users.filter((u) => {
-      const searchLower = search.toLowerCase();
-      return (u.fullName || '').toLowerCase().includes(searchLower) || 
-             (u.username || '').toLowerCase().includes(searchLower) || 
-             (u.email || '').toLowerCase().includes(searchLower) ||
-             (u.phoneNumber || '').toLowerCase().includes(searchLower);
+      return [u.fullName, u.username, u.email, u.phoneNumber]
+        .some((value) => String(value ?? '').toLowerCase().includes(searchLower));
     });
   }, [users, search]);
+
+  const handleSearch = useCallback((query) => {
+    setSearch(String(query ?? ''));
+  }, []);
 
   return {
     users: filteredUsers,
     loading,
     search,
-    setSearch,
+    setSearch: handleSearch,
     currentPage,
     setCurrentPage,
-    totalUsers
+    totalUsers,
   };
 }

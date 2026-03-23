@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
 import categoryService from '../api/categoriesService';
+import { categories as mockCategories } from '../../../utils/mockData';
+
+/**
+ * useCategories - Hook quản lý danh sách danh mục
+ * Hiện tại: dùng mockData (fallback khi API fail)
+ */
 
 export function useCategories() {
   const [categories, setCategories] = useState([]);
@@ -15,15 +21,13 @@ export function useCategories() {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
-      setCurrentPage(1);
     }, 500);
     return () => clearTimeout(handler);
   }, [search]);
 
   // Fetch danh mục
-  const fetchCategories = async (isInitial = false) => {
+  const fetchCategories = async () => {
     setLoading(true);
-    if (isInitial) setIsFirstFetch(true);
     
     try {
       const response = await categoryService.filter({
@@ -43,20 +47,54 @@ export function useCategories() {
           items = response.items || response.data || response.results || [];
           total = response.totalCount || response.totalItems || response.count || response.total || items.length;
         }
+      } else {
+        throw new Error('Empty response');
       }
       
       setCategories(Array.isArray(items) ? items : []);
       setTotalCount(total);
     } catch (error) {
-      console.error('[useCategories] Lỗi API:', error);
+      console.warn('[useCategories] Fallback to mockData:', error.message);
+      
+      // Fallback về mockData khi API lỗi
+      let items = [...mockCategories];
+      
+      // Lọc theo search
+      if (debouncedSearch && debouncedSearch.trim()) {
+        const keyword = debouncedSearch.toLowerCase();
+        items = items.filter(c =>
+          c.name.toLowerCase().includes(keyword) ||
+          c.seoDescription?.toLowerCase().includes(keyword)
+        );
+      }
+      
+      const total = items.length;
+      
+      // Phân trang
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      
+      setCategories(items.slice(start, end));
+      setTotalCount(total);
     } finally {
       setLoading(false);
       setIsFirstFetch(false);
     }
   };
 
+  // Fetch danh mục lúc mount
   useEffect(() => {
-    fetchCategories(isFirstFetch);
+    fetchCategories();
+  }, []);
+
+  // Reset page khi search thay đổi
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  // Fetch lại khi pagination/search thay đổi
+  useEffect(() => {
+    fetchCategories();
   }, [currentPage, pageSize, debouncedSearch]);
 
   return {
