@@ -17,6 +17,7 @@ const SuppliersPage = lazy(() => import('../features/suppliers/components/Suppli
 const CustomersPage = lazy(() => import('../features/customers/components/CustomersPage'));
 const ProfilePage = lazy(() => import('../features/profile/components/ProfilePage'));
 const SettingsPage = lazy(() => import('../features/settings/components/SettingsPage'));
+const ReportsPage = lazy(() => import('../features/reports/pages/ReportsPage'));
 
 function PlaceholderPage({ title }) {
   return (
@@ -54,7 +55,7 @@ export default function AppRouter() {
           <Route path="suppliers/:id" element={<SuppliersPage />} />
           <Route path="customers" element={<CustomersPage />} />
           <Route path="customers/:id" element={<CustomersPage />} />
-          <Route path="reports" element={<PlaceholderPage title="Báo cáo" />} />
+          <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

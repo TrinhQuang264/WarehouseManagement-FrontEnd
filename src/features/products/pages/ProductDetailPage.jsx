@@ -121,7 +121,7 @@ export default function ProductDetailPage() {
       {/* MAIN CONTENT GRID */}
       <div className="grid grid-cols-12 gap-8 mb-8">
         {/* LEFT COLUMN: Image & Stock */}
-        <div className="col-span-8 lg:col-span-4 space-y-6">
+        <div className="col-span-12 lg:col-span-4 space-y-6">
           {/* Image Gallery */}
           <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-100">
             <div className="aspect-square bg-slate-50 flex items-center justify-center p-8">
@@ -151,15 +151,6 @@ export default function ProductDetailPage() {
               </button>
             </div>
           </div>
-
-          {/* Stock Status Card */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500 border border-slate-100">
-            <div>
-              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Trạng thái tồn kho</span>
-              <div className="text-4xl font-bold text-slate-900 mt-2">{product.quantity}</div>
-              <p className="text-sm text-slate-600 mt-1">Sản phẩm hiện có</p>
-            </div>
-          </div>
         </div>
 
         {/* RIGHT COLUMN: Information Cards */}
@@ -169,10 +160,15 @@ export default function ProductDetailPage() {
             <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
               <h3 className="font-bold text-slate-900">Thông tin cơ bản</h3>
             </div>
-            <div className="p-6 grid grid-cols-2 gap-y-6 gap-x-8">
-              <div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-y-6 gap-x-8">
+              <div className="col-span-1 md:col-span-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Tên sản phẩm</label>
-                <p className="text-sm font-semibold text-slate-900">{product.name}</p>
+                <p className="text-base font-bold text-slate-900">{product.name}</p>
+              </div>
+              <div className="md:row-span-2 bg-emerald-50/50 rounded-xl p-4 border border-emerald-100 flex flex-col justify-center items-center text-center">
+                <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-2">Trạng thái tồn kho</span>
+                <div className="text-4xl font-black text-emerald-700">{product.quantity}</div>
+                <div className="mt-2 text-xs font-medium bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">Sản phẩm có sẵn</div>
               </div>
               <div>
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Thương hiệu</label>
@@ -186,11 +182,11 @@ export default function ProductDetailPage() {
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Thời gian bảo hành</label>
                 <p className="text-sm font-semibold text-slate-900">{product.warranty}</p>
               </div>
-              <div className="col-span-2">
+              <div className="col-span-1 md:col-span-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Danh mục</label>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {product.categories?.map((cat, idx) => (
-                    <span key={idx} className="px-3 py-1 bg-slate-100 rounded-full text-xs font-medium text-slate-700">
+                    <span key={idx} className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 shadow-sm">
                       {cat}
                     </span>
                   ))}
@@ -231,19 +227,7 @@ export default function ProductDetailPage() {
               <h3 className="font-bold text-slate-900">Mô tả chi tiết & Kỹ thuật</h3>
             </div>
             <div className="p-6">
-              <p className="text-slate-700 text-sm mb-4">{product.description}</p>
-              <div className="grid grid-cols-2 gap-4 text-sm bg-slate-50 p-4 rounded-lg">
-                {product.specs && (Array.isArray(product.specs) ? product.specs : Object.entries(product.specs)).map((item, idx) => {
-                  const key = Array.isArray(product.specs) ? item.key : item[0];
-                  const value = Array.isArray(product.specs) ? item.value : item[1];
-                  return key && value ? (
-                    <div key={idx} className="flex justify-between border-b border-slate-200 pb-2">
-                      <span className="text-slate-600">{key}</span>
-                      <span className="font-semibold text-slate-900">{value}</span>
-                    </div>
-                  ) : null;
-                })}
-              </div>
+              <p className="text-slate-700 text-sm mb-4">{product.description}</p>        
             </div>
           </div>
         </div>

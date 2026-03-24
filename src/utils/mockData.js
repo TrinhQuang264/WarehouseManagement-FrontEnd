@@ -92,12 +92,6 @@ export const products = [
     "categoryId": 2,
     "code": "MAN-HINH-001",
     "isActive": true,
-    "specs": [
-      { "key": "Resolution", "value": "1920 x 1080 px" },
-      { "key": "Panel Type", "value": "IPS" },
-      { "key": "Refresh Rate", "value": "60Hz" },
-      { "key": "Response Time", "value": "5ms" }
-    ]
   },
   {
     "id": 2,
@@ -111,12 +105,6 @@ export const products = [
     "categoryId": 2,
     "code": "MAN-HINH-002",
     "isActive": true,
-    "specs": [
-      { "key": "Resolution", "value": "3840 x 2160 px" },
-      { "key": "Panel Type", "value": "IPS" },
-      { "key": "Refresh Rate", "value": "60Hz" },
-      { "key": "Color Accuracy", "value": "Delta E <2" }
-    ]
   },
   {
     "id": 3,
@@ -130,12 +118,6 @@ export const products = [
     "categoryId": 3,
     "code": "BAN-PHIM-001",
     "isActive": true,
-    "specs": [
-      { "key": "Switch Type", "value": "Mechanical (Romer-G)" },
-      { "key": "Backlight", "value": "RGB LED" },
-      { "key": "Connection", "value": "USB/Wireless" },
-      { "key": "Key Lifespan", "value": "50 Million Clicks" }
-    ]
   },
   {
     "id": 4,
@@ -149,12 +131,6 @@ export const products = [
     "categoryId": 3,
     "code": "CHUOT-001",
     "isActive": true,
-    "specs": [
-      { "key": "DPI", "value": "8000 DPI" },
-      { "key": "Buttons", "value": "8 Programmable" },
-      { "key": "Connection", "value": "2.4GHz Wireless" },
-      { "key": "Battery Life", "value": "30 Hours" }
-    ]
   },
   {
     "id": 5,
@@ -168,12 +144,6 @@ export const products = [
     "categoryId": 1,
     "code": "LINH-KIEN-001",
     "isActive": true,
-    "specs": [
-      { "key": "Capacity", "value": "512GB" },
-      { "key": "Interface", "value": "M.2 NVMe" },
-      { "key": "Speed", "value": "3500 MB/s Read" },
-      { "key": "Form Factor", "value": "2280" }
-    ]
   },
   {
     "id": 6,
@@ -187,12 +157,6 @@ export const products = [
     "categoryId": 4,
     "code": "PHU-KIEN-001",
     "isActive": true,
-    "specs": [
-      { "key": "Driver Size", "value": "40mm" },
-      { "key": "Frequency", "value": "20Hz - 20kHz" },
-      { "key": "Noise Cancellation", "value": "Active ANC" },
-      { "key": "Battery", "value": "24 Hours" }
-    ]
   }
 ];
 

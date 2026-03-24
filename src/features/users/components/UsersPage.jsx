@@ -152,31 +152,7 @@ export default function UsersPage() {
           </button>
         </div>
       </PaginationBar>
-
-      <div className="users-info-cards">
-        <InfoCard
-          icon={<Shield size={20} className="text-primary" />}
-          title="Bảo mật hệ thống"
-          description="Lần cuối kiểm tra định kỳ phân quyền người dùng là 2 ngày trước."
-          colorClass="bg-primary/5 border-primary/20"
-          titleColorClass="text-primary"
-        />
-        <InfoCard
-          icon={<UserCheck size={20} className="text-emerald-600" />}
-          title="Đang trực tuyến"
-          description="Có 12 nhân viên hiện đang đăng nhập và làm việc trên hệ thống."
-          colorClass="bg-emerald-50 border-emerald-100"
-          titleColorClass="text-emerald-600"
-        />
-        <InfoCard
-          icon={<History size={20} className="text-amber-600" />}
-          title="Nhật ký hoạt động"
-          description="Xem chi tiết các thay đổi cấu hình gần đây tại mục nhật ký hệ thống."
-          colorClass="bg-amber-50 border-amber-100"
-          titleColorClass="text-amber-600"
-        />
       </div>
-    </div>
   );
 }
 
@@ -257,22 +233,5 @@ function UserRow({ user }) {
         </div>
       </td>
     </tr>
-  );
-}
-
-/**
- * InfoCard — Thẻ thông tin hệ thống
- */
-function InfoCard({ icon, title, description, colorClass, titleColorClass }) {
-  return (
-    <div className={`info-card ${colorClass}`}>
-      {icon}
-      <div>
-        <h4 className={`text-sm font-semibold ${titleColorClass}`}>{title}</h4>
-        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-          {description}
-        </p>
-      </div>
-    </div>
   );
 }

@@ -282,37 +282,6 @@ export default function SupplierDetailPage({ supplier, history = [], onEdit }) {
               </div>
             </PaginationBar>
           </DataTableCard>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h4 className="mb-3 font-bold text-slate-900">
-                Hợp đồng pháp lý
-              </h4>
-              <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <FileText size={20} className="text-red-500" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-bold">
-                    Contract_{supplier.code}.pdf
-                  </p>
-                  <p className="text-[10px] uppercase tracking-widest text-slate-500">
-                    Hết hạn: 31/12/2026
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="text-xs font-bold text-primary hover:underline"
-                >
-                  Tải
-                </button>
-              </div>
-              <button
-                type="button"
-                className="mt-5 w-full border-t border-slate-100 pt-3 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-primary"
-              >
-                Gia hạn hợp đồng
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

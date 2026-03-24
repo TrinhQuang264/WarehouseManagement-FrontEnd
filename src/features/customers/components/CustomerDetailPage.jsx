@@ -60,10 +60,9 @@ export default function CustomerDetailPage({ customer, history = [], onEdit }) {
         </div>
 
         <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600"><ShoppingBag size={20} /></div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Tổng chi tiêu</p><p className="mt-1 text-2xl font-black text-slate-900">{formatCurrency(totalSpend)}</p></div>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"><MessageSquare size={20} /></div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Số đơn hàng</p><p className="mt-1 text-2xl font-black text-slate-900">{history.length}</p></div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-600"><Star size={20} /></div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Điểm tích lũy</p><p className="mt-1 text-2xl font-black text-slate-900">{score}</p></div>
           </div>
 
           <DataTableCard>

@@ -10,11 +10,18 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Cài đặt Hồ sơ Cá nhân</h2>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-          Quản lý thông tin cá nhân và bảo mật tài khoản của bạn.
-        </p>
+      <div className="page-header">
+        <div>
+          <nav className="flex text-sm text-slate-500 mb-2">
+            <Link to="/" className="hover:text-primary transition-colors">
+              Trang chủ
+            </Link>
+            <span className="mx-2 text-slate-300">/</span>
+            <span className="text-slate-900 dark:text-white font-medium">
+              Thông tin cá nhân
+            </span>
+          </nav>
+        </div>
       </div>
 
       <div className="space-y-6">

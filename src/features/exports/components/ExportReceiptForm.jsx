@@ -117,8 +117,15 @@ export default function ExportReceiptForm({ mode, receipt, customers, products, 
 
         <div className="imports-form-side">
           <ReceiptSummary receipt={receipt} />
-          <div className="imports-side-actions"><Button className="w-full justify-center py-3" onClick={onSubmit}>{mode === 'edit' ? 'Cập nhật phiếu xuất' : 'Xác nhận xuất kho'}</Button><Button variant="secondary" className="w-full justify-center py-3" icon={<Save size={18} />} onClick={onSaveDraft}>Lưu nháp</Button><button type="button" className="imports-cancel-link" onClick={onCancel}><X size={16} /> Hủy bỏ phiếu này</button></div>
-          <div className="imports-tip-box"><div className="imports-tip-title">Mẹo nhỏ</div><p>Kiểm tra đúng khách hàng, số lượng xuất và đơn giá bán trước khi xác nhận xuất kho.</p></div>
+          <div className="imports-side-actions">
+            <Button 
+              className="w-full justify-center py-3" 
+              onClick={onSubmit}>{mode === 'edit' ? 'Cập nhật phiếu xuất' : 'Xác nhận xuất kho'}
+            </Button>
+            <button type="button" className="imports-cancel-link" onClick={onCancel}>
+              <X size={16} /> Hủy bỏ phiếu này
+            </button>
+          </div>
         </div>
       </div>
     </div>
