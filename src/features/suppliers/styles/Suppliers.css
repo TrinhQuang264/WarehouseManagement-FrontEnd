@@ -7,6 +7,7 @@
   padding-bottom: 3rem;
 }
 
+<<<<<<< HEAD
 .page-header {
   display: flex;
   flex-direction: column;
@@ -160,6 +161,12 @@
 .supplier-table-card:hover {
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
+=======
+
+/* Pagination Styles */
+
+/* Supplier Table Specific */
+>>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
 
 .supplier-code-badge {
   padding-left: 0.625rem;
@@ -182,6 +189,7 @@
   border-color: #334155;
 }
 
+<<<<<<< HEAD
 .action-buttons-group {
   display: flex;
   justify-content: center;
@@ -212,3 +220,5 @@
   background-color: #1e293b;
   border-color: #334155;
 }
+=======
+>>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a

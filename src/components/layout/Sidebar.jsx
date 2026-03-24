@@ -18,23 +18,37 @@ import Avatar from '../ui/Avatar';
 // Danh sách menu chính
 const mainMenu = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/products', icon: Smartphone, label: 'Sản phẩm' },
-  { to: '/categories', icon: FolderTree, label: 'Danh mục' },
   { to: '/import', icon: Download, label: 'Nhập kho' },
   { to: '/export', icon: Upload, label: 'Xuất kho' },
   { to: '/inventory', icon: Package, label: 'Tồn kho' },
-  { to: '/suppliers', icon: Store, label: 'Nhà cung cấp' },
-  { to: '/customers', icon: Users2, label: 'Khách hàng' },
-];
-
-// Danh sách menu hệ thống
-const systemMenu = [
-  { to: '/reports', icon: BarChart3, label: 'Báo cáo' },
-  { to: '/users', icon: Users, label: 'Người dùng' },
   { to: '/settings', icon: Settings, label: 'Cài đặt' },
 ];
 
+const managerMenu = [
+  { to: '/products', icon: Smartphone, label: 'Sản phẩm' },
+  { to: '/categories', icon: FolderTree, label: 'Danh mục' },
+  { to: '/customers', icon: Users2, label: 'Khách hàng' },
+  { to: '/suppliers', icon: Store, label: 'Nhà cung cấp' },
+];
+// Danh sách menu hệ thống
+const systemMenu = [
+  { to: '/users', icon: Users, label: 'Người dùng' },
+  { to: '/reports', icon: BarChart3, label: 'Báo cáo' },
+];
+
 export default function Sidebar({ user, onLogout }) {
+  const [expandedSections, setExpandedSections] = useState({
+    manager: false,
+    system: false,
+  });
+
+  const toggleSection = (section) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
   return (
     <aside className="sidebar">
       {/* Logo */}
@@ -58,6 +72,10 @@ export default function Sidebar({ user, onLogout }) {
         <div className="sidebar-section-title">
           Hệ thống
         </div>
+        {expandedSections.manager &&
+          managerMenu.map((item) => (
+            <SidebarLink key={item.to} item={item} />
+          ))}
 
         {/* Menu hệ thống */}
         {systemMenu.map((item) => (

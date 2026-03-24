@@ -62,7 +62,7 @@ export default function LoginPage() {
               Đăng nhập hệ thống
             </h1>
             <p className="login-subtitle">
-              Quản lý kho linh kiện điện thoại
+              Hệ thống quản lý kho hàng
             </p>
           </div>
 

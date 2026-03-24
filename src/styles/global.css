@@ -17,7 +17,10 @@
 }
 
 .page-container {
-  padding: 2rem;
+  padding-top: 18px;
+  padding-left: 25px;
+  padding-right: 25px;
+  padding-bottom: 25px;
 }
 
 /* Header Styles */
@@ -35,9 +38,54 @@
   z-index: 10;
 }
 
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 2rem;
+}
+
+.header-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.header-title {
+  font-size: 1.25rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+}
+
+.header-subtitle {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.header-search {
+  flex: 1;
+  max-width: 400px;
+}
+
+.header-action {
+  flex-shrink: 0;
+}
+
 .dark .header {
   background-color: var(--color-bg-dark);
   border-color: #1e293b;
+}
+
+.dark .header-title {
+  color: #ffffff;
+}
+
+.dark .header-subtitle {
+  color: #94a3b8;
 }
 
 .header-actions {
@@ -69,6 +117,25 @@
   color: #94a3b8;
 }
 
+@media (max-width: 767px) {
+  .header {
+    height: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .header-action {
+    display: flex;
+    justify-content: flex-start;
+  }
+}
+
 .notification-badge {
   position: absolute;
   top: 0.5rem;
@@ -82,7 +149,7 @@
 
 /* Sidebar Styles */
 .sidebar {
-  width: 16rem;
+  width: 17.6rem;
   background-color: #ffffff;
   border-right: 1px solid #e2e8f0;
   display: flex;
@@ -184,6 +251,29 @@
   letter-spacing: 0.05em;
 }
 
+/* Sidebar Section Title Styles */
+.sidebar-section-title {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s, color 0.3s;
+  color: #475569;
+}
+
+.sidebar-section-title:hover {
+  background-color: #f8fafc;
+  color: var(--color-primary);
+}
+
+.dark .sidebar-section-title {
+  color: #94a3b8;
+}
+
+.dark .sidebar-section-title:hover {
+  background-color: #1e293b;
+}
+
 .sidebar-user {
   padding: 1rem;
   border-top: 1px solid #e2e8f0;
@@ -278,6 +368,7 @@
 .table {
   width: 100%;
   text-align: left;
+  text-align: left;
   border-collapse: collapse;
 }
 
@@ -314,4 +405,208 @@
 
 .dark .table-row-hover:hover {
   background-color: rgba(30, 41, 59, 0.5);
+}
+
+/* ============================================
+   SHARED PAGE LAYOUT
+   ============================================ */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .page-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.page-title {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+}
+
+.dark .page-title {
+  color: #ffffff;
+}
+
+.page-subtitle {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* ============================================
+   SHARED PAGINATION
+   ============================================ */
+.pagination-container {
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .pagination-container {
+    flex-direction: row;
+  }
+}
+
+.dark .pagination-container {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.dark .pagination-info {
+  color: #94a3b8;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-page-list {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.pagination-btn {
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  color: #94a3b8;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark .pagination-btn {
+  border-color: #334155;
+  color: #64748b;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #f8fafc;
+  color: var(--color-primary);
+}
+
+.dark .pagination-btn:hover:not(:disabled) {
+  background-color: #1e293b;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-page-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #475569;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .pagination-page-btn {
+  color: #94a3b8;
+}
+
+.pagination-page-btn:hover {
+  background-color: #f8fafc;
+  color: var(--color-primary);
+}
+
+.dark .pagination-page-btn:hover {
+  background-color: #1e293b;
+}
+
+.pagination-page-btn-active {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 10px 15px -3px rgba(19, 127, 236, 0.2);
+}
+
+/* ============================================
+   SHARED ACTION BUTTONS
+   ============================================ */
+.action-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: all 0.3s;
+}
+
+.group:hover .action-buttons-group {
+  opacity: 1;
+}
+
+.action-btn {
+  padding: 0.5rem;
+  color: #94a3b8;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  background-color: #f1f5f9;
+  color: var(--color-primary);
+  border-color: #e2e8f0;
+}
+
+.dark .action-btn:hover {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #ffffff;
+}
+
+/* Shared Table Card */
+.data-table-card,
+.supplier-table-card {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .data-table-card,
+.dark .supplier-table-card {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+.data-table-card:hover,
+.supplier-table-card:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }

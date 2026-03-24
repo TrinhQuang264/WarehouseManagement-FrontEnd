@@ -1,5 +1,3 @@
-// StatCard.jsx — Component thẻ thống kê trên Dashboard
-// Params: title, value, icon, iconBgClass, trend, subtitle
 export default function StatCard({
   title,
   value,

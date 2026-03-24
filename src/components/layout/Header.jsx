@@ -1,7 +1,18 @@
-import { Bell, HelpCircle } from 'lucide-react';
-import Breadcrumbs from '../ui/Breadcrumbs';
+import { Bell, HelpCircle, Search } from 'lucide-react';
+import { useHeader } from '../../contexts/HeaderContext';
+import SearchBar from '../ui/SearchBar';
+import Button from '../ui/Button';
 
 export default function Header() {
+  const { searchValue, setSearchValue, actionButton, onSearch, title, subtitle } = useHeader();
+
+  const handleSearchChange = (value) => {
+    setSearchValue(value);
+    if (onSearch) {
+      onSearch(value);
+    }
+  };
+
   return (
     <header className="header">
       {/* Breadcrumbs thay cho Ô tìm kiếm */}
