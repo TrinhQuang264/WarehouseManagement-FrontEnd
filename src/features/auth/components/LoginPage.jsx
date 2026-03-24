@@ -46,10 +46,10 @@ export default function LoginPage() {
             backgroundImage: 'radial-gradient(#137fec 0.5px, transparent 0.5px)',
             backgroundSize: '20px 20px',
           }}
-        />
+        ></div>
       </div>
-      <div className="login-bg-blur-1" />
-      <div className="login-bg-blur-2" />
+      <div className="login-bg-blur-1"></div>
+      <div className="login-bg-blur-2"></div>
 
       {/* Login Card */}
       <div className="login-card-wrapper">
@@ -131,7 +131,7 @@ export default function LoginPage() {
 
           <div className="login-divider">
             <div className="login-divider-line">
-              <div className="w-full border-t border-slate-200" />
+              <div className="w-full border-t border-slate-200"></div>
             </div>
             <div className="login-divider-text-wrapper">
               <span className="login-divider-text">Hoặc</span>
