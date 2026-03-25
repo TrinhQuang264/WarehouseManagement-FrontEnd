@@ -1,46 +1,114 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import authService from '../api/authService';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Khi app load → kiểm tra localStorage
   useEffect(() => {
-    console.log('[AuthProvider] Kiểm tra thông tin user từ localStorage...');
     const storedUser = authService.getStoredUser();
-    if (storedUser && authService.isAuthenticated()) {
-      console.log('[AuthProvider] Đã tìm thấy user trong localStorage:', storedUser);
+    const isLoggedIn = authService.isAuthenticated();
+
+    if (isLoggedIn && storedUser) {
       setUser(storedUser);
-    } else {
-      console.log('[AuthProvider] Không tìm thấy user hoặc chưa đăng nhập.');
     }
-    setLoading(false);
+
+    setIsInitialized(true);
   }, []);
 
-  // Đăng nhập
   const login = useCallback(async (username, password) => {
-    console.log('[AuthProvider] Bắt đầu gọi login()...');
-    const { user: userData } = await authService.login(username, password);
-    console.log('[AuthProvider] Login thành công, cập nhật state user...');
-    setUser(userData);
-    return userData;
+    setIsLoading(true);
+    setError(null); 
+
+    try {
+      const { user: loggedInUser } = await authService.login(username, password);
+      setUser(loggedInUser);
+      return { success: true };
+
+    } catch (err) {
+      const isAuthError = err.response?.status === 400 || err.response?.status === 401;
+      const message = isAuthError 
+        ? 'Tài khoản hoặc mật khẩu không chính xác'
+        : (err.response?.data?.message || err.response?.data?.Message || 'Tài khoản hoặc mật khẩu không chính xác');
+
+      setError(message);
+      return { success: false, message };
+
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  // Đăng xuất
-  const logout = useCallback(() => {
-    authService.logout();
-    setUser(null);
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      await authService.logout();
+
+    } catch (err) {
+      console.warn('Logout API lỗi:', err.message);
+
+    } finally {
+      setUser(null);
+      setError(null);
+      setIsLoading(false);
+    }
   }, []);
+
+
+  const refreshToken = useCallback(async () => {
+    try {
+      await authService.refreshToken();
+      return { success: true };
+
+    } catch (err) {
+      setUser(null);
+      setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+      return { success: false };
+    }
+  }, []);
+
+  const changePassword = useCallback(async (currentPassword, newPassword) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await authService.changePassword(currentPassword, newPassword);
+      return { success: true, message: 'Đổi mật khẩu thành công.' };
+
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.Message ||
+        err.message ||
+        'Đổi mật khẩu thất bại. Vui lòng thử lại.';
+
+      setError(message);
+      return { success: false, message };
+
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+
+  const clearError = useCallback(() => setError(null), []);
 
   const value = {
     user,
+    isLoading,
+    isInitialized,
+    isAuthenticated: !!user,
+    error,
     login,
     logout,
-    isAuthenticated: !!user,
-    loading,
+    refreshToken,
+    changePassword,
+    clearError,
   };
 
   return (
@@ -50,14 +118,12 @@ export function AuthProvider({ children }) {
   );
 }
 
-/**
- * useAuth — Hook lấy auth context
- * @returns {{ user, login, logout, isAuthenticated, loading }}
- */
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (!context) {
-    throw new Error('useAuth phải được sử dụng bên trong <AuthProvider>');
+    throw new Error('useAuth() phải được dùng bên trong <AuthProvider>.');
   }
+
   return context;
 }

@@ -5,7 +5,7 @@ import PublicRoute from './PublicRoute';
 import Loading from '../components/ui/Loading';
 
 const MainLayout = lazy(() => import('../components/layout/MainLayout'));
-const LoginPage = lazy(() => import('../features/auth/components/LoginPage'));
+const LoginPage = lazy(() => import('../features/auth/pages/LoginPage'));
 const DashboardPage = lazy(() => import('../features/dashboard/components/DashboardPage'));
 const UsersPage = lazy(() => import('../features/users/components/UsersPage'));
 const ProductsPage = lazy(() => import('../features/products/pages/ProductsPage'));
