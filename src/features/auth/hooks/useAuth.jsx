@@ -1,12 +1,8 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import authService from '../api/authService';
 
-// React Context để chia sẻ auth state
 const AuthContext = createContext(null);
 
-/**
- * AuthProvider — Bọc app, cung cấp auth state cho toàn bộ component tree
- */
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

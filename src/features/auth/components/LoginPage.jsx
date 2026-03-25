@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Eye, EyeOff, Box, AlertCircle, Headphones } from 'lucide-react';
+import { Eye, EyeOff, Box, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth.jsx';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
@@ -18,7 +18,6 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('[LoginPage] Người dùng nhấn Đăng nhập. Username:', username);
     setError('');
     setLoading(true);
 
@@ -38,7 +37,9 @@ export default function LoginPage() {
 
   return (
     <div className="login-container">
-      {/* Decorative Background */}
+      {/* Background */}
+      <div className="login-bg-blur-1" />
+      <div className="login-bg-blur-2" />
       <div className="login-bg-dots">
         <div
           className="absolute top-0 left-0 w-full h-full"
@@ -48,13 +49,10 @@ export default function LoginPage() {
           }}
         />
       </div>
-      <div className="login-bg-blur-1" />
-      <div className="login-bg-blur-2" />
 
       {/* Login Card */}
       <div className="login-card-wrapper">
         <div className="login-card">
-          {/* Header */}
           <div className="login-header">
             <div className="login-logo-box">
               <Box size={32} />
@@ -67,26 +65,22 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Tên đăng nhập */}
             <Input
               label="Tên đăng nhập"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="nhanvien@waresmart.vn"
+              placeholder="Nhập tên đăng nhập"
               required
             />
 
-            {/* Mật khẩu */}
             <Input
               label="Mật khẩu"
               type={showPassword ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              icon={<Lock size={20} />}
-              placeholder="••••••••"
+              onChange={(e) => setPassword(e.target.value)}       
+              placeholder="Nhập mật khẩu"
               required
               rightElement={
                 <button
@@ -99,7 +93,6 @@ export default function LoginPage() {
               }
             />
 
-            {/* Thông báo lỗi */}
             {error && (
               <div className="login-error-box">
                 <AlertCircle size={16} />
@@ -107,7 +100,6 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Ghi nhớ mật khẩu */}
             <div className="flex items-center justify-between">
               <label className="flex items-center cursor-pointer">
                 <input
@@ -128,22 +120,7 @@ export default function LoginPage() {
             >
               Đăng nhập
             </Button>
-          </form>
-
-          <div className="login-divider">
-            <div className="login-divider-line">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="login-divider-text-wrapper">
-              <span className="login-divider-text">Hoặc</span>
-            </div>
-          </div>
-          <div className="text-center">
-            <button className="login-support-btn">
-              <Headphones size={18} className="mr-2" />
-              Liên hệ hỗ trợ kỹ thuật
-            </button>
-          </div>
+          </form>    
         </div>
       </div>
     </div>
