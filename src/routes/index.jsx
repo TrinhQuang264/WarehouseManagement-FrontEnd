@@ -1,23 +1,39 @@
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
-import PublicRoute from './PublicRoute';
-import Loading from '../components/ui/Loading';
+import React, { Suspense, lazy } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+import PublicRoute from "./PublicRoute";
+import Loading from "../components/ui/Loading";
 
-const MainLayout = lazy(() => import('../components/layout/MainLayout'));
-const LoginPage = lazy(() => import('../features/auth/pages/LoginPage'));
-const DashboardPage = lazy(() => import('../features/dashboard/components/DashboardPage'));
-const UsersPage = lazy(() => import('../features/users/components/UsersPage'));
-const ProductsPage = lazy(() => import('../features/products/pages/ProductsPage'));
-const CategoriesPage = lazy(() => import('../features/categories/components/CategoriesPage'));
-const InventoryPage = lazy(() => import('../features/inventory/components/InventoryPage'));
-const ImportsPage = lazy(() => import('../features/imports/pages/ImportsPage'));
-const ExportsPage = lazy(() => import('../features/exports/pages/ExportsPage'));
-const SuppliersPage = lazy(() => import('../features/suppliers/components/SuppliersPage'));
-const CustomersPage = lazy(() => import('../features/customers/components/CustomersPage'));
-const ProfilePage = lazy(() => import('../features/profile/components/ProfilePage'));
-const SettingsPage = lazy(() => import('../features/settings/components/SettingsPage'));
-const ReportsPage = lazy(() => import('../features/reports/pages/ReportsPage'));
+const MainLayout = lazy(() => import("../components/layout/MainLayout"));
+const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
+const DashboardPage = lazy(
+  () => import("../features/dashboard/components/DashboardPage"),
+);
+const UsersPage = lazy(() => import("../features/users/components/UsersPage"));
+const ProductsPage = lazy(
+  () => import("../features/products/pages/ProductsPage"),
+);
+const CategoriesPage = lazy(
+  () => import("../features/categories/pages/CategoriesPage"),
+);
+const InventoryPage = lazy(
+  () => import("../features/inventory/components/InventoryPage"),
+);
+const ImportsPage = lazy(() => import("../features/imports/pages/ImportsPage"));
+const ExportsPage = lazy(() => import("../features/exports/pages/ExportsPage"));
+const SuppliersPage = lazy(
+  () => import("../features/suppliers/components/SuppliersPage"),
+);
+const CustomersPage = lazy(
+  () => import("../features/customers/components/CustomersPage"),
+);
+const ProfilePage = lazy(
+  () => import("../features/profile/components/ProfilePage"),
+);
+const SettingsPage = lazy(
+  () => import("../features/settings/components/SettingsPage"),
+);
+const ReportsPage = lazy(() => import("../features/reports/pages/ReportsPage"));
 
 function PlaceholderPage({ title }) {
   return (
@@ -33,8 +49,22 @@ export default function AppRouter() {
   return (
     <Suspense fallback={<Loading text="Đang tải giao diện..." />}>
       <Routes>
-        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-        <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<DashboardPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="products" element={<ProductsPage />} />
