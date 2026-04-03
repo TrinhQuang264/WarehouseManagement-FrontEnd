@@ -6,44 +6,18 @@ import Loading from "../components/ui/Loading";
 
 const MainLayout = lazy(() => import("../components/layout/MainLayout"));
 const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
-const DashboardPage = lazy(
-  () => import("../features/dashboard/components/DashboardPage"),
-);
+const DashboardPage = lazy(() => import("../features/dashboard/components/DashboardPage"));
 const UsersPage = lazy(() => import("../features/users/components/UsersPage"));
-const ProductsPage = lazy(
-  () => import("../features/products/pages/ProductsPage"),
-);
-const CategoriesPage = lazy(
-  () => import("../features/categories/pages/CategoriesPage"),
-);
-const InventoryPage = lazy(
-  () => import("../features/inventory/components/InventoryPage"),
-);
+const ProductsPage = lazy(() => import("../features/products/pages/ProductsPage"));
+const CategoriesPage = lazy(() => import("../features/categories/pages/CategoriesPage"));
+const InventoryPage = lazy(() => import("../features/inventory/components/InventoryPage"));
 const ImportsPage = lazy(() => import("../features/imports/pages/ImportsPage"));
 const ExportsPage = lazy(() => import("../features/exports/pages/ExportsPage"));
-const SuppliersPage = lazy(
-  () => import("../features/suppliers/components/SuppliersPage"),
-);
-const CustomersPage = lazy(
-  () => import("../features/customers/components/CustomersPage"),
-);
-const ProfilePage = lazy(
-  () => import("../features/profile/components/ProfilePage"),
-);
-const SettingsPage = lazy(
-  () => import("../features/settings/components/SettingsPage"),
-);
+const SuppliersPage = lazy(() => import("../features/suppliers/components/SuppliersPage"));
+const CustomersPage = lazy(() => import("../features/customers/components/CustomersPage"));
+const ProfilePage = lazy(() => import("../features/profile/pages/ProfilePage"));
+const SettingsPage = lazy(() => import("../features/settings/components/SettingsPage"));
 const ReportsPage = lazy(() => import("../features/reports/pages/ReportsPage"));
-
-function PlaceholderPage({ title }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-      <span className="material-icons text-6xl mb-4">construction</span>
-      <h2 className="text-xl font-semibold text-slate-600">Trang {title}</h2>
-      <p className="text-sm mt-2">Chức năng đang được phát triển...</p>
-    </div>
-  );
-}
 
 export default function AppRouter() {
   return (

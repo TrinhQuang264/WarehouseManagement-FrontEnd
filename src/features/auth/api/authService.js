@@ -1,109 +1,114 @@
 import api from '../../../lib/axios';
+import { getUsernameFromToken, getUserIdFromToken } from '../../../utils/jwt';
 
 const authService = {
-  async login (username, password) {
+  
+  // POST /Authentication/login
+  async login(username, password) {
     try {
       const response = await api.post('/Authentication/login', {
         userName: username,
-        password: password
-      })
+        password: password,
+      });
 
-      // Hỗ trợ chuyển đổi do Backend ASP.NET Core thường trả về PascalCase hoặc camelCase
-      const accessToken = 
-        response.data.token || 
-        response.data.Token ||
-        response.data.accessToken ||
-        response.data.AccessToken;
-      
-      const refeshToken = 
-        response.refreshToken ||
-        response.RefreshToken;
-
-      let user = response.data.user || response.data.User;
-
-      if (!user && accessToken) {
-        user = { username };
-      }
+      const responseData = response.data;
+      const accessToken = responseData.accessToken;
+      const refreshToken = responseData.refreshToken;
 
       if (!accessToken) {
-        throw new Error('Server không trả về token.')
+        throw new Error('Server không trả về token.');
       }
 
-      // Lưu vào localStorage để dùng cho các request tiếp theo
       localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
+      const userId = getUserIdFromToken(accessToken);
+      const jwtUserName = getUsernameFromToken(accessToken) || username;
+      let user = { id: userId, userName: jwtUserName };
+      try {
+        if (userId) {
+          const userResponse = await api.get(`/Users/${userId}`);
+          const foundUser = userResponse.data;
+
+          if (foundUser) {
+            const firstName = foundUser.firstName || '';
+            const lastName = foundUser.lastName || '';
+
+            user = {
+              ...foundUser,
+              fullName: `${lastName} ${firstName}`.trim() || foundUser.userName,
+            };
+          }
+        }
+      } catch (userErr) {
+        console.warn('[Login] Không thể lấy profile chi tiết:', userErr?.message);
+        user.fullName = jwtUserName;
+      }
+
       localStorage.setItem('user', JSON.stringify(user));
+      console.log(`ĐĂNG NHẬP THÀNH CÔNG: ${user.fullName}`);    
+      return { accessToken, refreshToken, user };
+    } catch (error) {
+      console.error('Lỗi đăng nhập:', error);
+      throw error;
+    }
+  },
 
-      // Mục đính để gia hạn đăng nhập
-      if ( refeshToken ) {
-        localStorage.setItem('refreshToken', refeshToken);
-      }
-
-      return { accessToken, refeshToken, user }; 
-      } catch ( error ) {
-        throw error;
-      }
-    },
-
+  // POST /Authentication/refresh-token
   async refreshToken() {
     try {
       const storedRefreshToken = localStorage.getItem('refreshToken');
 
       if (!storedRefreshToken) {
-        throw new Error('Không có refresh token. Đăng nhập lại');
+        throw new Error('Không có refresh token. Đăng nhập lại.');
       }
 
       const response = await api.post('/Authentication/refresh-token', {
-        refreshToken : storedRefreshToken
-      }) ;
+        refreshToken: storedRefreshToken,
+      });
 
-      const newAccessToken =
-        response.data.token       ||
-        response.data.Token       ||
-        response.data.accessToken ||
-        response.data.AccessToken;
-
-      const newRefreshToken =
-        response.data.refreshToken ||
-        response.data.RefreshToken;
+      const newAccessToken = response.data.accessToken;
+      const newRefreshToken = response.data.refreshToken;
 
       if (!newAccessToken) {
-        throw new Error('Không nhận được token từ server');
+        throw new Error('Không nhận được token từ server.');
       }
-      
+
       localStorage.setItem('accessToken', newAccessToken);
 
-      if ( newRefreshToken) {
-        localStorage.setItem('refreshToken', newAccessToken);
+      if (newRefreshToken) {
+        localStorage.setItem('refreshToken', newRefreshToken);
       }
-
+      
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
-    } catch ( error) {
-      authService.clearSession();
-      throw error;
-    }
-  }, 
-
-  async changePassword(currentPassword, newPassword) {
-    try {
-      const response = await api.post('/Authentication/change-password', {
-        currentPassword: currentPassword,
-        newPassword: newPassword,
-      });
-      return response.data;
-
     } catch (error) {
+      authService.clearSession();
       throw error;
     }
   },
 
+  // POST /Authentication/change-password
+  async changePassword(userName, currentPassword, newPassword, confirmPassword) {
+    try {
+      const response = await api.post(`/Authentication/change-password?userName=${userName}`, {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('[authService] Lỗi changePassword:', error);
+      throw error;
+    }
+  },
+
+  // POST /Authentication/logout
   async logout() {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
-
       await api.post('/Authentication/logout', {
-        refreshToken: refreshToken,
+        refreshToken,
       });
-
     } catch (error) {
       console.warn('Logout API lỗi, vẫn xóa session local:', error.message);
     } finally {
@@ -111,7 +116,7 @@ const authService = {
     }
   },
 
-  // helper function
+  // Helper functions
   clearSession() {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
@@ -122,14 +127,13 @@ const authService = {
     return !!localStorage.getItem('accessToken');
   },
 
-
   getStoredUser() {
     const userStr = localStorage.getItem('user');
     if (!userStr) return null;
     try {
       return JSON.parse(userStr);
     } catch {
-      return null; 
+      return null;
     }
   },
 
@@ -137,6 +141,16 @@ const authService = {
     return localStorage.getItem('accessToken');
   },
 
+  // Lấy userId từ localStorage hoặc giải mã JWT
+  getUserId() {
+    const user = authService.getStoredUser();
+    if (user?.id || user?.Id) {
+      return user.id || user.Id;
+    }
+
+    const token = authService.getAccessToken();
+    return getUserIdFromToken(token);
+  },
 };
 
 export default authService;

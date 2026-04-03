@@ -15,7 +15,6 @@ export default function useProfile() {
       const data = await profileService.getProfile(userId);
       setProfile(data);
     } catch (err) {
-      console.error('Lỗi khi tải profile:', err);
       setError(err.message || 'Không thể tải thông tin cá nhân');
       toast.error('Lỗi khi tải thông tin cá nhân');
     } finally {
@@ -31,7 +30,6 @@ export default function useProfile() {
       toast.success('Cập nhật thông tin thành công!');
       return true;
     } catch (err) {
-      console.error('Lỗi khi cập nhật profile:', err);
       toast.error(err.response?.data?.message || 'Lỗi khi cập nhật thông tin');
       return false;
     } finally {
@@ -46,9 +44,6 @@ export default function useProfile() {
       toast.success('Đổi mật khẩu thành công!');
       return true;
     } catch (err) {
-      console.error('Lỗi khi đổi mật khẩu:', err);
-      
-      // Lấy message lỗi chi tiết nhất có thể từ server
       const errorData = err.response?.data;
       let errorMessage = 'Lỗi khi đổi mật khẩu';
       
@@ -56,7 +51,6 @@ export default function useProfile() {
         if (typeof errorData === 'string') {
           errorMessage = errorData;
         } else if (errorData.errors && typeof errorData.errors === 'object') {
-          // Xử lý lỗi validation từ .NET (thường là mảng các lỗi cho từng field)
           const firstErrorField = Object.values(errorData.errors)[0];
           if (Array.isArray(firstErrorField)) errorMessage = firstErrorField[0];
         } else {
