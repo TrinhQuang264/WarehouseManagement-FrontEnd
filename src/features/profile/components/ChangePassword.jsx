@@ -83,6 +83,7 @@ export default function ChangePassword({ authUser }) {
                 className="profile-input profile-input-editable"
                 placeholder="Nhập mật khẩu hiện tại"
                 type="password"
+                autoComplete="new-password"
               />
             </div>
           </div>
@@ -98,6 +99,7 @@ export default function ChangePassword({ authUser }) {
                 className="profile-input profile-input-editable"
                 placeholder="Nhập mật khẩu mới"
                 type="password"
+                autoComplete="new-password"
               />
               {isPasswordFocused && (
                 <div className="absolute top-1/2 left-full ml-4 w-64 z-10 -translate-y-1/2 md:w-max opacity-100 transition-opacity">
@@ -116,6 +118,7 @@ export default function ChangePassword({ authUser }) {
                 className={`profile-input profile-input-editable ${confirmError ? 'border-red-500' : ''}`}
                 placeholder="Xác nhận mật khẩu mới"
                 type="password"
+                autoComplete="new-password"
               />
               {confirmError && (
                 <p className="text-[11px] text-red-500 mt-1 absolute left-0 top-full">

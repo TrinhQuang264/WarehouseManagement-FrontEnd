@@ -4,6 +4,7 @@ import useProfile from '../hooks/useProfile';
 
 export default function ProfileInfo({ profile, authUser, userId, updateUser, handleUpdateProfile, loading }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -12,7 +13,7 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
     phoneNumber: '',
   });
 
-  useEffect(() => {
+  const resetForm = () => {
     if (profile) {
       const lastName = profile.lastName || '';
       const firstName = profile.firstName || '';
@@ -34,16 +35,48 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
         phoneNumber: authUser.phoneNumber || '',
       });
     }
+  };
+
+  useEffect(() => {
+    resetForm();
   }, [profile, authUser]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
   };
 
   const onUpdateProfile = async () => {
     if (!userId) {
       toast.error('Không tìm thấy ID người dùng. Hãy đăng nhập lại.');
+      return;
+    }
+
+    let formErrors = {};
+    let hasError = false;
+
+    if (!formData.email) {
+      formErrors.email = 'Email không được bỏ trống';
+      hasError = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      formErrors.email = 'Email không hợp lệ';
+      hasError = true;
+    }
+
+    if (!formData.phoneNumber) {
+      formErrors.phoneNumber = 'Số điện thoại không được bỏ trống';
+      hasError = true;
+    } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
+      formErrors.phoneNumber = 'Số điện thoại phải gồm 10 chữ số';
+      hasError = true;
+    }
+
+    if (hasError) {
+      setErrors(formErrors);
+      toast.error('Vui lòng kiểm tra lại thông tin không hợp lệ.');
       return;
     }
 
@@ -87,7 +120,13 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
           <h3 className="font-bold text-lg text-slate-900 dark:text-white">Thông tin cá nhân</h3>
         </div>
         <button
-          onClick={() => setIsEditing(!isEditing)}
+          onClick={() => {
+            if (isEditing) {
+              resetForm();
+            }
+            setIsEditing(!isEditing);
+            setErrors({});
+          }}
           className="text-sm font-medium text-primary hover:underline hover:text-blue-600 transition-colors px-2 py-1 rounded"
         >
           {isEditing ? 'Hủy' : 'Chỉnh sửa'}
@@ -96,7 +135,7 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
 
       <div className="p-8">
         <div className="flex flex-col md:flex-row items-start gap-12">
-          <div className="profile-avatar-box">
+          {/*<div className="profile-avatar-box">
             <div className="relative">
               <img
                 alt="Avatar"
@@ -110,7 +149,7 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
             <p className="text-[10px] text-slate-400 text-center uppercase tracking-widest font-bold">
               Ảnh đại diện
             </p>
-          </div>
+          </div>*/}
 
           <div className="profile-input-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="profile-input-group">
@@ -173,6 +212,9 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
                 onChange={handleInputChange}
                 placeholder={isEditing ? 'Nhập email' : ''}
               />
+              {isEditing && errors.email && (
+                <span className="text-red-500 text-xs mt-1 block">{errors.email}</span>
+              )}
             </div>
             <div className="profile-input-group">
               <label className="profile-label">Số điện thoại</label>
@@ -185,6 +227,9 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
                 onChange={handleInputChange}
                 placeholder={isEditing ? 'Nhập số điện thoại' : ''}
               />
+              {isEditing && errors.phoneNumber && (
+                <span className="text-red-500 text-xs mt-1 block">{errors.phoneNumber}</span>
+              )}
             </div>
           </div>
         </div>
@@ -192,7 +237,11 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
         {isEditing && (
           <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
             <button
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                resetForm();
+                setIsEditing(false);
+                setErrors({});
+              }}
               className="px-6 py-2 border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors font-semibold text-sm"
             >
               Hủy
