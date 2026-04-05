@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import usePageMode from '../../../hooks/usePageMode';
 import { useHeader } from '../../../contexts/HeaderContext';
 import { useProducts } from '../hooks/useProducts';
+import TrashBinDrawer from '../../../components/ui/TrashBinDrawer';
+import productService from '../api/productsService';
 
 import '../styles/Products.css';
 
@@ -16,7 +18,7 @@ import ProductDetailPage from './ProductDetailPage';
 
 export default function ProductsPage() {
   const mode = usePageMode('/products');
-  const { setTitle, setActionButton, setOnSearch, setSearchValue } = useHeader();
+  const { setTitle, setSubtitle, setActionButton, setExtraActions, setOnSearch, setSearchValue } = useHeader();
   const navigate = useNavigate();
   
   const {
@@ -35,24 +37,47 @@ export default function ProductsPage() {
     resetFilters,
     searchProducts,
     
+    // Selection & Bulk actions
+    selectedIds,
+    toggleSelect,
+    toggleSelectAll,
+    softDeleteProduct,
+    handleBulkSoftDelete,
+
     // Form handlers
     formData,
     setFormData,
     imagePreview,
     setImagePreview,
     handleSave,
-    products
+    products,
+
+    // Trash state
+    isTrashOpen,
+    setIsTrashOpen,
+    refreshList
   } = useProducts();
 
   useEffect(() => {
     if (mode.list) {
       setTitle('Quản lý sản phẩm');
+      setSubtitle('Danh sách các sản phẩm đang kinh doanh');
+      
       setActionButton({
         label: "Thêm sản phẩm",
         icon: <Plus size={18} />,
         onClick: () => navigate('/products/new'),
-        className: "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
+        className: "shadow-lg shadow-primary/20",
       });
+
+      setExtraActions([
+        {
+          label: "Thùng rác",
+          icon: <Trash2 size={18} />,
+          onClick: () => setIsTrashOpen(true),
+          className: "bg-slate-100 text-slate-600 hover:bg-slate-200",
+        }
+      ]);
       
       setOnSearch(() => searchProducts);
       
@@ -62,18 +87,21 @@ export default function ProductsPage() {
     } else if (mode.add) {
       setTitle('Thêm Sản Phẩm Mới');
       setActionButton(null);
+      setExtraActions([]);
       setOnSearch(null);
     } else if (mode.edit) {
       setTitle('Cập Nhật Sản Phẩm');
       setActionButton(null);
+      setExtraActions([]);
       setOnSearch(null);
     }
     
     return () => {
       setActionButton(null);
+      setExtraActions([]);
       setOnSearch(null);
     };
-  }, [mode.current, setTitle, setActionButton, setOnSearch, setSearchValue, searchProducts, navigate]);
+  }, [mode.current, setTitle, setSubtitle, setActionButton, setExtraActions, setOnSearch, setSearchValue, searchProducts, navigate, setIsTrashOpen]);
 
   // Handle Edit Data Initialization
   useEffect(() => {
@@ -104,8 +132,7 @@ export default function ProductsPage() {
 
   const handleDelete = (product) => {
     if (window.confirm(`Bạn có chắc muốn xóa sản phẩm ${product.name}?`)) {
-      console.log('Delete product', product);
-      // Calls actual API inside useProducts when implemented
+      softDeleteProduct(product.id);
     }
   };
 
@@ -180,47 +207,65 @@ export default function ProductsPage() {
 
   // DEFAULT: LIST MODE
   return (
-    <div className="products-page">
-      <div className="page-header">
-        <div>
-          <nav className="flex text-sm text-slate-500 mb-2">
-            <Link to="/" className="hover:text-primary transition-colors">
-              Trang chủ
-            </Link>
-            <span className="mx-2 text-slate-300">/</span>
-            <span className="text-slate-900 dark:text-white font-medium">
-              Sản phẩm
-            </span>
-          </nav>
+    <>
+      <div className="products-page">
+        <div className="page-header">
+          <div>
+            <nav className="flex text-sm text-slate-500 mb-2">
+              <Link to="/" className="hover:text-primary transition-colors">
+                Trang chủ
+              </Link>
+              <span className="mx-2 text-slate-300">/</span>
+              <span className="text-slate-900 dark:text-white font-medium">
+                Sản phẩm
+              </span>
+            </nav>
+          </div>
+        </div>
+        <div className="space-y-6">
+          <ProductsSearchFilter 
+            minPrice={minPrice}
+            setMinPrice={setMinPrice}
+            maxPrice={maxPrice}
+            setMaxPrice={setMaxPrice}
+            onResetFilters={resetFilters}
+          />
+          
+          <ProductsTable 
+            products={filteredProducts}
+            categories={categories}
+            loading={loading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onViewDetail={handleViewDetail}
+            selectedIds={selectedIds}
+            toggleSelect={toggleSelect}
+            toggleSelectAll={toggleSelectAll}
+            onBulkDelete={handleBulkSoftDelete}
+          />
+
+          {totalCount > 0 && (
+            <ProductsPagination 
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              pageSize={pageSize}
+              totalCount={totalCount}
+            />
+          )}
         </div>
       </div>
-      <div className="space-y-6">
-        <ProductsSearchFilter 
-          minPrice={minPrice}
-          setMinPrice={setMinPrice}
-          maxPrice={maxPrice}
-          setMaxPrice={setMaxPrice}
-          onResetFilters={resetFilters}
-        />
-        
-        <ProductsTable 
-          products={filteredProducts}
-          categories={categories}
-          loading={loading}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onViewDetail={handleViewDetail}
-        />
 
-        {totalCount > 0 && (
-          <ProductsPagination 
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            pageSize={pageSize}
-            totalCount={totalCount}
-          />
-        )}
-      </div>
-    </div>
+      <TrashBinDrawer 
+        isOpen={isTrashOpen}
+        onClose={() => setIsTrashOpen(false)}
+        title="Thùng rác sản phẩm"
+        service={productService}
+        onDataChange={refreshList}
+        columns={[
+          { label: 'Giá', key: 'price' },
+          { label: 'Tồn kho', key: 'quantity' }
+        ]}
+      />
+    </>
   );
 }

@@ -3,12 +3,14 @@ import { Folder, Link, FileText, Hash, Layers } from "lucide-react";
 import Modal from "../../../components/ui/Modal";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
+import Select from "../../../components/ui/Select";
 
 export default function CategoryModal({
   isOpen,
   onClose,
   onSave,
   editingCategory,
+  allCategories = [],
 }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -123,10 +125,8 @@ export default function CategoryModal({
               })
             }
           />
-          <Input
-            label="Danh mục cha (ID)"
-            type="number"
-            placeholder="0"
+          <Select
+            label="Danh mục cha"
             icon={<Layers size={18} />}
             value={formData.parentId}
             onChange={(e) =>
@@ -135,7 +135,17 @@ export default function CategoryModal({
                 parentId: parseInt(e.target.value) || 0,
               })
             }
-          />
+          >
+            <option value="0">--- Không có (Cấp cao nhất) ---</option>
+            {allCategories
+              .filter(c => !editingCategory || c.id !== editingCategory.id)
+              .map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))
+            }
+          </Select>
         </div>
 
         <div className="flex flex-col gap-2">

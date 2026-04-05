@@ -1,30 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
 
-const TOAST_DURATION = 2000;
+const TOAST_DURATION = 3000;
 
 export default function ToastContainer() {
   const [toasts, setToasts] = useState([]);
 
-  const removeToast = useCallback((id) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  const removeToastWithAnimation = useCallback((id) => {
+    setToasts((prev) => 
+      prev.map((t) => t.id === id ? { ...t, isExiting: true } : t)
+    );
+    
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 300);
   }, []);
 
   useEffect(() => {
     const handleToast = (event) => {
       const { type, message, id } = event.detail;
-      const newToast = { type, message, id };
+      const newToast = { type, message, id, isExiting: false };
       
       setToasts((prev) => [...prev, newToast]);
 
       setTimeout(() => {
-        removeToast(id);
+        removeToastWithAnimation(id);
       }, TOAST_DURATION);
     };
 
     window.addEventListener('app-toast', handleToast);
     return () => window.removeEventListener('app-toast', handleToast);
-  }, [removeToast]);
+  }, [removeToastWithAnimation]);
 
   return (
     <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-3 pointer-events-none">
@@ -32,7 +38,7 @@ export default function ToastContainer() {
         <ToastItem 
           key={toast.id} 
           toast={toast} 
-          onClose={() => removeToast(toast.id)} 
+          onClose={() => removeToastWithAnimation(toast.id)} 
         />
       ))}
     </div>
@@ -41,6 +47,7 @@ export default function ToastContainer() {
 
 function ToastItem({ toast, onClose }) {
   const configs = {
+    // ... (keep success, error, warning, info configs)
     success: {
       icon: <CheckCircle className="text-emerald-500" size={20} />,
       bg: 'bg-emerald-50 dark:bg-emerald-900/20',
@@ -73,8 +80,11 @@ function ToastItem({ toast, onClose }) {
     <div className={`
       ${config.bg} ${config.border} ${config.text}
       flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg
-      animate-in slide-in-from-right duration-300 pointer-events-auto
+      transition-all duration-300 pointer-events-auto
       min-w-[280px] max-w-md
+      ${toast.isExiting 
+        ? 'opacity-0 translate-x-12 scale-95 blur-sm' 
+        : 'animate-in slide-in-from-right opacity-100 translate-x-0 scale-100'}
     `}>
       <div className="shrink-0">{config.icon}</div>
       <p className="text-sm font-medium flex-1">{toast.message}</p>

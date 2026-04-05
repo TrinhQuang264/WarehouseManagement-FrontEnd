@@ -6,8 +6,6 @@ export default function CategoriesPagination({
   totalCount,
   onPageChange,
 }) {
-  console.log({ currentPage, pageSize, totalCount });
-  
   return (
     <PaginationBar
       currentPage={currentPage}

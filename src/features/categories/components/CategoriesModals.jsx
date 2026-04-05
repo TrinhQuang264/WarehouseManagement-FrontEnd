@@ -11,6 +11,7 @@ export default function CategoriesModals({
   onDeleteCategory,
   selectedCategory,
   loading,
+  allCategories = [],
 }) {
   return (
     <>
@@ -19,6 +20,7 @@ export default function CategoriesModals({
         onClose={onCloseModal}
         onSave={onSaveCategory}
         editingCategory={editingCategory}
+        allCategories={allCategories}
       />
 
       <ConfirmModal

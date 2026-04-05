@@ -21,6 +21,10 @@ export function useProducts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
   
   // Form modal state
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -41,7 +45,11 @@ export function useProducts() {
   const fetchCategories = async () => {
     try {
       const data = await categoryService.getAll();
-      setCategories(Array.isArray(data) ? data : []);
+      // Đảm bảo chỉ hiện thị danh mục chưa xóa trong dropdown/form
+      const activeCategories = Array.isArray(data) 
+        ? data.filter(c => c.isDeleted === false || c.isDelete === false || (!c.isDeleted && !c.isDelete))
+        : [];
+      setCategories(activeCategories);
     } catch (error) {
       console.warn('[useProducts] Lỗi lấy danh mục, dùng mockData');
     }
@@ -50,45 +58,19 @@ export function useProducts() {
   // Fetch sản phẩm
   const fetchProducts = async () => {
     setLoading(true);
-    
     try {
-      const response = await productService.filter({
-        filter: debouncedSearch,
-        pageIndex: currentPage,
-        pageSize: pageSize
-      });
+      // Sử dụng getAll() để lấy toàn bộ dữ liệu, hỗ trợ lọc và phân trang client-side chính xác nhất
+      const response = await productService.getAll();
       
-      let items = [];
-      let total = 0;
+      let allItems = Array.isArray(response) ? response : (response.data || []);
 
-      if (response) {
-        if (Array.isArray(response)) {
-          items = response;
-          total = response.length;
-        } else {
-          items = response.items || response.data || response.results || response.products || [];
-          total = response.totalCount || response.totalItems || response.count || response.total || items.length;
-        }
-      } else {
-        throw new Error('Empty response');
-      }
-      
-      setProducts(Array.isArray(items) ? items : []);
-      setTotalCount(total);
-      
-    } catch (error) {
-      console.warn('[useProducts] Fallback to mockData:', error.message);
-      
-      // Fallback về mockData khi API lỗi
-      let items = [...mockProducts];
-      
-      // Lọc theo search
-      if (debouncedSearch && debouncedSearch.trim()) {
-        const keyword = debouncedSearch.toLowerCase();
-        items = items.filter(p =>
-          p.name.toLowerCase().includes(keyword) ||
-          p.code.toLowerCase().includes(keyword) ||
-          p.description?.toLowerCase().includes(keyword)
+      // 1. Tìm kiếm (Client-side)
+      if (debouncedSearch) {
+        const searchLower = debouncedSearch.toLowerCase();
+        allItems = allItems.filter(item => 
+          (item.name && item.name.toLowerCase().includes(searchLower)) || 
+          (item.code && item.code.toLowerCase().includes(searchLower)) ||
+          (item.description && item.description.toLowerCase().includes(searchLower))
         );
       }
       
@@ -103,6 +85,7 @@ export function useProducts() {
     } finally {
       setLoading(false);
       setIsFirstFetch(false);
+      setSelectedIds([]);
     }
   };
 
@@ -168,7 +151,6 @@ export function useProducts() {
       setProducts(updatedProducts);
       setTotalCount(totalCount + 1);
       
-      console.log('[useProducts] Product added successfully:', newProduct);
       // toast.success('Thêm sản phẩm thành công');
     } catch (error) {
       console.error('[useProducts] Error adding product:', error);
@@ -230,6 +212,55 @@ export function useProducts() {
     setSearch(value);
   }, []);
 
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === products.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(products.map((p) => p.id));
+    }
+  };
+
+  const softDeleteProduct = async (id) => {
+    setLoading(true);
+    try {
+      await productService.softDelete(id);
+      // toast.success('Đã chuyển sản phẩm vào thùng rác');
+      fetchProducts();
+    } catch (error) {
+      console.error('[useProducts] Error soft deleting product:', error);
+      // toast.error('Lỗi khi xóa sản phẩm');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkSoftDelete = async () => {
+    if (selectedIds.length === 0) return;
+    setLoading(true);
+    try {
+      await productService.bulkSoftDelete(selectedIds);
+      // toast.success(`Đã chuyển ${selectedIds.length} sản phẩm vào thùng rác`);
+      setSelectedIds([]);
+      fetchProducts();
+    } catch (error) {
+      console.error('[useProducts] Error bulk soft deleting products:', error);
+      // toast.error('Lỗi khi xóa sản phẩm hàng loạt');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openDeleteModal = (product) => {
+    setSelectedProduct(product);
+    setIsDeleteModalOpen(true);
+  };
+
   return {
     // Data
     filteredProducts,
@@ -245,10 +276,10 @@ export function useProducts() {
     currentPage,
     pageSize,
     totalCount,
-    isFormOpen,
-    editingProduct,
     formData,
     imagePreview,
+    isTrashOpen,
+    setIsTrashOpen,
     
     // Setters
     setSearch,
@@ -259,14 +290,21 @@ export function useProducts() {
     setIsFormOpen,
     setFormData,
     setImagePreview,
+    setIsTrashOpen,
     
     // Handlers
     handleOpenAdd,
     handleOpenEdit,
     handleSave,
+    toggleSelect,
+    toggleSelectAll,
+    softDeleteProduct,
+    handleBulkSoftDelete,
+    openDeleteModal,
     
     // Methods
     resetFilters,
-    searchProducts
+    searchProducts,
+    refreshList: fetchProducts
   };
 }

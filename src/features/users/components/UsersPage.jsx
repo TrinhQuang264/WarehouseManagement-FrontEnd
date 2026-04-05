@@ -106,52 +106,12 @@ export default function UsersPage() {
       </DataTableCard>
 
       <PaginationBar
-        info={
-          <span className="pagination-info">
-            Hiển thị{" "}
-            <span className="font-medium text-slate-900 dark:text-white">
-              1 - {users.length}
-            </span>{" "}
-            trong tổng số{" "}
-            <span className="font-medium text-slate-900 dark:text-white">
-              {totalUsers}
-            </span>{" "}
-            người dùng
-          </span>
-        }
-      >
-        <div className="pagination-controls">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-            className="pagination-btn"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          {[1, 2, 3].map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`pagination-page-btn ${currentPage === page ? "pagination-page-btn-active" : ""}`}
-            >
-              {page}
-            </button>
-          ))}
-          <span className="text-slate-400 mx-1">...</span>
-          <button
-            onClick={() => setCurrentPage(6)}
-            className="pagination-page-btn"
-          >
-            6
-          </button>
-          <button
-            onClick={() => setCurrentPage((p) => p + 1)}
-            className="pagination-btn"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      </PaginationBar>
+        currentPage={currentPage}
+        pageSize={10} // Giả định pageSize là 10 dựa trên dữ liệu mẫu
+        totalCount={totalUsers}
+        onPageChange={setCurrentPage}
+        resourceName="người dùng"
+      />
       </div>
   );
 }

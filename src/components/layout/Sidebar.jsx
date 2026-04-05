@@ -88,21 +88,33 @@ export default function Sidebar({ user, onLogout }) {
       {/* User Info */}
       <div className="sidebar-user">
         <div className="flex items-center gap-3 px-2 py-2">
-          <Link to="/profile" className="flex items-center gap-3 flex-1 overflow-hidden group cursor-pointer">
+          <NavLink 
+            to="/profile" 
+            className={({ isActive }) => 
+              `flex items-center gap-3 flex-1 overflow-hidden group cursor-pointer p-2 rounded-lg transition-all ${
+                isActive ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`
+            }
+          >
             <Avatar
               src={user?.avatar}
-              name={user?.fullName || 'User'}
+              name={user?.fullName || user?.userName || 'User'}
               size="md"
             />
             <div className="overflow-hidden flex-1">
-              <p className="text-sm font-semibold truncate text-slate-900 dark:text-white group-hover:text-primary transition-colors">
-                {user?.fullName || 'Người dùng'}
+              <p className={`text-sm font-semibold truncate transition-colors ${
+                user?.role ? 'text-slate-900 dark:text-white' : 'text-primary'
+              }`}>
+                {user?.fullName || 
+                 (user?.lastName && user?.firstName ? `${user.lastName} ${user.firstName}` : null) ||
+                 user?.userName || 
+                 'Người dùng'}
               </p>
               <p className="text-xs text-slate-500 truncate">
                 {user?.role || 'Nhân viên'}
               </p>
             </div>
-          </Link>
+          </NavLink>
           <button
             onClick={onLogout}
             className="text-slate-400 hover:text-accent-red transition-colors p-1"

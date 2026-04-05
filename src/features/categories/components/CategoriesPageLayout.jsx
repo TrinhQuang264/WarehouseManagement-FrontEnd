@@ -21,6 +21,11 @@ export default function CategoriesPageLayout({
   onCloseDeleteModal,
   onDeleteCategory,
   selectedCategory,
+  selectedIds,
+  toggleSelect,
+  toggleSelectAll,
+  onBulkDelete,
+  allActiveCategories = [],
 }) {
   return (
     <div className="categories-page">
@@ -34,6 +39,10 @@ export default function CategoriesPageLayout({
         onEdit={onEdit}
         onDelete={onDelete}
         searchTerm={searchTerm}
+        selectedIds={selectedIds}
+        toggleSelect={toggleSelect}
+        toggleSelectAll={toggleSelectAll}
+        onBulkDelete={onBulkDelete}
       />
 
       <div className="">
@@ -55,6 +64,7 @@ export default function CategoriesPageLayout({
         onDeleteCategory={onDeleteCategory}
         selectedCategory={selectedCategory}
         loading={loading}
+        allCategories={allActiveCategories}
       />
     </div>
   );

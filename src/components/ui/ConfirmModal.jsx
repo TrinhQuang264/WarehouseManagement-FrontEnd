@@ -20,7 +20,7 @@ export default function ConfirmModal({
   onConfirm,
   title = 'Xác nhận xóa',
   message = 'Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác.',
-  confirmLabel = 'Của người dùng',
+  confirmText = 'Xác nhận',
   loading = false,
   variant = 'danger'
 }) {
@@ -28,7 +28,7 @@ export default function ConfirmModal({
     <>
       <Button 
         variant="secondary" 
-        onClick={onClose}
+        onClick={onClose} 
         disabled={loading}
       >
         Hủy bỏ
@@ -38,7 +38,7 @@ export default function ConfirmModal({
         onClick={onConfirm}
         loading={loading}
       >
-        {confirmLabel}
+        {confirmText}
       </Button>
     </>
   );

@@ -36,15 +36,8 @@ api.interceptors.response.use(
           refreshToken: storedRefreshToken,
         });
 
-        const newAccessToken =
-          response.data.accessToken ||
-          response.data.AccessToken ||
-          response.data.token ||
-          response.data.Token;
-
-        const newRefreshToken =
-          response.data.refreshToken || 
-          response.data.RefreshToken;
+        const newAccessToken = response.data.accessToken;
+        const newRefreshToken = response.data.refreshToken;
 
         if (newAccessToken) {
           // Lưu token mới

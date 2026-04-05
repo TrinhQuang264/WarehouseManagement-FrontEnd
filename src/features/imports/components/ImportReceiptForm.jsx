@@ -1,8 +1,17 @@
-import { CalendarDays, FileText, PackagePlus, Save, Search, Store, Trash2, X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import Button from '../../../components/ui/Button.jsx';
-import DataTableCard from '../../../components/ui/DataTableCard.jsx';
-import { formatCurrency } from '../../../utils/util.js';
+import {
+  CalendarDays,
+  FileText,
+  PackagePlus,
+  Save,
+  Search,
+  Store,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import Button from "../../../components/ui/Button.jsx";
+import DataTableCard from "../../../components/ui/DataTableCard.jsx";
+import { formatCurrency } from "../../../utils/util.js";
 
 function ReceiptSummary({ receipt }) {
   return (
@@ -53,28 +62,40 @@ export default function ImportReceiptForm({
   onCancel,
 }) {
   const selectedProduct = useMemo(
-    () => products.find((product) => String(product.id) === String(draftItem.productId)) || null,
+    () =>
+      products.find(
+        (product) => String(product.id) === String(draftItem.productId),
+      ) || null,
     [products, draftItem.productId],
   );
 
-  const [productSearch, setProductSearch] = useState('');
+  const [productSearch, setProductSearch] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
-    setProductSearch(selectedProduct?.name || '');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setProductSearch(selectedProduct?.name || "");
   }, [selectedProduct]);
 
   const searchResults = useMemo(() => {
-    const keyword = String(productSearch ?? '').trim().toLowerCase();
+    const keyword = String(productSearch ?? "")
+      .trim()
+      .toLowerCase();
     if (!keyword) return products.slice(0, 6);
 
     return products
-      .filter((product) => [product.name, product.code, product.description].some((value) => String(value ?? '').toLowerCase().includes(keyword)))
+      .filter((product) =>
+        [product.name, product.code, product.description].some((value) =>
+          String(value ?? "")
+            .toLowerCase()
+            .includes(keyword),
+        ),
+      )
       .slice(0, 6);
   }, [products, productSearch]);
 
   const handleSelectProduct = (product) => {
-    onDraftItemChange('productId', String(product.id));
+    onDraftItemChange("productId", String(product.id));
     setProductSearch(product.name);
     setIsSearchOpen(false);
   };
@@ -99,7 +120,9 @@ export default function ImportReceiptForm({
                   <select
                     className="imports-input imports-input-icon"
                     value={receipt.supplierId}
-                    onChange={(event) => onMetaChange('supplierId', event.target.value)}
+                    onChange={(event) =>
+                      onMetaChange("supplierId", event.target.value)
+                    }
                   >
                     <option value="">Chọn nhà cung cấp...</option>
                     {suppliers.map((supplier) => (
@@ -119,7 +142,9 @@ export default function ImportReceiptForm({
                     type="date"
                     className="imports-input imports-input-icon"
                     value={receipt.date}
-                    onChange={(event) => onMetaChange('date', event.target.value)}
+                    onChange={(event) =>
+                      onMetaChange("date", event.target.value)
+                    }
                   />
                 </div>
               </label>
@@ -130,7 +155,9 @@ export default function ImportReceiptForm({
                   type="text"
                   className="imports-input"
                   value={receipt.referenceCode}
-                  onChange={(event) => onMetaChange('referenceCode', event.target.value)}
+                  onChange={(event) =>
+                    onMetaChange("referenceCode", event.target.value)
+                  }
                   placeholder="VD: PO-202603-9001"
                 />
               </label>
@@ -143,7 +170,9 @@ export default function ImportReceiptForm({
                     type="text"
                     className="imports-input imports-input-icon"
                     value={receipt.note}
-                    onChange={(event) => onMetaChange('note', event.target.value)}
+                    onChange={(event) =>
+                      onMetaChange("note", event.target.value)
+                    }
                     placeholder="Nhập ghi chú thêm..."
                   />
                 </div>
@@ -189,11 +218,20 @@ export default function ImportReceiptForm({
                           onClick={() => handleSelectProduct(product)}
                         >
                           <div className="imports-search-result-thumb">
-                            {product.imageUrl ? <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" /> : null}
+                            {product.imageUrl ? (
+                              <img
+                                src={product.imageUrl}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : null}
                           </div>
                           <div className="imports-search-result-content">
                             <p>{product.name}</p>
-                            <span>{product.code} • {product.description || 'Sản phẩm kho'}</span>
+                            <span>
+                              {product.code} •{" "}
+                              {product.description || "Sản phẩm kho"}
+                            </span>
                           </div>
                         </button>
                       ))}
@@ -209,22 +247,30 @@ export default function ImportReceiptForm({
                   min="1"
                   className="imports-input"
                   value={draftItem.quantity}
-                  onChange={(event) => onDraftItemChange('quantity', event.target.value)}
+                  onChange={(event) =>
+                    onDraftItemChange("quantity", event.target.value)
+                  }
                 />
               </label>
               <label className="imports-field imports-entry-price">
-                  <span>Đơn giá (VNĐ)</span>
+                <span>Đơn giá (VNĐ)</span>
                 <input
                   type="number"
                   min="0"
                   className="imports-input imports-input-right"
                   value={draftItem.unitPrice}
-                  onChange={(event) => onDraftItemChange('unitPrice', event.target.value)}
+                  onChange={(event) =>
+                    onDraftItemChange("unitPrice", event.target.value)
+                  }
                 />
               </label>
 
               <div className="imports-entry-action">
-                <Button variant="secondary" className="w-full justify-center border-primary/20 text-primary hover:bg-primary hover:text-white" onClick={onAddItem}>
+                <Button
+                  variant="secondary"
+                  className="w-full justify-center border-primary/20 text-primary hover:bg-primary hover:text-white"
+                  onClick={onAddItem}
+                >
                   Thêm
                 </Button>
               </div>
@@ -247,31 +293,66 @@ export default function ImportReceiptForm({
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
                   {receipt.items.map((item, index) => (
-                    <tr key={item.id || `${item.productId}-${index}`} className="table-row-hover">
-                      <td className="px-6 py-4 text-sm text-slate-500">{String(index + 1).padStart(2, '0')}</td>
+                    <tr
+                      key={item.id || `${item.productId}-${index}`}
+                      className="table-row-hover"
+                    >
+                      <td className="px-6 py-4 text-sm text-slate-500">
+                        {String(index + 1).padStart(2, "0")}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="imports-product-thumb">
-                            {item.imageUrl ? <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" /> : null}
+                            {item.imageUrl ? (
+                              <img
+                                src={item.imageUrl}
+                                alt={item.productName}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : null}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white">{item.productName}</p>
-                            <p className="text-xs text-slate-500">{item.description || 'Linh kiện kho'}</p>
+                            <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                              {item.productName}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {item.description || "Linh kiện kho"}
+                            </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-mono text-slate-500 uppercase">{item.sku}</td>
+                      <td className="px-6 py-4 text-sm font-mono text-slate-500 uppercase">
+                        {item.sku}
+                      </td>
                       <td className="px-6 py-4 text-center">
                         <div className="imports-qty-stepper">
-                          <button type="button" onClick={() => onDecreaseQty(item.id)}>-</button>
+                          <button
+                            type="button"
+                            onClick={() => onDecreaseQty(item.id)}
+                          >
+                            -
+                          </button>
                           <span>{item.quantity}</span>
-                          <button type="button" onClick={() => onIncreaseQty(item.id)}>+</button>
+                          <button
+                            type="button"
+                            onClick={() => onIncreaseQty(item.id)}
+                          >
+                            +
+                          </button>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right text-sm">{formatCurrency(item.unitPrice)}</td>
-                      <td className="px-6 py-4 text-right text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(item.lineTotal)}</td>
+                      <td className="px-6 py-4 text-right text-sm">
+                        {formatCurrency(item.unitPrice)}
+                      </td>
+                      <td className="px-6 py-4 text-right text-sm font-bold text-slate-900 dark:text-white">
+                        {formatCurrency(item.lineTotal)}
+                      </td>
                       <td className="px-6 py-4 text-center">
-                        <button type="button" onClick={() => onRemoveItem(item.id)} className="imports-danger-btn">
+                        <button
+                          type="button"
+                          onClick={() => onRemoveItem(item.id)}
+                          className="imports-danger-btn"
+                        >
                           <Trash2 size={16} />
                         </button>
                       </td>
@@ -287,13 +368,24 @@ export default function ImportReceiptForm({
           <ReceiptSummary receipt={receipt} />
 
           <div className="imports-side-actions">
+            {onSaveDraft && (
+              <Button
+                variant="secondary"
+                className="w-full justify-center py-3 mb-2"
+                icon={<Save size={18} />}
+                onClick={onSaveDraft}
+              >
+                Lưu nháp
+              </Button>
+            )}
             <Button className="w-full justify-center py-3" onClick={onSubmit}>
-              {mode === 'edit' ? 'Cập nhật phiếu nhập' : 'Xác nhận nhập kho'}
+              {mode === "edit" ? "Cập nhật phiếu nhập" : "Xác nhận nhập kho"}
             </Button>
-            {/* <Button variant="secondary" className="w-full justify-center py-3" icon={<Save size={18} />} onClick={onSaveDraft}>
-              Lưu nháp
-            </Button> */}
-            <button type="button" className="imports-cancel-link" onClick={onCancel}>
+            <button
+              type="button"
+              className="imports-cancel-link"
+              onClick={onCancel}
+            >
               <X size={16} /> Hủy bỏ phiếu này
             </button>
           </div>
@@ -302,5 +394,3 @@ export default function ImportReceiptForm({
     </div>
   );
 }
-
-

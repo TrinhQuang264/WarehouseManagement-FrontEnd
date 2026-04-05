@@ -6,13 +6,25 @@ export default function CategoryTable({
   loading,
   onEdit,
   onDelete,
+  selectedIds = [],
+  toggleSelect,
+  toggleSelectAll,
 }) {
+  const isAllSelected = categories.length > 0 && selectedIds.length === categories.length;
+
   return (
     <div className="table-wrapper">
       <table className="table">
         <thead>
           <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
-            <th className="table-th px-6">ID</th>
+            <th className="table-th px-6 w-10">
+              <input
+                type="checkbox"
+                className="rounded border-slate-300 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
+                checked={isAllSelected}
+                onChange={toggleSelectAll}
+              />
+            </th>
             <th className="table-th px-6">Tên Danh Mục</th>
             <th className="table-th px-6">Mô Tả SEO</th>
             <th className="table-th px-6 text-right">Thao Tác</th>
@@ -23,22 +35,34 @@ export default function CategoryTable({
         >
           {categories.length > 0 ? (
             categories.map((category) => (
-              <tr key={category.id} className="group table-row-hover">
-                <td className="px-6 py-5 text-sm font-bold text-slate-700 dark:text-slate-300">
-                  #{category.id.toString().padStart(4, "0")}
+              <tr key={category.id} className={`group table-row-hover ${selectedIds.includes(category.id) ? 'bg-primary/5' : ''}`}>
+                <td className="px-6 py-5">
+                  <input
+                    type="checkbox"
+                    className="rounded border-slate-300 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
+                    checked={selectedIds.includes(category.id)}
+                    onChange={() => toggleSelect(category.id)}
+                  />
                 </td>
                 <td className="px-6 py-5">
-                  <div className="flex items-center gap-3">
-                    <div className="category-icon-box bg-primary/10 text-primary p-2 rounded-lg group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                      <FolderOpen size={18} />
+                  <div className="flex items-center gap-4">
+                    <div className="category-icon-box bg-primary/10 text-primary p-2.5 rounded-2xl group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm group-hover:shadow-primary/20 group-hover:-translate-y-0.5">
+                      <FolderOpen size={20} />
                     </div>
-                    <span className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
-                      {category.name}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+                        {category.name}
+                      </span>
+                      {category.seoAlias && (
+                        <span className="text-[10px] text-slate-400 font-mono">/{category.seoAlias}</span>
+                      )}
+                    </div>
                   </div>
                 </td>
-                <td className="px-6 py-5 text-sm text-slate-500 max-w-xs truncate">
-                  {category.seoDescription || "Chưa có mô tả"}
+                <td className="px-6 py-5">
+                  <p className="text-sm text-slate-500 max-w-sm line-clamp-1 italic">
+                    {category.seoDescription || "Chưa có mô tả SEO cho danh mục này"}
+                  </p>
                 </td>
                 <td className="px-6 py-5 text-right">
                   <div className="flex items-center justify-end gap-2">

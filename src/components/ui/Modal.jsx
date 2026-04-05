@@ -43,7 +43,7 @@ export default function Modal({
   const isFullscreen = size === 'fullscreen';
 
   const modalContent = (
-    <div className={`fixed inset-0 z-[999] flex items-center justify-center ${isFullscreen ? '' : 'p-4 sm:p-6'} overflow-y-auto`}>
+    <div className={`fixed inset-0 z-[1100] flex items-center justify-center ${isFullscreen ? '' : 'p-4 sm:p-6'} overflow-y-auto`}>
       {/* Backdrop */}
       {!isFullscreen && (
         <div 

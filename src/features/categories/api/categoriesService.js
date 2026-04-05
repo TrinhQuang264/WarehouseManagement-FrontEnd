@@ -5,18 +5,25 @@ const categoryService = {
   async getAll() {
     try {
       const response = await api.get('/Categories/all');
-      return response.data;
+      return response.data || [];
     } catch (error) {
-      console.warn('[categoryService] Lỗi getAll', error);
+      console.warn('[categoryService] Lỗi getAll:', error);
+      return [];
     }
   },
 
   // GET /api/Categories/filter
   async filter(params = {}) {
     try {
-      const response = await api.get('/Categories/filter', { params });
-        console.log("RAW RESPONSE:", response);
-        return response.data;
+      // Mặc định lọc isDeleted=false nếu không truyền gì vào params
+      const response = await api.get('/Categories/filter', { 
+        params: { 
+          isDeleted: false,
+          ...params 
+        } 
+      });
+      console.log("RAW RESPONSE:", response);
+      return response.data;
     } catch (error) {
       console.error('[categoryService] Lỗi filter data từ API:', error);
       throw error;
@@ -55,13 +62,24 @@ const categoryService = {
     }
   },
 
-  // DELETE /api/Categories/{id}/soft-delete
+  // PUT /api/Categories/{id}/soft-delete
   async softDelete(id) {
     try {
       const response = await api.delete(`/Categories/${id}/soft-delete`);
       return response.data;
     } catch (error) {
       console.error('[categoryService] Lỗi khi xóa mềm:', error);
+      throw error;
+    }
+  },
+
+  // PUT /api/Categories/bulk-soft-delete
+  async bulkSoftDelete(ids) {
+    try {
+      const response = await api.delete('/Categories/bulk-soft-delete', { data: { ids } });
+      return response.data;
+    } catch (error) {
+      console.error('[categoryService] Lỗi xóa mềm hàng loạt:', error);
       throw error;
     }
   },
@@ -73,6 +91,17 @@ const categoryService = {
       return response.data;
     } catch (error) {
       console.error('[categoryService] Lỗi khi xóa vĩnh viễn:', error);
+      throw error;
+    }
+  },
+
+  // DELETE /api/Categories/bulk-permanent-delete 
+  async bulkPermanentDelete(ids) {
+    try {
+      const response = await api.delete('/Categories/bulk-permanent-delete', { data: { ids } });
+      return response.data;
+    } catch (error) {
+      console.error('[categoryService] Lỗi xóa vĩnh viễn hàng loạt:', error);
       throw error;
     }
   },
@@ -107,6 +136,17 @@ const categoryService = {
     } catch (error) {
       console.warn('[categoryService] Lỗi getProductsByCategory:', error);
       return [];
+    }
+  },
+
+  // GET /api/Categories/trash
+  async getTrash() {
+    try {
+      const response = await api.get('/Categories/trash');
+      return response.data;
+    } catch (error) {
+      console.error('[categoryService] Lỗi khi lấy dữ liệu thùng rác:', error);
+      throw error;
     }
   }
 };

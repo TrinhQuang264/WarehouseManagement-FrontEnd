@@ -20,6 +20,17 @@ export function useCategories() {
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const [totalCount, setTotalCount] = useState(0);
 
+  // States quản lý chọn hàng loạt (Bulk Selection)
+  const [selectedIds, setSelectedIds] = useState([]);
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
+  const [allActiveCategories, setAllActiveCategories] = useState([]);
+  
+  const isFirstMount = useRef(true);
+  
   useEffect(() => {
     const params = new URLSearchParams();
     if (currentPage > 1) params.set("page", currentPage);
@@ -29,114 +40,68 @@ export function useCategories() {
     setSearchParams(params, { replace: true });
   }, [currentPage, debouncedSearch, setSearchParams]);
 
-  // --- States quản lý UI (Modal) ---
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-
-  const isFirstMount = useRef(true);
-
   useEffect(() => {
     if (isFirstMount.current) {
       isFirstMount.current = false;
       return;
     }
 
-    // Debounce 500ms để tránh gọi API liên tục khi user đang gõ phím nhanh
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
       setCurrentPage(1);
-    }, 500);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [search]);
 
-  /**
-   * 2. Parse response từ API — hỗ trợ nhiều cấu trúc trả về khác nhau
-   * Trả về { items, total, isServerPaginated }
-   */
-  const parseResponse = (response) => {
-    if (!response) return { items: [], total: 0, isServerPaginated: false };
-
-    // Cấu trúc: { items, totalRecords } — cấu trúc API hiện tại
-    if (response.items) {
-      return {
-        items: response.items,
-        total: response.totalRecords ?? response.totalCount ?? response.items.length,
-        isServerPaginated: true,
-      };
+  const checkNameExists = async (name) => {
+    try {
+      const checkResult = await categoryService.checkName(name);
+      return typeof checkResult === "object" 
+        ? (checkResult.isExist || checkResult.data?.isExist || checkResult.exists) 
+        : checkResult === true;
+    } catch (error) {
+      console.error("[useCategories] Lỗi kiểm tra tên:", error);
+      return false;
     }
-
-    // Cấu trúc: { results, totalRecords }
-    if (response.results) {
-      return {
-        items: response.results,
-        total: response.totalRecords ?? response.totalCount ?? response.results.length,
-        isServerPaginated: true,
-      };
-    }
-
-    // Cấu trúc: { data: { items, totalRecords } } — axios bọc thêm 1 lớp data
-    if (response.data?.items) {
-      return {
-        items: response.data.items,
-        total: response.data.totalRecords ?? response.data.totalCount ?? response.data.items.length,
-        isServerPaginated: true,
-      };
-    }
-
-    // Cấu trúc: { data: [...] }
-    if (Array.isArray(response.data)) {
-      return {
-        items: response.data,
-        total: response.totalRecords ?? response.totalCount ?? response.data.length,
-        isServerPaginated: !!(response.totalRecords ?? response.totalCount),
-      };
-    }
-
-    // Cấu trúc: [...] — API trả về mảng thẳng, phân trang client-side
-    if (Array.isArray(response)) {
-      return {
-        items: response,
-        total: response.length,
-        isServerPaginated: false,
-      };
-    }
-
-    return { items: [], total: 0, isServerPaginated: false };
   };
 
-  /**
-   * 3. Lấy dữ liệu danh mục từ API
-   */
   const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await categoryService.filter({
-        filter: debouncedSearch,
-        pageIndex: currentPage,
-        pageSize: pageSize,
-      });
+      const response = await categoryService.getAll();
+      let allItems = Array.isArray(response) ? response : (response.data || []);
 
-      let { items, total, isServerPaginated } = parseResponse(response);
-
-      // Nếu API trả về toàn bộ dữ liệu (không phân trang server-side),
-      // tính total trước rồi mới slice để phân trang client-side
-      if (!isServerPaginated && items.length > 0) {
-        total = items.length; // tổng thực sự
-        const start = (currentPage - 1) * pageSize;
-        items = items.slice(start, start + pageSize);
+      const activeItems = allItems.filter(item => 
+        item.isDeleted === false
+      );
+      
+      setAllActiveCategories(activeItems);
+      let filteredItems = [...activeItems];
+      if (debouncedSearch) {
+        const searchLower = debouncedSearch.toLowerCase();
+        filteredItems = filteredItems.filter(item => 
+          item.name?.toLowerCase().includes(searchLower) || 
+          item.seoDescription?.toLowerCase().includes(searchLower)
+        );
       }
+      
+      const total = filteredItems.length;
 
-      setCategories(items);
+      //Phân trang 
+      const start = (currentPage - 1) * pageSize;
+      const paginatedItems = filteredItems.slice(start, start + pageSize);
+
+      setCategories(paginatedItems);
       setTotalCount(total);
     } catch (error) {
-      console.error("[useCategories] Lỗi lấy dữ liệu API:", error);
+      console.error("useCategories - Lỗi lấy dữ liệu API:", error);
       setCategories([]);
       setTotalCount(0);
     } finally {
       setLoading(false);
       setIsFirstFetch(false);
+      setSelectedIds([]);
     }
   }, [debouncedSearch, currentPage, pageSize]);
 
@@ -145,17 +110,12 @@ export function useCategories() {
     fetchCategories();
   }, [fetchCategories]);
 
-  /**
-   * 4. Xử lý Thêm mới Danh mục
-   */
+  // Thêm mới Danh mục
   const handleAddCategory = async (data) => {
     setLoading(true);
     try {
-      const checkResult = await categoryService.checkName(data.name);
-      const isExist = typeof checkResult === "object" ? checkResult.isExist || checkResult.data?.isExist || checkResult.exists : checkResult === true;
-      if (isExist) {
+      if (await checkNameExists(data.name)) {
         toast.error("Tên danh mục đã tồn tại!");
-        setLoading(false);
         return false;
       }
 
@@ -165,7 +125,7 @@ export function useCategories() {
       fetchCategories();
       return true;
     } catch (error) {
-      console.error("[useCategories] handleAddCategory error:", error);
+      console.error("useCategories - handleAddCategory error:", error);
       toast.error("Không thể thêm danh mục. Vui lòng thử lại.");
       return false;
     } finally {
@@ -173,18 +133,13 @@ export function useCategories() {
     }
   };
 
-  /**
-   * 5. Xử lý Cập nhật Danh mục
-   */
+  // Xử lý Cập nhật Danh mục
   const handleUpdateCategory = async (id, data) => {
     setLoading(true);
     try {
       if (selectedCategory && selectedCategory.name !== data.name) {
-        const checkResult = await categoryService.checkName(data.name);
-        const isExist = typeof checkResult === "object" ? checkResult.isExist || checkResult.data?.isExist || checkResult.exists : checkResult === true;
-        if (isExist) {
+        if (await checkNameExists(data.name)) {
           toast.error("Tên danh mục đã tồn tại!");
-          setLoading(false);
           return false;
         }
       }
@@ -204,7 +159,7 @@ export function useCategories() {
       fetchCategories();
       return true;
     } catch (error) {
-      console.error("[useCategories] handleUpdateCategory error:", error);
+      console.error("useCategories - handleUpdateCategory error:", error);
       toast.error("Lỗi khi cập nhật danh mục. Hãy kiểm tra lại dữ liệu.");
       return false;
     } finally {
@@ -212,9 +167,7 @@ export function useCategories() {
     }
   };
 
-  /**
-   * 6. Xử lý Xóa mềm (Soft Delete)
-   */
+  // Xử lý Xóa mềm (Soft Delete)
   const handleDeleteCategory = async () => {
     if (!selectedCategory) return;
     setLoading(true);
@@ -225,28 +178,62 @@ export function useCategories() {
       setSelectedCategory(null);
       fetchCategories();
     } catch (error) {
-      console.error("[useCategories] handleDeleteCategory error:", error);
+      console.error("useCategories - handleDeleteCategory error:", error);
       toast.error("Không thể xóa danh mục này.");
     } finally {
       setLoading(false);
     }
   };
 
-  // --- Mở Modal để Sửa ---
+  // Mở Modal để Sửa
   const openEditModal = (category) => {
     setSelectedCategory(category);
     setIsModalOpen(true);
   };
 
-  // --- Mở Modal để Xóa ---
+  // Mở Modal để Xóa
   const openDeleteModal = (category) => {
     setSelectedCategory(category);
     setIsDeleteModalOpen(true);
   };
 
+  // Logic Chọn Checkbox
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === categories.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(categories.map((c) => c.id));
+    }
+  };
+
+  // Hành động hàng loạt
+  const handleBulkSoftDelete = async () => {
+    if (selectedIds.length === 0) return;
+    
+    setLoading(true);
+    try {
+      await categoryService.bulkSoftDelete(selectedIds);
+      toast.success(`Đã xóa ${selectedIds.length} danh mục vào thùng rác`);
+      setSelectedIds([]);
+      fetchCategories();
+    } catch (error) {
+      console.error("useCategories - handleBulkSoftDelete error:", error);
+      toast.error("Không thể xóa các danh mục đã chọn.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     // Dữ liệu & Loading
     categories,
+    allActiveCategories,
     loading,
     isFirstFetch,
 
@@ -267,13 +254,19 @@ export function useCategories() {
     setIsDeleteModalOpen,
     selectedCategory,
     setSelectedCategory,
+    isTrashOpen,
+    setIsTrashOpen,
 
     // Actions
     handleAddCategory,
     handleUpdateCategory,
     handleDeleteCategory,
+    handleBulkSoftDelete,
     openEditModal,
     openDeleteModal,
+    toggleSelect,
+    toggleSelectAll,
+    selectedIds,
     refreshList: fetchCategories,
   };
 }
