@@ -1,89 +1,111 @@
 import api from '../../../lib/axios';
-import { categories as mockCategories } from '../../../utils/mockData';
 
-/**
- * Service quản lý các yêu cầu API liên quan đến Danh mục sản phẩm
- */
 const categoryService = {
-  /**
-   * Lấy danh sách tất cả các danh mục
-   * GET /api/Categories/all
-   * @returns {Promise<Array>}
-   */
+  // GET /api/Categories/all
   async getAll() {
     try {
       const response = await api.get('/Categories/all');
       return response.data;
     } catch (error) {
-      console.warn('[categoryService] Fallback to mockData for getAll');
-      return mockCategories;
+      console.warn('[categoryService] Lỗi getAll', error);
     }
   },
 
-  /**
-   * Lấy chi tiết thông tin một danh mục theo ID
-   * GET /api/Categories/{id}
-   * @param {string|number} id - ID của danh mục
-   * @returns {Promise<Object>}
-   */
+  // GET /api/Categories/filter
+  async filter(params = {}) {
+    try {
+      const response = await api.get('/Categories/filter', { params });
+        console.log("RAW RESPONSE:", response);
+        return response.data;
+    } catch (error) {
+      console.error('[categoryService] Lỗi filter data từ API:', error);
+      throw error;
+    }
+  },
+
+  // GET /api/Categories/{id}
   async getById(id) {
     try {
       const response = await api.get(`/Categories/${id}`);
       return response.data;
     } catch (error) {
-      console.warn(`[categoryService] Fallback to mockData for getById(${id})`);
-      return mockCategories.find(c => c.id === Number(id)) || null;
+      console.warn('[categoryService] Lỗi getById, trả về null', error);
     }
   },
 
-  /**
-   * Lọc và tìm kiếm danh mục
-   * GET /api/Categories/filter
-   * @param {Object} params - Các tham số lọc { filter, pageIndex, pageSize }
-   * @returns {Promise<Object>}
-   */
-  async filter(params = {}) {
+  // POST /api/Categories
+  async create(data) {
     try {
-      const response = await api.get('/Categories/filter', { params });
+      const response = await api.post('/Categories', data);
       return response.data;
     } catch (error) {
-      console.warn('[categoryService] Fallback to mockData for filter');
-      const { filter, pageIndex = 1, pageSize = 10 } = params;
-      
-      let items = [...mockCategories];
-      
-      // Lọc theo từ khóa
-      if (filter && filter.trim()) {
-        const keyword = filter.toLowerCase();
-        items = items.filter(c => 
-          c.name.toLowerCase().includes(keyword) || 
-          c.seoDescription?.toLowerCase().includes(keyword)
-        );
-      }
-      
-      // Phân trang
-      const start = (pageIndex - 1) * pageSize;
-      const end = start + pageSize;
-      
-      return {
-        items: items.slice(start, end),
-        totalCount: items.length
-      };
+      console.error('[categoryService] Lỗi khi tạo danh mục:', error);
+      throw error;
     }
   },
 
-  /**
-   * Lấy danh sách sản phẩm thuộc về một danh mục cụ thể
-   * GET /api/Categories/{id}/products
-   * @param {string|number} id - ID của danh mục
-   * @returns {Promise<Array>}
-   */
+  // PUT /api/Categories/{id}
+  async update(id, data) {
+    try {
+      const response = await api.put(`/Categories/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error('[categoryService] Lỗi khi cập nhật danh mục:', error);
+      throw error;
+    }
+  },
+
+  // DELETE /api/Categories/{id}/soft-delete
+  async softDelete(id) {
+    try {
+      const response = await api.delete(`/Categories/${id}/soft-delete`);
+      return response.data;
+    } catch (error) {
+      console.error('[categoryService] Lỗi khi xóa mềm:', error);
+      throw error;
+    }
+  },
+
+  // DELETE /api/Categories/{id}/permanent-delete
+  async permanentDelete(id) {
+    try {
+      const response = await api.delete(`/Categories/${id}/permanent-delete`);
+      return response.data;
+    } catch (error) {
+      console.error('[categoryService] Lỗi khi xóa vĩnh viễn:', error);
+      throw error;
+    }
+  },
+  
+  // PUT /api/Categories/{id}/restore
+  async restore(id) {
+    try {
+      const response = await api.put(`/Categories/${id}/restore`);
+      return response.data;
+    } catch (error) {
+      console.error('[categoryService] Lỗi restore:', error);
+      throw error;
+    }
+  },
+
+  // GET /api/Categories/check-name?name=...
+  async checkName(name) {
+    try {
+      const response = await api.get('/Categories/check-name', { params: { name } });
+      return response.data;
+    } catch (error) {
+      console.warn('[categoryService] Lỗi checkName:', error);
+      return false;
+    }
+  },
+
+  // GET /api/Categories/{id}/products
   async getProductsByCategory(id) {
     try {
       const response = await api.get(`/Categories/${id}/products`);
       return response.data;
     } catch (error) {
-      console.warn(`[categoryService] Fallback to mockData for getProductsByCategory(${id})`);
+      console.warn('[categoryService] Lỗi getProductsByCategory:', error);
       return [];
     }
   }
