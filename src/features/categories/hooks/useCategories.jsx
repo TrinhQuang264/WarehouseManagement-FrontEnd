@@ -6,31 +6,38 @@ import toast from "../../../utils/toast";
 const PAGE_SIZE = 7;
 
 export function useCategories() {
+  // URL query params: đồng bộ search/page với URL
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Dữ liệu danh mục hiển thị trên trang
   const [categories, setCategories] = useState([]);
+  const [allActiveCategories, setAllActiveCategories] = useState([]);
+
+  // Trạng thái loading chung, loading fetch danh sách, loading submit action
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFirstFetch, setIsFirstFetch] = useState(true);
-  const [searchParams, setSearchParams] = useSearchParams();
 
+  // Giá trị khởi tạo từ URL
   const initialSearch = searchParams.get("search") || "";
   const initialPage = Number(searchParams.get("page")) || 1;
 
+  // State tìm kiếm + phân trang
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const [totalCount, setTotalCount] = useState(0);
 
-  // States quản lý chọn hàng loạt (Bulk Selection)
+  // UI state: chọn hàng, modal add/edit/delete, drawer thùng rác
   const [selectedIds, setSelectedIds] = useState([]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isTrashOpen, setIsTrashOpen] = useState(false);
-  const [allActiveCategories, setAllActiveCategories] = useState([]);
 
+  // Refs nội bộ: bỏ debounce lần mount đầu + hủy request cũ khi fetch mới
   const isFirstMount = useRef(true);
   const abortControllerRef = useRef(null);
 

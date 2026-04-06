@@ -8,6 +8,7 @@ import categoryService from "../api/categoriesService";
 import "../styles/Categories.css";
 
 export default function CategoriesPage() {
+  // Categories module state/actions
   const {
     categories,
     loading,
@@ -38,7 +39,8 @@ export default function CategoriesPage() {
     refreshList,
   } = useCategories();
 
-  const { setActionButton, setExtraActions, setOnSearch, resetHeader, setTitle, setSubtitle } = useHeader();
+  // Header controls for page-level actions/search
+  const { setActionButton, setExtraActions, setOnSearch, resetHeader } = useHeader();
 
   useEffect(() => {
     setActionButton({
@@ -61,7 +63,7 @@ export default function CategoriesPage() {
     setOnSearch(() => setSearch);
 
     return () => resetHeader();
-  }, [setActionButton, setExtraActions, setOnSearch, setSearch, resetHeader, setIsModalOpen, setIsTrashOpen, setTitle, setSubtitle]);
+  }, [setActionButton, setExtraActions, setOnSearch, setSearch, resetHeader, setIsModalOpen, setIsTrashOpen]);
 
   if (isFirstFetch && loading) {
     return (

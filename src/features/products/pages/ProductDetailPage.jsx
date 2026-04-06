@@ -7,6 +7,27 @@ import { useHeader } from '../../../contexts/HeaderContext.jsx';
 import { products as mockProducts } from '../../../utils/mockData.js';
 import { formatCurrency } from '../../../utils/util.js';
 
+function ProductImage({ imageUrl, alt, className }) {
+  if (!imageUrl) {
+    return (
+      <div className={`flex items-center justify-center text-sm font-medium text-slate-400 ${className}`}>
+        Không có ảnh
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={imageUrl}
+      alt={alt}
+      className={className}
+      onError={(e) => {
+        e.currentTarget.style.display = 'none';
+      }}
+    />
+  );
+}
+
 export default function ProductDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -125,23 +146,23 @@ export default function ProductDetailPage() {
           {/* Image Gallery */}
           <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-100">
             <div className="aspect-square bg-slate-50 flex items-center justify-center p-8">
-              <img 
-                src={product.imageUrl || 'https://via.placeholder.com/400'} 
+              <ProductImage
+                imageUrl={product.imageUrl}
                 alt={product.name}
                 className="w-full h-full object-contain"
               />
             </div>
             <div className="p-4 flex gap-2 overflow-x-auto border-t border-slate-200">
               <div className="w-20 h-20 rounded-lg border-2 border-primary bg-white flex-shrink-0 p-2">
-                <img 
-                  src={product.imageUrl || 'https://via.placeholder.com/80'} 
+                <ProductImage
+                  imageUrl={product.imageUrl}
                   alt={product.name}
                   className="w-full h-full object-contain"
                 />
               </div>
               <div className="w-20 h-20 rounded-lg border border-slate-200 bg-white flex-shrink-0 p-2 hover:border-primary transition-colors cursor-pointer">
-                <img 
-                  src={product.imageUrl || 'https://via.placeholder.com/80'} 
+                <ProductImage
+                  imageUrl={product.imageUrl}
                   alt={product.name}
                   className="w-full h-full object-contain"
                 />

@@ -1,5 +1,17 @@
 import api from '../../../lib/axios';
 
+const normalizeProductPayload = (data = {}) => {
+  const sellingPrice = data.sellingPrice ?? data.price ?? 0;
+
+  return {
+    ...data,
+    categoryId: data.categoryId ? Number(data.categoryId) : data.categoryId,
+    importPrice: Number(data.importPrice ?? 0),
+    sellingPrice: Number(sellingPrice),
+    price: Number(sellingPrice),
+  };
+};
+
 const productService = {
 
   // GET /api/Products/all
@@ -65,7 +77,7 @@ const productService = {
   // POST /api/Products
   async create(data) {
     try {
-      const response = await api.post('/Products', data);
+      const response = await api.post('/Products', normalizeProductPayload(data));
       return response.data;
     } catch (error) {
       console.error('Error creating product:', error);
@@ -73,10 +85,10 @@ const productService = {
     }
   },
 
-  // PUT /api/Products/{productId}/status
-  async updateStatus(productId, data) {
+  // PUT /api/Products/{productId}
+  async update(productId, data) {
     try {
-      const response = await api.put(`/Products/${productId}/status`, data);
+      const response = await api.put(`/Products/${productId}`, normalizeProductPayload(data));
       return response.data;
     } catch (error) {
       console.error('Error updating product:', error);
@@ -204,6 +216,17 @@ const productService = {
       return response.data;
     } catch (error) {
       console.error('[productService] Lỗi khi lấy dữ liệu thùng rác:', error);
+      throw error;
+    }
+  },
+
+  // GET /api/Products/{id}/images
+  async getProductImages(id) {
+    try {
+      const response = await api.get(`/Products/${id}/images`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching product images:', error);
       throw error;
     }
   },

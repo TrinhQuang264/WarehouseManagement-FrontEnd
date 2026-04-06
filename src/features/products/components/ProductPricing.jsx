@@ -3,8 +3,6 @@
  * Fields: Import Price, Sell Price
  */
 
-import { DollarSign } from 'lucide-react';
-
 export default function ProductPricing({ 
   formData, 
   setFormData, 
@@ -17,7 +15,7 @@ export default function ProductPricing({
 
   // Calculate profit margin
   const importPrice = Number(formData.importPrice) || 0;
-  const sellPrice = Number(formData.price) || 0;
+  const sellPrice = Number(formData.price ?? formData.sellingPrice) || 0;
   const margin = importPrice > 0 ? Math.round(((sellPrice - importPrice) / importPrice) * 100) : 0;
 
   return (
@@ -49,7 +47,7 @@ export default function ProductPricing({
           <input
             type="number"
             name="price"
-            value={formData.price || ''}
+            value={formData.price ?? formData.sellingPrice ?? ''}
             onChange={handleChange}
             placeholder="0"
             className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm font-semibold text-primary"

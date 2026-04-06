@@ -1,24 +1,48 @@
-import { Edit, Trash2 } from 'lucide-react';
-import { formatCurrency } from '../../../utils/util';
-import DataTableCard from '../../../components/ui/DataTableCard.jsx';
-import BulkActionBar from '../../../components/ui/BulkActionBar';
+import { Edit, Trash2 } from "lucide-react";
+import { formatCurrency } from "../../../utils/util";
+import DataTableCard from "../../../components/ui/DataTableCard.jsx";
+import BulkActionBar from "../../../components/ui/BulkActionBar";
 
-export default function ProductsTable({ 
-  products, 
-  categories, 
-  loading, 
-  onEdit, 
+function ProductThumbnail({ imageUrl, name }) {
+  const hasImage = Boolean(imageUrl);
+
+  return (
+    <div className="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center flex-shrink-0">
+      {hasImage ? (
+        <img
+          src={imageUrl}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+          }}
+        />
+      ) : (
+        <span className="text-[10px] font-bold text-slate-400 uppercase">N/A</span>
+      )}
+    </div>
+  );
+}
+
+export default function ProductsTable({
+  products,
+  categories,
+  loading,
+  onEdit,
   onDelete,
   onViewDetail,
   selectedIds = [],
   toggleSelect,
   toggleSelectAll,
-  onBulkDelete
+  clearSelection,
+  onBulkDelete,
 }) {
-  const isAllSelected = products.length > 0 && selectedIds.length === products.length;
+  const isAllSelected =
+    products.length > 0 && selectedIds.length === products.length;
+  const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
 
   return (
-    <DataTableCard className="relative">
+    <DataTableCard className="relative min-h-[500px] flex flex-col">
       <div className="table-wrapper">
         <table className="table">
           <thead>
@@ -39,13 +63,15 @@ export default function ProductsTable({
               <th className="table-th px-6 text-right">Thao Tác</th>
             </tr>
           </thead>
-          <tbody className={`divide-y divide-slate-100 dark:divide-slate-800/50 transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+          <tbody
+            className={`divide-y divide-slate-100 dark:divide-slate-800/50 transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+          >
             {products.length > 0 ? (
               products.map((product) => (
-                <tr 
-                  key={product.id} 
+                <tr
+                  key={product.id}
                   onDoubleClick={() => onViewDetail?.(product)}
-                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${selectedIds.includes(product.id) ? 'bg-primary/5' : ''}`}
+                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${selectedIds.includes(product.id) ? "bg-primary/5" : ""}`}
                 >
                   <td className="px-6 py-4">
                     <input
@@ -66,20 +92,17 @@ export default function ProductsTable({
                   {/* Thông Tin Sản Phẩm (Ảnh + Tên + Mô Tả) */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 bg-cover flex-shrink-0" style={{ backgroundImage: `url('${product.imageUrl}')` }}>
-                        <img 
-                          src={product.imageUrl} 
-                          alt={product.name}
-                          className="w-full h-full object-cover rounded"
-                          onError={(e) => { 
-                            e.target.style.display = 'none';
-                            e.target.parentElement.style.backgroundImage = "url('https://via.placeholder.com/40')";
-                          }}
-                        />
-                      </div>
+                      <ProductThumbnail
+                        imageUrl={product.imageUrl}
+                        name={product.name}
+                      />
                       <div>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white">{product.name}</p>
-                        <p className="text-xs text-slate-500">{product.description || 'N/A'}</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">
+                          {product.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {product.description || "N/A"}
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -87,7 +110,7 @@ export default function ProductsTable({
                   {/* Danh Mục */}
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-                      {categories.find(c => c.id === product.categoryId)?.name || 'Khác'}
+                      {categoryNameById.get(product.categoryId) || "Khác"}
                     </span>
                   </td>
 
@@ -99,30 +122,40 @@ export default function ProductsTable({
                   {/* Tồn Kho */}
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
-                      <span className="text-sm font-medium text-slate-900 dark:text-white">{product.quantity}</span>
-                      <span className={`w-2 h-2 rounded-full ${
-                        product.quantity > 50 
-                          ? 'bg-emerald-500' 
-                          : product.quantity > 10 
-                          ? 'bg-amber-500' 
-                          : 'bg-red-500'
-                      }`} />
+                      <span className="text-sm font-medium text-slate-900 dark:text-white">
+                        {product.quantity}
+                      </span>
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          product.quantity > 50
+                            ? "bg-emerald-500"
+                            : product.quantity > 10
+                              ? "bg-amber-500"
+                              : "bg-red-500"
+                        }`}
+                      />
                     </div>
                   </td>
 
                   {/* Thao Tác */}
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); onEdit(product); }}
-                        className="p-1 hover:text-primary transition-colors text-slate-400" 
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(product);
+                        }}
+                        className="p-1 hover:text-primary transition-colors text-slate-400"
                         title="Sửa"
                       >
                         <Edit size={18} />
                       </button>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); onDelete(product); }}
-                        className="p-1 hover:text-red-500 transition-colors text-slate-400" 
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(product);
+                        }}
+                        className="p-1 hover:text-red-500 transition-colors text-slate-400"
                         title="Xóa"
                       >
                         <Trash2 size={18} />
@@ -133,7 +166,10 @@ export default function ProductsTable({
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="px-6 py-12 text-center text-slate-400 italic">
+                <td
+                  colSpan="7"
+                  className="px-6 py-12 text-center text-slate-400 italic"
+                >
                   Không tìm thấy sản phẩm ...
                 </td>
               </tr>
@@ -145,7 +181,7 @@ export default function ProductsTable({
       <BulkActionBar
         selectedCount={selectedIds.length}
         isVisible={selectedIds.length > 0}
-        onClearSelection={() => toggleSelectAll()}
+        onClearSelection={clearSelection}
         actions={[
           {
             label: "Xóa vào thùng rác",

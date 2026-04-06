@@ -1,260 +1,305 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import productService from '../api/productsService';
-import categoryService from '../../categories/api/categoriesService';
-import { products as mockProducts } from '../../../utils/mockData';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import productService from "../api/productsService";
+import categoryService from "../../categories/api/categoriesService";
+import toast from "../../../utils/toast";
 
-/**
- * useProducts - Hook quản lý danh sách sản phẩm
- * Hiện tại: dùng mockData (fallback khi API fail)
- * Khi có API: chỉ cần bỏ try-catch fallback
- */
+const PAGE_SIZE = 10;
+const normalizeProduct = (item = {}) => {
+  const normalizedPrice = item.price ?? item.sellingPrice ?? 0;
 
-export function useProducts() {
+  return {
+    ...item,
+    price: normalizedPrice,
+    sellingPrice: normalizedPrice,
+  };
+};
+
+export function useProducts(defaultPageSize = PAGE_SIZE) {
+  // URL query params for sync search/page/filter with browser URL
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Data nguồn hiển thị cho trang sản phẩm
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+
+  // Loading/submitting states for fetch/list actions and submit actions
   const [loading, setLoading] = useState(false);
-  const [isFirstFetch, setIsFirstFetch] = useState(true);
-  const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Initial values lấy từ URL để giữ trạng thái khi reload/share link
+  const initialSearch = searchParams.get("search") || "";
+  const initialPage = Number(searchParams.get("page")) || 1;
+  const initialCategoryId = searchParams.get("categoryId") || "";
+  const initialPageSize = Number(searchParams.get("pageSize")) || defaultPageSize;
+
+  // Search + pagination state
+  const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [pageSize, setPageSize] = useState(initialPageSize);
   const [totalCount, setTotalCount] = useState(0);
+
+  // Filter state
+  const [selectedCategoryId, setSelectedCategoryId] = useState(initialCategoryId);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+
+  // UI state: chọn hàng, modal xác nhận, và drawer thùng rác
   const [selectedIds, setSelectedIds] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isTrashOpen, setIsTrashOpen] = useState(false);
-  
-  // Form modal state
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [formData, setFormData] = useState({
-    code: '',
-    name: '',
-    description: '',
-    categoryId: '',
-    importPrice: '',
-    price: '',
-    imageUrl: '',
-    specs: []
-  });
-  const [imagePreview, setImagePreview] = useState(null);
 
-  // Lấy danh mục
-  const fetchCategories = async () => {
-    try {
-      const data = await categoryService.getAll();
-      // Đảm bảo chỉ hiện thị danh mục chưa xóa trong dropdown/form
-      const activeCategories = Array.isArray(data) 
-        ? data.filter(c => c.isDeleted === false || c.isDelete === false || (!c.isDeleted && !c.isDelete))
-        : [];
-      setCategories(activeCategories);
-    } catch (error) {
-      console.warn('[useProducts] Lỗi lấy danh mục, dùng mockData');
-    }
-  };
+  // Internal refs: skip debounce lần mount đầu + hủy request cũ khi fetch mới
+  const isFirstMount = useRef(true);
+  const abortControllerRef = useRef(null);
 
-  // Fetch sản phẩm
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      // Sử dụng getAll() để lấy toàn bộ dữ liệu, hỗ trợ lọc và phân trang client-side chính xác nhất
-      const response = await productService.getAll();
-      
-      let allItems = Array.isArray(response) ? response : (response.data || []);
-
-      // 1. Tìm kiếm (Client-side)
-      if (debouncedSearch) {
-        const searchLower = debouncedSearch.toLowerCase();
-        allItems = allItems.filter(item => 
-          (item.name && item.name.toLowerCase().includes(searchLower)) || 
-          (item.code && item.code.toLowerCase().includes(searchLower)) ||
-          (item.description && item.description.toLowerCase().includes(searchLower))
-        );
-      }
-      
-      const total = items.length;
-      
-      // Phân trang
-      const start = (currentPage - 1) * pageSize;
-      const end = start + pageSize;
-      
-      setProducts(items.slice(start, end));
-      setTotalCount(total);
-    } finally {
-      setLoading(false);
-      setIsFirstFetch(false);
-      setSelectedIds([]);
-    }
-  };
+  // Sync state with URL search params
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (currentPage > 1) params.set("page", currentPage);
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    if (selectedCategoryId) params.set("categoryId", selectedCategoryId);
+    if (pageSize !== defaultPageSize) params.set("pageSize", pageSize);
+    setSearchParams(params, { replace: true });
+  }, [currentPage, debouncedSearch, selectedCategoryId, pageSize, defaultPageSize, setSearchParams]);
 
   // Debounce search
   useEffect(() => {
-    const handler = setTimeout(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
       setDebouncedSearch(search);
-    }, 500);
-    return () => clearTimeout(handler);
+      setCurrentPage(1);
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [search]);
 
-  // Lấy danh mục & sản phẩm lúc mount
+  // Fetch categories for the form dropdown
+  const fetchCategories = useCallback(async () => {
+    try {
+      const data = await categoryService.getAll();
+      const activeItems = Array.isArray(data) 
+        ? data.filter(c => c.isDeleted === false)
+        : (data.data || []).filter(c => c.isDeleted === false);
+      setCategories(activeItems);
+    } catch (error) {
+      console.error("useProducts - fetchCategories error:", error);
+    }
+  }, []);
+
+  // Main fetch products logic
+  const fetchProducts = useCallback(async () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
+    setLoading(true);
+    try {
+      // Use getAll to handle flexible client-side filtering as requested by the user's structure
+      // or alternate between getAll and getTrash based on isTrashOpen
+      let response;
+      if (isTrashOpen) {
+        response = await productService.getTrash();
+      } else {
+        response = await productService.getAll();
+      }
+
+      if (signal.aborted) return;
+
+      let allItems = Array.isArray(response) ? response : (response.data || []);
+      allItems = allItems.map(normalizeProduct);
+
+      // Deduplicate: API trả về flat list tất cả variants.
+      // Chỉ giữ lại variant mặc định (isDefault: true) để hiển thị bảng danh sách.
+      // Nếu không có variant nào isDefault, fallback lấy cái đầu tiên của mỗi mã.
+      const seen = new Map();
+      for (const item of allItems) {
+        const key = item.code || item.id;
+        if (!seen.has(key)) {
+          seen.set(key, item);
+        } else if (item.isDefault === true) {
+          // Ưu tiên variant isDefault
+          seen.set(key, item);
+        }
+      }
+      allItems = Array.from(seen.values());
+
+      // Rule: isActive determines visibility in main list vs trash if not already split by API
+      // However, since we have a dedicated /trash endpoint, we'll trust the API response but 
+      // can still double-check isActive if needed.
+      // Client-side Filtering
+      let filteredItems = [...allItems];
+
+
+      // 1. Search (Name/Code/Description)
+      if (debouncedSearch) {
+        const lowerSearch = debouncedSearch.toLowerCase();
+        filteredItems = filteredItems.filter(item => 
+          item.name?.toLowerCase().includes(lowerSearch) ||
+          item.code?.toLowerCase().includes(lowerSearch) ||
+          item.description?.toLowerCase().includes(lowerSearch)
+        );
+      }
+
+      // 2. Category Filter
+      if (selectedCategoryId) {
+        filteredItems = filteredItems.filter(item => 
+          item.categoryId === Number(selectedCategoryId)
+        );
+      }
+
+      // 3. Price Filter (Selling Price)
+      if (minPrice !== "") {
+        filteredItems = filteredItems.filter(item => item.price >= Number(minPrice));
+      }
+      if (maxPrice !== "") {
+        filteredItems = filteredItems.filter(item => item.price <= Number(maxPrice));
+      }
+
+      const total = filteredItems.length;
+
+      // 4. Client-side Pagination
+      const start = (currentPage - 1) * pageSize;
+      const paginatedItems = filteredItems.slice(start, start + pageSize);
+
+      setProducts(paginatedItems);
+      setTotalCount(total);
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      console.error("useProducts - fetchProducts error:", error);
+      setProducts([]);
+      setTotalCount(0);
+    } finally {
+      if (!signal.aborted) {
+        setLoading(false);
+      }
+    }
+  }, [debouncedSearch, currentPage, pageSize, isTrashOpen, selectedCategoryId, minPrice, maxPrice]);
+
   useEffect(() => {
     fetchCategories();
-    fetchProducts();
-  }, []);
+  }, [fetchCategories]);
 
-  // Reset page khi search thay đổi
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch]);
-
-  // Fetch lại khi pagination/search thay đổi
   useEffect(() => {
     fetchProducts();
-  }, [currentPage, pageSize, debouncedSearch]);
+    return () => abortControllerRef.current?.abort();
+  }, [fetchProducts]);
 
-  // Lọc client-side cho giá tiền
-  const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      const price = p.importPrice || p.price || 0;
-      const minMatch = minPrice === '' || price >= Number(minPrice);
-      const maxMatch = maxPrice === '' || price <= Number(maxPrice);
-      return minMatch && maxMatch;
-    });
-  }, [products, minPrice, maxPrice]);
+  // --- Handlers ---
 
-  const resetFilters = () => {
-    setSearch('');
-    setMinPrice('');
-    setMaxPrice('');
-    setCurrentPage(1);
-  };
-
-  const addProduct = async (formData) => {
+  const handleAddProduct = async (data) => {
+    setIsSubmitting(true);
     try {
-      // TODO: Replace with actual API call when available
-      // const response = await productService.create(formData);
-      
-      // For now, add to mockData locally
-      const newProduct = {
-        id: Math.max(...mockProducts.map(p => p.id), 0) + 1,
-        ...formData,
-        importPrice: Number(formData.importPrice) || 0,
-        price: Number(formData.price) || 0,
-        categoryId: Number(formData.categoryId) || 0,
-        quantity: 0,
-        isActive: true
-      };
-
-      // Add to products list
-      const updatedProducts = [newProduct, ...products];
-      setProducts(updatedProducts);
-      setTotalCount(totalCount + 1);
-      
-      // toast.success('Thêm sản phẩm thành công');
+      await productService.create(data);
+      toast.success("Thêm sản phẩm mới thành công!");
+      fetchProducts();
+      return true;
     } catch (error) {
-      console.error('[useProducts] Error adding product:', error);
-      // toast.error('Lỗi khi thêm sản phẩm');
-      throw error;
+      console.error("useProducts - handleAddProduct error:", error);
+      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      toast.error(serverMsg || "Không thể thêm sản phẩm. Vui lòng thử lại.");
+      return false;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Form handlers
-  const handleOpenAdd = useCallback(() => {
-    setEditingProduct(null);
-    setFormData({
-      code: '',
-      name: '',
-      description: '',
-      categoryId: '',
-      importPrice: '',
-      price: '',
-      imageUrl: '',
-      specs: []
-    });
-    setImagePreview(null);
-    setIsFormOpen(true);
-  }, []);
-
-  const handleOpenEdit = useCallback((product) => {
-    setEditingProduct(product);
-    setFormData({
-      code: product.code || '',
-      name: product.name || '',
-      description: product.description || '',
-      categoryId: product.categoryId || '',
-      importPrice: product.importPrice || '',
-      price: product.price || '',
-      imageUrl: product.imageUrl || '',
-      specs: product.specs || []
-    });
-    setImagePreview(product.imageUrl || null);
-    setIsFormOpen(true);
-  }, []);
-
-  const handleSave = useCallback(async (formDataParam) => {
-    if (editingProduct) {
-      // Edit mode
-      const updatedProducts = products.map(p => 
-        p.id === editingProduct.id ? { ...p, ...formDataParam } : p
-      );
-      setProducts(updatedProducts);
-      console.log('[useProducts] Product updated:', formDataParam);
-    } else {
-      // Add mode
-      await addProduct(formDataParam);
+  const handleUpdateProduct = async (id, data) => {
+    setIsSubmitting(true);
+    try {
+      // Assuming a generic update or specifically updateStatus if that's what's available
+      // If backend doesn't have a generic PUT /Products/{id}, we might need to adjust.
+      // For now, mapping to updateStatus or create if it handles both (generic pattern)
+      await productService.update(id, data);
+      toast.success("Cập nhật thông tin sản phẩm thành công!");
+      setSelectedProduct(null);
+      fetchProducts();
+      return true;
+    } catch (error) {
+      console.error("useProducts - handleUpdateProduct error:", error);
+      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      toast.error(serverMsg || "Lỗi khi cập nhật sản phẩm.");
+      return false;
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsFormOpen(false);
-  }, [editingProduct, products]);
+  };
 
-  // Memoized search function for stable reference (prevents infinite loop in ProductsPageNew)
-  const searchProducts = useCallback((value) => {
-    setSearch(value);
-  }, []);
+  const handleSoftDeleteById = async (id) => {
+    setIsSubmitting(true);
+    try {
+      await productService.softDelete(id);
+      toast.success("Đã chuyển sản phẩm vào thùng rác");
+      if (products.length === 1 && currentPage > 1) {
+        setCurrentPage(p => p - 1);
+      } else {
+        fetchProducts();
+      }
+    } catch (error) {
+      console.error("useProducts - handleSoftDelete error:", error);
+      toast.error("Không thể xóa sản phẩm này.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSoftDelete = async () => {
+    if (!selectedProduct) return;
+    await handleSoftDeleteById(selectedProduct.id);
+    setIsDeleteModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  // --- Bulk Actions ---
 
   const toggleSelect = (id) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
   const toggleSelectAll = () => {
     if (selectedIds.length === products.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(products.map((p) => p.id));
-    }
-  };
-
-  const softDeleteProduct = async (id) => {
-    setLoading(true);
-    try {
-      await productService.softDelete(id);
-      // toast.success('Đã chuyển sản phẩm vào thùng rác');
-      fetchProducts();
-    } catch (error) {
-      console.error('[useProducts] Error soft deleting product:', error);
-      // toast.error('Lỗi khi xóa sản phẩm');
-    } finally {
-      setLoading(false);
+      setSelectedIds(products.map(p => p.id));
     }
   };
 
   const handleBulkSoftDelete = async () => {
     if (selectedIds.length === 0) return;
-    setLoading(true);
+    setIsSubmitting(true);
     try {
       await productService.bulkSoftDelete(selectedIds);
-      // toast.success(`Đã chuyển ${selectedIds.length} sản phẩm vào thùng rác`);
+      toast.success(`Đã chuyển ${selectedIds.length} sản phẩm vào thùng rác`);
       setSelectedIds([]);
       fetchProducts();
     } catch (error) {
-      console.error('[useProducts] Error bulk soft deleting products:', error);
-      // toast.error('Lỗi khi xóa sản phẩm hàng loạt');
+      toast.error("Lỗi khi xóa hàng loạt.");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
+
+  const clearSelection = () => setSelectedIds([]);
+
+  const resetFilters = () => {
+    setSearch("");
+    setMinPrice("");
+    setMaxPrice("");
+    setSelectedCategoryId("");
+    setCurrentPage(1);
+  };
+
+  const searchProducts = useCallback((value) => {
+    setSearch(value);
+  }, []);
 
   const openDeleteModal = (product) => {
     setSelectedProduct(product);
@@ -262,49 +307,48 @@ export function useProducts() {
   };
 
   return {
-    // Data
-    filteredProducts,
-    categories,
     products,
-    
-    // State
+    filteredProducts: products, // Alias for compatibility
+    categories,
     loading,
-    isFirstFetch,
+    isSubmitting,
+
     search,
-    minPrice,
-    maxPrice,
+    setSearch,
+    debouncedSearch,
     currentPage,
+    setCurrentPage,
     pageSize,
     totalCount,
-    formData,
-    imagePreview,
+
+    // Filters
+    selectedCategoryId,
+    setSelectedCategoryId,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+    resetFilters,
+
+    // Modals & Selection
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    selectedProduct,
     isTrashOpen,
     setIsTrashOpen,
-    
-    // Setters
-    setSearch,
-    setMinPrice,
-    setMaxPrice,
-    setCurrentPage,
-    setPageSize,
-    setIsFormOpen,
-    setFormData,
-    setImagePreview,
-    setIsTrashOpen,
-    
-    // Handlers
-    handleOpenAdd,
-    handleOpenEdit,
-    handleSave,
-    toggleSelect,
-    toggleSelectAll,
-    softDeleteProduct,
+    selectedIds,
+
+    // Actions
+    handleAddProduct,
+    handleUpdateProduct,
+    handleSoftDelete,
+    handleSoftDeleteById,
     handleBulkSoftDelete,
     openDeleteModal,
-    
-    // Methods
-    resetFilters,
+    toggleSelect,
+    toggleSelectAll,
+    clearSelection,
     searchProducts,
-    refreshList: fetchProducts
+    refreshList: fetchProducts,
   };
 }
