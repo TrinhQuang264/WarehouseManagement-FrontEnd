@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useBlocker } from 'react-router-dom';
+import { useBlocker } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
 import '../styles/Settings.css';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs';
@@ -11,6 +11,9 @@ export default function SettingsPage() {
   const [shake, setShake] = useState(false);
 
   const hasChanges = localTheme !== theme || localLang !== 'vi';
+  useEffect(() => {
+    setLocalTheme(theme);
+  }, [theme]);
 
   let blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
@@ -18,14 +21,14 @@ export default function SettingsPage() {
   );
 
   useEffect(() => {
-  if (blocker.state === 'blocked') {
+    if (blocker.state !== 'blocked') return;
     setShake(true);
-    setTimeout(() => {
-      setShake(false); // ✅ reset để lần sau vẫn animate được
+    const timer = setTimeout(() => {
+      setShake(false);
       blocker.reset();
     }, 500);
-  }
-  }, [blocker.state]);
+    return () => clearTimeout(timer);
+  }, [blocker]);
 
   const handleSave = () => {
     setTheme(localTheme);

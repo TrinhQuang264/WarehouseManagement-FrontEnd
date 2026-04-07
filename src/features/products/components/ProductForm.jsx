@@ -28,6 +28,12 @@ export default function ProductForm({
       console.warn('Vui lòng điền thông tin bắt buộc');
       return;
     }
+    const originalPrice = Number(formData.originalPrice ?? formData.importPrice ?? 0);
+    const sellingPrice = Number(formData.price ?? formData.sellingPrice ?? 0);
+    if (originalPrice <= 0 || sellingPrice <= 0) {
+      console.warn('Giá nhập và giá bán phải lớn hơn 0');
+      return;
+    }
 
     onSubmit(formData);
   };

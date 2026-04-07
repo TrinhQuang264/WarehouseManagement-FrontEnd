@@ -1,15 +1,15 @@
-import { useState, useCallback, useMemo } from 'react';
-import { customers as mockCustomers } from '../../../utils/mockData';
-import { toast } from '../../../utils/toast';
+import { useState, useCallback, useMemo } from "react";
+import { customers as mockCustomers } from "../../../utils/mockData";
+import { toast } from "../../../utils/toast";
 
 export function useCustomers() {
   // 1. Quản lý danh sách khách hàng
   const [customers, setCustomers] = useState(
     mockCustomers.map((c, index) => ({
       ...c,
-      code: `KH${String(c.id || index + 1).padStart(3, '0')}`,
-      email: `${(c.fullName || 'customer').toLowerCase().replace(/\s+/g, '.')}@gmail.com`,
-    }))
+      code: `KH${String(c.id || index + 1).padStart(3, "0")}`,
+      email: `${(c.fullName || "customer").toLowerCase().replace(/\s+/g, ".")}@gmail.com`,
+    })),
   );
 
   // 2. State cho Modal Form (Thêm/Sửa)
@@ -21,7 +21,7 @@ export function useCustomers() {
   const [deletingCustomer, setDeletingCustomer] = useState(null);
 
   // 4. State cho tìm kiếm
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   // --- TÌM KIẾM VÀ LỌC ---
   const filteredCustomers = useMemo(() => {
@@ -29,11 +29,12 @@ export function useCustomers() {
       return customers;
     }
     const query = searchQuery.toLowerCase();
-    return customers.filter(c =>
-      c.fullName?.toLowerCase().includes(query) ||
-      c.code?.toLowerCase().includes(query) ||
-      c.email?.toLowerCase().includes(query) ||
-      c.phone?.toLowerCase().includes(query)
+    return customers.filter(
+      (c) =>
+        c.fullName?.toLowerCase().includes(query) ||
+        c.code?.toLowerCase().includes(query) ||
+        c.email?.toLowerCase().includes(query) ||
+        c.phone?.toLowerCase().includes(query),
     );
   }, [customers, searchQuery]);
 
@@ -77,19 +78,25 @@ export function useCustomers() {
     setIsFormOpen(true);
   }, []);
 
-  const handleSave = useCallback((formData) => {
-    setCustomers(prev => {
-      if (editingCustomer) {
-        toast.success('Cập nhật khách hàng thành công');
-        return prev.map(c => c.id === editingCustomer.id ? { ...c, ...formData } : c);
-      } else {
-        const newId = prev.length > 0 ? Math.max(...prev.map(c => c.id)) + 1 : 1;
-        toast.success('Thêm khách hàng mới thành công');
-        return [{ id: newId, ...formData }, ...prev];
-      }
-    });
-    setIsFormOpen(false);
-  }, [editingCustomer]);
+  const handleSave = useCallback(
+    (formData) => {
+      setCustomers((prev) => {
+        if (editingCustomer) {
+          toast.success("Cập nhật khách hàng thành công");
+          return prev.map((c) =>
+            c.id === editingCustomer.id ? { ...c, ...formData } : c,
+          );
+        } else {
+          const newId =
+            prev.length > 0 ? Math.max(...prev.map((c) => c.id)) + 1 : 1;
+          toast.success("Thêm khách hàng mới thành công");
+          return [{ id: newId, ...formData }, ...prev];
+        }
+      });
+      setIsFormOpen(false);
+    },
+    [editingCustomer],
+  );
 
   const handleOpenDelete = useCallback((customer) => {
     setDeletingCustomer(customer);
@@ -97,12 +104,12 @@ export function useCustomers() {
   }, []);
 
   const confirmDelete = useCallback(() => {
-    setCustomers(prev => prev.filter(c => c.id !== deletingCustomer.id));
+    setCustomers((prev) => prev.filter((c) => c.id !== deletingCustomer.id));
     setIsDeleteOpen(false);
-    toast.success('Xóa khách hàng thành công');
+    toast.success("Xóa khách hàng thành công");
   }, [deletingCustomer]);
 
-  const nextCode = `KH${String(customers.length + 1).padStart(3, '0')}`;
+  const nextCode = `KH${String(customers.length + 1).padStart(3, "0")}`;
 
   return {
     customers,
@@ -119,6 +126,6 @@ export function useCustomers() {
     handleOpenDelete,
     confirmDelete,
     searchCustomers,
-    nextCode
+    nextCode,
   };
 }

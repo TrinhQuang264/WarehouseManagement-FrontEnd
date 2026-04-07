@@ -10,11 +10,15 @@ export default function ProductPricing({
 }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "originalPrice") {
+      setFormData(prev => ({ ...prev, originalPrice: value, importPrice: value }));
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   // Calculate profit margin
-  const importPrice = Number(formData.importPrice) || 0;
+  const importPrice = Number(formData.originalPrice ?? formData.importPrice) || 0;
   const sellPrice = Number(formData.price ?? formData.sellingPrice) || 0;
   const margin = importPrice > 0 ? Math.round(((sellPrice - importPrice) / importPrice) * 100) : 0;
 
@@ -30,13 +34,13 @@ export default function ProductPricing({
           </label>
           <input
             type="number"
-            name="importPrice"
-            value={formData.importPrice || ''}
+            name="originalPrice"
+            value={formData.originalPrice ?? formData.importPrice ?? ''}
             onChange={handleChange}
             placeholder="0"
             className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm font-semibold"
           />
-          {errors.importPrice && <p className="text-xs text-red-500">{errors.importPrice}</p>}
+          {errors.originalPrice && <p className="text-xs text-red-500">{errors.originalPrice}</p>}
         </div>
 
         {/* Sell Price */}

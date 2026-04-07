@@ -1,126 +1,223 @@
-import { useState, useCallback, useMemo } from 'react';
-import { suppliers as mockSuppliers } from '../../../utils/mockData';
-import { toast } from '../../../utils/toast';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import suppliersService from "../api/suppliersService";
+import toast from "../../../utils/toast";
+
+const PAGE_SIZE = 7;
+const normalizeSupplierPayload = (data = {}) => ({
+  supplierName: String(data.supplierName || "").trim(),
+  contactPerson: String(data.contactPerson || "").trim(),
+  phone: String(data.phone || "").trim(),
+  address: String(data.address || "").trim(),
+  email: String(data.email || "").trim(),
+});
 
 export function useSuppliers() {
-  // 1. Quản lý danh sách nhà cung cấp
-  const [suppliers, setSuppliers] = useState(
-    mockSuppliers.map((s, index) => ({
-      ...s,
-      code: `NCC00${s.id || index + 1}`,
-      email: `${(s.supplierName || 'supplier').toLowerCase().replace(/\s+/g, '-')}@business.vn`,
-      phone: '0901 234 567',
-    }))
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // 2. State cho Modal Form (Thêm/Sửa)
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState(null);
+  const [suppliers, setSuppliers] = useState([]);
+  const [allActiveSuppliers, setAllActiveSuppliers] = useState([]);
 
-  // 3. State cho Modal Xác nhận xóa
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [deletingSupplier, setDeletingSupplier] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFirstFetch, setIsFirstFetch] = useState(true);
 
-  // 4. State cho tìm kiếm
-  const [searchQuery, setSearchQuery] = useState('');
+  const initialSearch = searchParams.get("search") || "";
+  const initialPage = Number(searchParams.get("page")) || 1;
 
-  // --- TÌM KIẾM VÀ LỌC ---
-  const filteredSuppliers = useMemo(() => {
-    if (!searchQuery || !searchQuery.trim()) {
-      return suppliers;
+  const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
+
+  const isFirstMount = useRef(true);
+  const abortControllerRef = useRef(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (currentPage > 1) params.set("page", currentPage);
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    setSearchParams(params, { replace: true });
+  }, [currentPage, debouncedSearch, setSearchParams]);
+
+  useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
     }
-    const query = searchQuery.toLowerCase();
-    return suppliers.filter(s =>
-      s.supplierName?.toLowerCase().includes(query) ||
-      s.code?.toLowerCase().includes(query) ||
-      s.email?.toLowerCase().includes(query) ||
-      s.phone?.toLowerCase().includes(query) ||
-      s.address?.toLowerCase().includes(query)
-    );
-  }, [suppliers, searchQuery]);
 
-  const searchSuppliers = useCallback((query) => {
-    setSearchQuery(query);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1);
+    }, 300);
 
-    /* === API CALL (uncomment when API is ready) ===
-    // Gọi API tìm kiếm nhà cung cấp
-    // import suppliersService from '../api/suppliersService';
-    
-    if (query.trim()) {
-      suppliersService.search({ keyword: query })
-        .then(data => {
-          setSuppliers(data);
-        })
-        .catch(error => {
-          console.error('Lỗi tìm kiếm:', error);
-          toast.error('Lỗi khi tìm kiếm nhà cung cấp');
-        });
-    } else {
-      // Nếu query rỗng, fetch toàn bộ danh sách
-      suppliersService.getAll()
-        .then(data => {
-          setSuppliers(data);
-        })
-        .catch(error => {
-          console.error('Lỗi lấy dữ liệu:', error);
-        });
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const fetchSuppliers = useCallback(async () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
-    === END API CALL ===*/
-  }, []);
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
 
-  // --- XỬ LÝ SỰ KIỆN ---
-  const handleOpenAdd = useCallback(() => {
-    setEditingSupplier(null);
-    setIsFormOpen(true);
-  }, []);
+    setIsFetching(true);
+    setLoading(true);
+    try {
+      const response = await suppliersService.getAll();
+      if (signal.aborted) return;
 
-  const handleOpenEdit = useCallback((supplier) => {
-    setEditingSupplier(supplier);
-    setIsFormOpen(true);
-  }, []);
+      const allItems = Array.isArray(response) ? response : response?.data || [];
+      const activeItems = allItems.filter((item) => item.isDeleted === false);
+      setAllActiveSuppliers(activeItems);
 
-  const handleSave = useCallback((formData) => {
-    setSuppliers(prev => {
-      if (editingSupplier) {
-        toast.success('Cập nhật nhà cung cấp thành công');
-        return prev.map(s => s.id === editingSupplier.id ? { ...s, ...formData } : s);
-      } else {
-        const newId = prev.length > 0 ? Math.max(...prev.map(s => s.id)) + 1 : 1;
-        toast.success('Thêm nhà cung cấp mới thành công');
-        return [{ id: newId, ...formData }, ...prev];
+      let filteredItems = [...activeItems];
+      if (debouncedSearch) {
+        const searchLower = debouncedSearch.toLowerCase();
+        filteredItems = filteredItems.filter(
+          (item) =>
+            item.supplierName?.toLowerCase().includes(searchLower) ||
+            item.code?.toLowerCase().includes(searchLower) ||
+            item.phone?.toLowerCase().includes(searchLower) ||
+            item.email?.toLowerCase().includes(searchLower) ||
+            item.address?.toLowerCase().includes(searchLower)
+        );
       }
-    });
-    setIsFormOpen(false);
-  }, [editingSupplier]);
 
-  const handleOpenDelete = useCallback((supplier) => {
-    setDeletingSupplier(supplier);
-    setIsDeleteOpen(true);
-  }, []);
+      const total = filteredItems.length;
+      const start = (currentPage - 1) * pageSize;
+      const paginatedItems = filteredItems.slice(start, start + pageSize);
 
-  const confirmDelete = useCallback(() => {
-    setSuppliers(prev => prev.filter(s => s.id !== deletingSupplier.id));
-    setIsDeleteOpen(false);
-    toast.success('Xóa nhà cung cấp thành công');
-  }, [deletingSupplier]);
+      setSuppliers(paginatedItems);
+      setTotalCount(total);
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      console.error("useSuppliers - Lỗi lấy dữ liệu API:", error);
+      setSuppliers([]);
+      setTotalCount(0);
+    } finally {
+      if (!signal.aborted) {
+        setIsFetching(false);
+        setLoading(false);
+        setIsFirstFetch(false);
+      }
+    }
+  }, [debouncedSearch, currentPage, pageSize]);
 
-  const nextCode = `NCC${String(suppliers.length + 1).padStart(3, '0')}`;
+  useEffect(() => {
+    fetchSuppliers();
+    return () => abortControllerRef.current?.abort();
+  }, [fetchSuppliers]);
+
+  const handleAddSupplier = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const payload = normalizeSupplierPayload(data);
+      await suppliersService.create(payload);
+      toast.success("Thêm nhà cung cấp mới thành công!");
+      setIsModalOpen(false);
+      fetchSuppliers();
+      return true;
+    } catch (error) {
+      console.error("useSuppliers - handleAddSupplier error:", error);
+      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      toast.error(serverMsg || "Không thể thêm nhà cung cấp. Vui lòng thử lại.");
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateSupplier = async (id, data) => {
+    setIsSubmitting(true);
+    try {
+      const payload = normalizeSupplierPayload(data);
+      await suppliersService.update(id, payload);
+      toast.success("Cập nhật thông tin thành công!");
+      setIsModalOpen(false);
+      setSelectedSupplier(null);
+      fetchSuppliers();
+      return true;
+    } catch (error) {
+      console.error("useSuppliers - handleUpdateSupplier error:", error);
+      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      toast.error(serverMsg || "Lỗi khi cập nhật nhà cung cấp. Hãy kiểm tra lại dữ liệu.");
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteSupplier = async () => {
+    if (!selectedSupplier) return;
+    setIsSubmitting(true);
+    try {
+      await suppliersService.softDelete(selectedSupplier.id);
+      toast.success(`Đã xóa nhà cung cấp "${selectedSupplier.supplierName}"`);
+      setIsDeleteModalOpen(false);
+      setSelectedSupplier(null);
+
+      if (suppliers.length === 1 && currentPage > 1) {
+        setCurrentPage((p) => p - 1);
+      } else {
+        fetchSuppliers();
+      }
+      return true;
+    } catch (error) {
+      console.error("useSuppliers - handleDeleteSupplier error:", error);
+      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      toast.error(serverMsg || "Không thể xóa nhà cung cấp này.");
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openEditModal = (supplier) => {
+    setSelectedSupplier(supplier);
+    setIsModalOpen(true);
+  };
+
+  const openDeleteModal = (supplier) => {
+    setSelectedSupplier(supplier);
+    setIsDeleteModalOpen(true);
+  };
 
   return {
     suppliers,
-    filteredSuppliers,
-    isFormOpen,
-    setIsFormOpen,
-    editingSupplier,
-    isDeleteOpen,
-    setIsDeleteOpen,
-    deletingSupplier,
-    handleOpenAdd,
-    handleOpenEdit,
-    handleSave,
-    handleOpenDelete,
-    confirmDelete,
-    searchSuppliers,
-    nextCode
+    allActiveSuppliers,
+    loading,
+    isFetching,
+    isSubmitting,
+    isFirstFetch,
+    search,
+    debouncedSearch,
+    setSearch,
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    totalCount,
+    isModalOpen,
+    setIsModalOpen,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    selectedSupplier,
+    setSelectedSupplier,
+    isTrashOpen,
+    setIsTrashOpen,
+    handleAddSupplier,
+    handleUpdateSupplier,
+    handleDeleteSupplier,
+    openEditModal,
+    openDeleteModal,
+    refreshList: fetchSuppliers,
   };
 }

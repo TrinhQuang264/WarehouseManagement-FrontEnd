@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Hash, Phone, Mail, MapPin } from 'lucide-react';
+import { Package, User, Phone, Mail, MapPin } from 'lucide-react';
 import Modal from '../../../components/ui/Modal';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
@@ -8,12 +8,11 @@ export default function SupplierModal({
   isOpen,
   onClose,
   onSave,
-  editingSupplier,
-  nextCode
+  editingSupplier
 }) {
   const [formData, setFormData] = useState({
     supplierName: '',
-    code: '',
+    contactPerson: '',
     phone: '',
     email: '',
     address: ''
@@ -24,29 +23,30 @@ export default function SupplierModal({
   useEffect(() => {
     if (editingSupplier) {
       setFormData({
-        supplierName: editingSupplier.supplierName,
-        code: editingSupplier.code,
-        phone: editingSupplier.phone,
-        email: editingSupplier.email,
-        address: editingSupplier.address
+        supplierName: editingSupplier.supplierName || '',
+        contactPerson: editingSupplier.contactPerson || '',
+        phone: editingSupplier.phone || '',
+        email: editingSupplier.email || '',
+        address: editingSupplier.address || ''
       });
     } else {
       setFormData({
         supplierName: '',
-        code: nextCode || '',
+        contactPerson: '',
         phone: '',
         email: '',
         address: ''
       });
     }
     setErrors({});
-  }, [isOpen, editingSupplier, nextCode]);
+  }, [isOpen, editingSupplier]);
 
   const validate = () => {
     const newErrors = {};
     if (!formData.supplierName.trim()) newErrors.supplierName = 'Tên nhà cung cấp không được để trống';
-    if (!formData.code.trim()) newErrors.code = 'Mã NCC không được để trống';
+    if (!formData.contactPerson.trim()) newErrors.contactPerson = 'Người liên hệ không được để trống';
     if (!formData.phone.trim()) newErrors.phone = 'Số điện thoại không được để trống';
+    if (!formData.address.trim()) newErrors.address = 'Địa chỉ không được để trống';
     if (!formData.email.trim()) {
       newErrors.email = 'Email không được để trống';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -88,12 +88,12 @@ export default function SupplierModal({
             required
           />
           <Input 
-            label="Mã nhà cung cấp"
-            placeholder="NCC001"
-            icon={<Hash size={18} />}
-            value={formData.code}
-            onChange={e => setFormData({...formData, code: e.target.value})}
-            error={errors.code}
+            label="Người liên hệ"
+            placeholder="Ví dụ: Nguyễn Văn A"
+            icon={<User size={18} />}
+            value={formData.contactPerson}
+            onChange={e => setFormData({...formData, contactPerson: e.target.value})}
+            error={errors.contactPerson}
             required
           />
         </div>
@@ -123,6 +123,8 @@ export default function SupplierModal({
           icon={<MapPin size={18} />}
           value={formData.address}
           onChange={e => setFormData({...formData, address: e.target.value})}
+          error={errors.address}
+          required
         />
       </div>
     </Modal>

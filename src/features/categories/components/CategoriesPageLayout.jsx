@@ -21,6 +21,7 @@ export default function CategoriesPageLayout({
   onCloseDeleteModal,
   onDeleteCategory,
   selectedCategory,
+  modalLoading,
   selectedIds,
   toggleSelect,
   toggleSelectAll,
@@ -63,7 +64,7 @@ export default function CategoriesPageLayout({
         onCloseDeleteModal={onCloseDeleteModal}
         onDeleteCategory={onDeleteCategory}
         selectedCategory={selectedCategory}
-        loading={loading}
+        loading={modalLoading}
         allCategories={allActiveCategories}
       />
     </div>

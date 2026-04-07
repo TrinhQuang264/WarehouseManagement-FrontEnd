@@ -16,16 +16,35 @@ import ProductForm from '../components/ProductForm';
 import ProductImageUpload from '../components/ProductImageUpload';
 import ProductDetailPage from './ProductDetailPage';
 import ConfirmModal from '../../../components/ui/ConfirmModal.jsx';
+import toast from '../../../utils/toast';
 
 const DEFAULT_PRODUCT_FORM = {
   code: '',
   name: '',
   description: '',
   categoryId: '',
+  originalPrice: '',
   importPrice: '',
   price: '',
   imageUrl: '',
   specs: [],
+};
+
+const getEntityFromResponse = (response) => response?.data ?? response ?? null;
+
+const pickProductId = (responseEntity, fallbackId = null) => {
+  const value = responseEntity?.id ?? responseEntity?.productId ?? fallbackId;
+  return value != null ? Number(value) : null;
+};
+
+const pickImageUrl = (image = {}) =>
+  image?.imageUrl || image?.url || image?.path || image?.thumbnailUrl || '';
+
+const sanitizeImageUrlForPayload = (imageUrl) => {
+  const value = String(imageUrl || '').trim();
+  if (!value) return '';
+  if (value.startsWith('data:image/')) return '';
+  return value;
 };
 
 export default function ProductsPage() {
@@ -76,6 +95,8 @@ export default function ProductsPage() {
   // Local UI state for add/edit form
   const [formData, setFormData] = useState(DEFAULT_PRODUCT_FORM);
   const [imagePreview, setImagePreview] = useState(null);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [selectedImageName, setSelectedImageName] = useState('');
 
   useEffect(() => {
     if (mode.list) {
@@ -123,6 +144,9 @@ export default function ProductsPage() {
   useEffect(() => {
     if (mode.add) {
       setFormData(DEFAULT_PRODUCT_FORM);
+      setImagePreview(null);
+      setSelectedImageFile(null);
+      setSelectedImageName('');
     }
   }, [mode.add, setFormData]);
 
@@ -142,11 +166,15 @@ export default function ProductsPage() {
           name: productToEdit.name || '',
           description: productToEdit.description || '',
           categoryId: productToEdit.categoryId || '',
+          originalPrice: productToEdit.originalPrice ?? productToEdit.importPrice ?? '',
           importPrice: productToEdit.importPrice || '',
           price: productToEdit.price ?? productToEdit.sellingPrice ?? '',
           imageUrl: productToEdit.imageUrl || '',
           specs: productToEdit.specs || []
         });
+        setImagePreview(productToEdit.imageUrl || null);
+        setSelectedImageFile(null);
+        setSelectedImageName('');
       } catch (error) {
         console.error('ProductsPage - loadProductDetail error:', error);
       }
@@ -172,11 +200,59 @@ export default function ProductsPage() {
   };
 
   const onSubmit = async (data) => {
+    const safeImageUrl = sanitizeImageUrlForPayload(data.imageUrl);
+    const payload = {
+      ...data,
+      originalPrice: data.originalPrice ?? data.importPrice ?? 0,
+      importPrice: data.originalPrice ?? data.importPrice ?? 0,
+      imageUrl: safeImageUrl,
+    };
+
+    let submitResult = null;
     if (mode.edit) {
-      await handleUpdateProduct(mode.id, data);
+      submitResult = await handleUpdateProduct(mode.id, payload);
     } else {
-      await handleAddProduct(data);
+      submitResult = await handleAddProduct(payload);
     }
+    if (!submitResult) return;
+
+    const savedProduct = getEntityFromResponse(submitResult);
+    const productId = pickProductId(savedProduct, mode.edit ? mode.id : null);
+
+    if (productId && selectedImageFile) {
+      try {
+        const uploadedResponse = await productService.uploadProductImage(productId, selectedImageFile);
+        const uploadedEntity = getEntityFromResponse(uploadedResponse);
+        const uploadedImages = Array.isArray(uploadedEntity)
+          ? uploadedEntity
+          : Array.isArray(uploadedEntity?.images)
+            ? uploadedEntity.images
+            : [uploadedEntity].filter(Boolean);
+
+        const firstImage = uploadedImages[0];
+        const imageId = firstImage?.id ?? firstImage?.imageId;
+        if (imageId) {
+          await productService.updateThumbnail(productId, imageId);
+        }
+
+        const refreshedImagesResponse = await productService.getProductImages(productId);
+        const refreshedImagesEntity = getEntityFromResponse(refreshedImagesResponse);
+        const refreshedImages = Array.isArray(refreshedImagesEntity)
+          ? refreshedImagesEntity
+          : Array.isArray(refreshedImagesEntity?.images)
+            ? refreshedImagesEntity.images
+            : [];
+        const thumbnailImage = refreshedImages.find((img) => img?.isThumbnail || img?.isPrimary) || refreshedImages[0];
+        const serverImageUrl = pickImageUrl(thumbnailImage);
+        if (serverImageUrl) {
+          setFormData((prev) => ({ ...prev, imageUrl: serverImageUrl }));
+        }
+      } catch (error) {
+        console.error("ProductsPage - limit upload error:", error);
+        toast.error("Sản phẩm đã được lưu nhưng không thể tải ảnh lên. Bạn có thể thử lại sau.");
+      }
+    }
+
     navigate('/products');
   };
 
@@ -210,13 +286,15 @@ export default function ProductsPage() {
           <div className="col-span-12 lg:col-span-4 space-y-6">
             <ProductImageUpload 
               imagePreview={imagePreview}
+              selectedImageName={selectedImageName}
               handleImageChange={(e) => {
                 const file = e.target.files[0];
                 if (file) {
+                  setSelectedImageFile(file);
+                  setSelectedImageName(file.name || '');
                   const reader = new FileReader();
                   reader.onloadend = () => {
                     setImagePreview(reader.result);
-                    setFormData(prev => ({ ...prev, imageUrl: reader.result }));
                   };
                   reader.readAsDataURL(file);
                 }

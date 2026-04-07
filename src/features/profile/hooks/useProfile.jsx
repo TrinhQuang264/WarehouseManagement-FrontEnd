@@ -22,7 +22,7 @@ export default function useProfile() {
     }
   }, []);
 
-  const handleUpdateProfile = async (userId, updateData) => {
+  const handleUpdateProfile = useCallback(async (userId, updateData) => {
     setLoading(true);
     try {
       const updatedUser = await profileService.updateProfile(userId, updateData);
@@ -35,9 +35,9 @@ export default function useProfile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleChangePassword = async (userName, currentPassword, newPassword, confirmPassword) => {
+  const handleChangePassword = useCallback(async (userName, currentPassword, newPassword, confirmPassword) => {
     setLoading(true);
     try {
       await profileService.changePassword(userName, currentPassword, newPassword, confirmPassword);
@@ -63,7 +63,7 @@ export default function useProfile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return {
     profile,

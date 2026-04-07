@@ -1,15 +1,76 @@
 import api from '../../../lib/axios';
 
 const normalizeProductPayload = (data = {}) => {
-  const sellingPrice = data.sellingPrice ?? data.price ?? 0;
+  const name = String(data.name ?? data.Name ?? '').trim();
+  const code = String(data.code ?? data.Code ?? '').trim();
+  const description = String(data.description ?? data.Description ?? '').trim();
+  const categoryId = Number(data.categoryId ?? data.CategoryId ?? 0);
+  const sellingPrice = Number(data.sellingPrice ?? data.price ?? data.SellingPrice ?? 0);
+  const originalPrice = Number(data.originalPrice ?? data.importPrice ?? data.OriginalPrice ?? data.ImportPrice ?? 0);
+  const initialStock = Number(data.initialStock ?? data.InitialStock ?? data.quantity ?? data.Quantity ?? 1);
+  const imageUrl = String(data.imageUrl ?? data.ImageUrl ?? '').trim();
 
   return {
     ...data,
-    categoryId: data.categoryId ? Number(data.categoryId) : data.categoryId,
-    importPrice: Number(data.importPrice ?? 0),
-    sellingPrice: Number(sellingPrice),
-    price: Number(sellingPrice),
+    // camelCase (frontend internal + backend thường chấp nhận)
+    name,
+    code,
+    description,
+    categoryId,
+    originalPrice,
+    importPrice: originalPrice,
+    sellingPrice,
+    price: sellingPrice,
+    initialStock,
+    quantity: initialStock,
+    imageUrl,
+
+    // PascalCase (đảm bảo tương thích backend DTO đang validate)
+    Name: name,
+    Code: code,
+    Description: description,
+    CategoryId: categoryId,
+    OriginalPrice: originalPrice,
+    ImportPrice: originalPrice,
+    SellingPrice: sellingPrice,
+    InitialStock: initialStock,
+    ImageUrl: imageUrl,
   };
+};
+
+const toProductFormData = (payload = {}) => {
+  const formData = new FormData();
+  const append = (key, value) => {
+    if (value === undefined || value === null) return;
+    formData.append(key, String(value));
+  };
+
+  append('Name', payload.Name);
+  append('Code', payload.Code);
+  append('Description', payload.Description);
+  append('CategoryId', payload.CategoryId);
+  append('SellingPrice', payload.SellingPrice);
+  append('Price', payload.SellingPrice); // Một số backend dùng Price thay vì SellingPrice
+  append('OriginalPrice', payload.OriginalPrice);
+  append('ImportPrice', payload.ImportPrice);
+  append('InitialStock', payload.InitialStock);
+  append('ImageUrl', payload.ImageUrl);
+  
+  // Thêm các biến thể chữ thường để đảm bảo tương thích tối đa
+  append('name', payload.name);
+  append('code', payload.code);
+  append('categoryId', payload.categoryId);
+  append('sellingPrice', payload.sellingPrice);
+  append('originalPrice', payload.originalPrice);
+  append('importPrice', payload.importPrice);
+  append('initialStock', payload.initialStock);
+
+  return formData;
+};
+
+const dumpFormDataEntries = (formData) => {
+  if (!formData || typeof formData.entries !== 'function') return [];
+  return Array.from(formData.entries()).map(([key, value]) => ({ key, value }));
 };
 
 const productService = {
@@ -77,10 +138,30 @@ const productService = {
   // POST /api/Products
   async create(data) {
     try {
-      const response = await api.post('/Products', normalizeProductPayload(data));
+      const payload = normalizeProductPayload(data);
+      const formData = toProductFormData(payload);
+      const response = await api.post('/Products', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error) {
       console.error('Error creating product:', error);
+      console.error('Create product status:', error?.response?.status);
+      console.error('Create product response data:', error?.response?.data);
+      console.error('Create product payload:', normalizeProductPayload(data));
+      console.error('Create product full axios error:', {
+        message: error?.message,
+        code: error?.code,
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        data: error?.response?.data,
+        headers: error?.response?.headers,
+        requestUrl: error?.config?.url,
+        requestMethod: error?.config?.method,
+        requestHeaders: error?.config?.headers,
+      });
+      const debugFormData = toProductFormData(normalizeProductPayload(data));
+      console.table(dumpFormDataEntries(debugFormData));
       throw error;
     }
   },
@@ -88,10 +169,30 @@ const productService = {
   // PUT /api/Products/{productId}
   async update(productId, data) {
     try {
-      const response = await api.put(`/Products/${productId}`, normalizeProductPayload(data));
+      const payload = normalizeProductPayload(data);
+      const formData = toProductFormData(payload);
+      const response = await api.put(`/Products/${productId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error) {
       console.error('Error updating product:', error);
+      console.error('Update product status:', error?.response?.status);
+      console.error('Update product response data:', error?.response?.data);
+      console.error('Update product payload:', normalizeProductPayload(data));
+      console.error('Update product full axios error:', {
+        message: error?.message,
+        code: error?.code,
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        data: error?.response?.data,
+        headers: error?.response?.headers,
+        requestUrl: error?.config?.url,
+        requestMethod: error?.config?.method,
+        requestHeaders: error?.config?.headers,
+      });
+      const debugFormData = toProductFormData(normalizeProductPayload(data));
+      console.table(dumpFormDataEntries(debugFormData));
       throw error;
     }
   },
@@ -227,6 +328,24 @@ const productService = {
       return response.data;
     } catch (error) {
       console.error('Error fetching product images:', error);
+      throw error;
+    }
+  },
+
+  // POST /api/Products/{id}/images
+  async uploadProductImage(id, files) {
+    try {
+      const formData = new FormData();
+      const fileList = Array.isArray(files) ? files : [files];
+      fileList.filter(Boolean).forEach((file) => {
+        formData.append('images', file);
+      });
+      const response = await api.post(`/Products/${id}/images`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error uploading product image:', error);
       throw error;
     }
   },

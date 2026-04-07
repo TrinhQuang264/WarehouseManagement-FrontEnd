@@ -5,11 +5,35 @@ import categoryService from "../../categories/api/categoriesService";
 import toast from "../../../utils/toast";
 
 const PAGE_SIZE = 10;
+const extractApiErrorMessage = (error, fallback) => {
+  const data = error?.response?.data;
+  if (!data) return fallback;
+
+  const directMessage = data.message || data.error || data.title || data.detail;
+  if (directMessage) return directMessage;
+
+  const validation = data.errors;
+  if (validation && typeof validation === "object") {
+    const firstKey = Object.keys(validation)[0];
+    const firstValue = firstKey ? validation[firstKey] : null;
+    if (Array.isArray(firstValue) && firstValue.length > 0) {
+      return firstValue[0];
+    }
+    if (typeof firstValue === "string" && firstValue.trim()) {
+      return firstValue;
+    }
+  }
+
+  return fallback;
+};
 const normalizeProduct = (item = {}) => {
-  const normalizedPrice = item.price ?? item.sellingPrice ?? 0;
+  const normalizedPrice = item.price ?? item.Price ?? item.sellingPrice ?? item.SellingPrice ?? 0;
+  const normalizedOriginalPrice = item.originalPrice ?? item.OriginalPrice ?? item.importPrice ?? item.ImportPrice ?? item.purchasePrice ?? item.PurchasePrice ?? item.costPrice ?? item.CostPrice ?? 0;
 
   return {
     ...item,
+    originalPrice: normalizedOriginalPrice,
+    importPrice: normalizedOriginalPrice,
     price: normalizedPrice,
     sellingPrice: normalizedPrice,
   };
@@ -198,15 +222,33 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
   const handleAddProduct = async (data) => {
     setIsSubmitting(true);
     try {
-      await productService.create(data);
+      const normalizedCategoryId = Number(data?.categoryId ?? data?.CategoryId ?? 0);
+      const categoryExists = categories.some((cat) => Number(cat?.id) === normalizedCategoryId);
+      if (!normalizedCategoryId || !categoryExists) {
+        toast.error("Danh mục không hợp lệ hoặc đã bị xóa. Vui lòng chọn lại danh mục.");
+        return null;
+      }
+
+      const productCode = String(data?.code ?? data?.Code ?? "").trim().toLowerCase();
+      if (productCode) {
+        const existingResponse = await productService.getAll();
+        const existingItems = Array.isArray(existingResponse) ? existingResponse : (existingResponse?.data || []);
+        const isDuplicateCode = existingItems.some((item) => String(item?.code ?? "").trim().toLowerCase() === productCode);
+        if (isDuplicateCode) {
+          toast.error("Mã sản phẩm đã tồn tại. Vui lòng nhập mã khác.");
+          return null;
+        }
+      }
+
+      const created = await productService.create(data);
       toast.success("Thêm sản phẩm mới thành công!");
       fetchProducts();
-      return true;
+      return created;
     } catch (error) {
       console.error("useProducts - handleAddProduct error:", error);
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      const serverMsg = extractApiErrorMessage(error, "Không thể thêm sản phẩm. Vui lòng thử lại.");
       toast.error(serverMsg || "Không thể thêm sản phẩm. Vui lòng thử lại.");
-      return false;
+      return null;
     } finally {
       setIsSubmitting(false);
     }
@@ -218,16 +260,16 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
       // Assuming a generic update or specifically updateStatus if that's what's available
       // If backend doesn't have a generic PUT /Products/{id}, we might need to adjust.
       // For now, mapping to updateStatus or create if it handles both (generic pattern)
-      await productService.update(id, data);
+      const updated = await productService.update(id, data);
       toast.success("Cập nhật thông tin sản phẩm thành công!");
       setSelectedProduct(null);
       fetchProducts();
-      return true;
+      return updated;
     } catch (error) {
       console.error("useProducts - handleUpdateProduct error:", error);
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      const serverMsg = extractApiErrorMessage(error, "Lỗi khi cập nhật sản phẩm.");
       toast.error(serverMsg || "Lỗi khi cập nhật sản phẩm.");
-      return false;
+      return null;
     } finally {
       setIsSubmitting(false);
     }

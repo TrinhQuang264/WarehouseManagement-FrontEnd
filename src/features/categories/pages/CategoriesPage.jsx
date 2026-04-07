@@ -1,5 +1,5 @@
 import { Plus, Trash2 } from "lucide-react";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useCategories } from "../hooks/useCategories.jsx";
 import { useHeader } from "../../../contexts/HeaderContext";
 import CategoriesPageLayout from "../components/CategoriesPageLayout";
@@ -12,6 +12,7 @@ export default function CategoriesPage() {
   const {
     categories,
     loading,
+    isSubmitting,
     isFirstFetch,
     search,
     setSearch,
@@ -41,6 +42,20 @@ export default function CategoriesPage() {
 
   // Header controls for page-level actions/search
   const { setActionButton, setExtraActions, setOnSearch, resetHeader } = useHeader();
+  const closeModal = useCallback(() => setIsModalOpen(false), [setIsModalOpen]);
+  const closeDeleteModal = useCallback(
+    () => setIsDeleteModalOpen(false),
+    [setIsDeleteModalOpen],
+  );
+  const openTrash = useCallback(() => setIsTrashOpen(true), [setIsTrashOpen]);
+  const closeTrash = useCallback(() => setIsTrashOpen(false), [setIsTrashOpen]);
+  const handleSaveCategory = useCallback(
+    (data) => {
+      if (selectedCategory) return handleUpdateCategory(selectedCategory.id, data);
+      return handleAddCategory(data);
+    },
+    [handleAddCategory, handleUpdateCategory, selectedCategory],
+  );
 
   useEffect(() => {
     setActionButton({
@@ -55,7 +70,7 @@ export default function CategoriesPage() {
       {
         label: "Thùng rác",
         icon: <Trash2 size={18} />,
-        onClick: () => setIsTrashOpen(true),
+        onClick: openTrash,
         className: "bg-red-500 text-red-600 hover:bg-red-300",
       }
     ]);
@@ -63,7 +78,7 @@ export default function CategoriesPage() {
     setOnSearch(() => setSearch);
 
     return () => resetHeader();
-  }, [setActionButton, setExtraActions, setOnSearch, setSearch, resetHeader, setIsModalOpen, setIsTrashOpen]);
+  }, [setActionButton, setExtraActions, setOnSearch, setSearch, resetHeader, setIsModalOpen, openTrash]);
 
   if (isFirstFetch && loading) {
     return (
@@ -87,17 +102,14 @@ export default function CategoriesPage() {
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         isModalOpen={isModalOpen}
-        onCloseModal={() => setIsModalOpen(false)}
-        onSaveCategory={(data) => {
-          if (selectedCategory)
-            return handleUpdateCategory(selectedCategory.id, data);
-          return handleAddCategory(data);
-        }}
+        onCloseModal={closeModal}
+        onSaveCategory={handleSaveCategory}
         editingCategory={selectedCategory}
         isDeleteModalOpen={isDeleteModalOpen}
-        onCloseDeleteModal={() => setIsDeleteModalOpen(false)}
+        onCloseDeleteModal={closeDeleteModal}
         onDeleteCategory={handleDeleteCategory}
         selectedCategory={selectedCategory}
+        modalLoading={isSubmitting}
         selectedIds={selectedIds}
         toggleSelect={toggleSelect}
         toggleSelectAll={toggleSelectAll}
@@ -106,7 +118,7 @@ export default function CategoriesPage() {
 
       <TrashBinDrawer 
         isOpen={isTrashOpen}
-        onClose={() => setIsTrashOpen(false)}
+        onClose={closeTrash}
         title="Thùng rác danh mục"
         service={categoryService}
         onDataChange={refreshList}

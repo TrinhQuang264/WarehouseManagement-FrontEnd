@@ -39,7 +39,7 @@ export default function ProductsTable({
 }) {
   const isAllSelected =
     products.length > 0 && selectedIds.length === products.length;
-  const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
+  const categoryNameById = new Map(categories.map((category) => [Number(category.id), category.name]));
 
   return (
     <DataTableCard className="relative min-h-[500px] flex flex-col">
@@ -110,7 +110,7 @@ export default function ProductsTable({
                   {/* Danh Mục */}
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-                      {categoryNameById.get(product.categoryId) || "Khác"}
+                      {categoryNameById.get(Number(product.categoryId)) || "Khác"}
                     </span>
                   </td>
 

@@ -4,8 +4,6 @@ import {
   Eye,
   FileText,
   Pencil,
-  Phone,
-  MapPin,
   Receipt,
   Wallet,
   ShieldCheck,

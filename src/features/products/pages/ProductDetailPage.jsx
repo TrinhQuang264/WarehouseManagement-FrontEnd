@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs.jsx';
 import DataTableCard from '../../../components/ui/DataTableCard.jsx';
 import { useHeader } from '../../../contexts/HeaderContext.jsx';
-import { products as mockProducts } from '../../../utils/mockData.js';
 import { formatCurrency } from '../../../utils/util.js';
+import productService from '../api/productsService';
+import categoryService from '../../categories/api/categoriesService';
 
 function ProductImage({ imageUrl, alt, className }) {
   if (!imageUrl) {
@@ -65,22 +66,46 @@ export default function ProductDetailPage() {
   ];
 
   useEffect(() => {
-    // Mock API call - replace with actual API later
-    setTimeout(() => {
-      const foundProduct = mockProducts.find(p => p.id === parseInt(id));
-      if (foundProduct) {
-        setProduct({
-          ...foundProduct,
-          warranty: foundProduct.warranty || '06 Tháng (Lỗi 1 đổi 1)',
-          brand: foundProduct.brand || 'Chưa cập nhật',
-          specs: foundProduct.specs || [],
-          categories: foundProduct.categories || [],
-          importPrice: foundProduct.importPrice || 0,
-          quantity: foundProduct.quantity || 0
-        });
+    let isMounted = true;
+    
+    const fetchProductAndCategories = async () => {
+      try {
+        setLoading(true);
+        const [productRes, categoriesRes] = await Promise.all([
+          productService.getById(id),
+          categoryService.getAll()
+        ]);
+
+        const productData = productRes?.data || productRes;
+        const allCategories = Array.isArray(categoriesRes) ? categoriesRes : (categoriesRes?.data || []);
+
+        if (isMounted && productData) {
+          // Find category name
+          const category = allCategories.find(c => Number(c.id) === Number(productData.categoryId));
+          const categoryName = category?.name || productData.categoryName || `Danh mục ${productData.categoryId}`;
+
+          setProduct({
+            ...productData,
+            warranty: productData.warranty || '06 Tháng (Lỗi 1 đổi 1)',
+            brand: productData.brand || 'Chưa cập nhật',
+            specs: productData.specs || [],
+            categories: productData.categoryId ? [categoryName] : [],
+            importPrice: productData.importPrice ?? productData.ImportPrice ?? productData.originalPrice ?? productData.OriginalPrice ?? productData.purchasePrice ?? productData.PurchasePrice ?? productData.costPrice ?? productData.CostPrice ?? 0,
+            price: productData.price ?? productData.Price ?? productData.sellingPrice ?? productData.SellingPrice ?? 0,
+            quantity: productData.quantity ?? productData.Quantity ?? productData.initialStock ?? productData.InitialStock ?? 0,
+            imageUrl: productData.imageUrl ?? productData.ImageUrl ?? ''
+          });
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu cho trang chi tiết:", error);
+      } finally {
+        if (isMounted) setLoading(false);
       }
-      setLoading(false);
-    }, 300);
+    };
+
+    fetchProductAndCategories();
+
+    return () => { isMounted = false; };
   }, [id]);
 
   useEffect(() => {

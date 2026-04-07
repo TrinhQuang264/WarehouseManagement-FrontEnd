@@ -1,7 +1,7 @@
 import React from "react";
 import { Edit, Trash2, FolderOpen } from "lucide-react";
 
-export default function CategoryTable({
+function CategoryTable({
   categories,
   loading,
   onEdit,
@@ -99,3 +99,5 @@ export default function CategoryTable({
     </div>
   );
 }
+
+export default React.memo(CategoryTable);

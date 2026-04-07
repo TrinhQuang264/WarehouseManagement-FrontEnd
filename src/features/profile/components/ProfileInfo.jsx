@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import toast from '../../../utils/toast';
-import useProfile from '../hooks/useProfile';
 
 export default function ProfileInfo({ profile, authUser, userId, updateUser, handleUpdateProfile, loading }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -94,7 +93,7 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
       const currentStoredStr = localStorage.getItem('user');
       let currentStored = {};
       if (currentStoredStr) {
-          try { currentStored = JSON.parse(currentStoredStr); } catch (e) {}
+          try { currentStored = JSON.parse(currentStoredStr); } catch (e) { /* ignore invalid local cache */ }
       }
 
       const updatedUser = {
@@ -107,10 +106,6 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
   };
 
   const displayUserName = profile?.userName || authUser?.userName || '';
-  const avatarUrl =
-    profile?.avatar || profile?.Avatar ||
-    authUser?.avatar || authUser?.Avatar ||
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuBw2aqesUY60aEk721ehQYmqYVqVDEJjW3hjZPjorwqulh-dGnDlhyx4Pe5XuIpr4W-QkQ0G6cTTQTWv-78XEm99L_vcr2TSVUxgxSV1DycA-EsSEtmCkQFN3sjtUZ2SAkWM-dTRxr--CnS1KlI3ZWtn1M5SNxtXhL-EwpNiyF_N18ChDS6OLbnzysGtPinpUhT0ony22hA3A3lDb6ZAmPZ6u1XREyG8tHCrUxY-xxbAaNaSzA_T7KsUVs33raV5BVc8UuTibvNmXU';
 
   return (
     <section className="profile-section mb-6">

@@ -13,7 +13,7 @@ const CategoriesPage = lazy(() => import("../features/categories/pages/Categorie
 const InventoryPage = lazy(() => import("../features/inventory/components/InventoryPage"));
 const ImportsPage = lazy(() => import("../features/imports/pages/ImportsPage"));
 const ExportsPage = lazy(() => import("../features/exports/pages/ExportsPage"));
-const SuppliersPage = lazy(() => import("../features/suppliers/components/SuppliersPage"));
+const SuppliersPage = lazy(() => import("../features/suppliers/pages/SuppliersPage"));
 const CustomersPage = lazy(() => import("../features/customers/components/CustomersPage"));
 const ProfilePage = lazy(() => import("../features/profile/pages/ProfilePage"));
 const SettingsPage = lazy(() => import("../features/settings/components/SettingsPage"));
