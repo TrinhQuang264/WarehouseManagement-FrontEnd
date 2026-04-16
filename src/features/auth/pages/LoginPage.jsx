@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [hasLoginAttempted, setHasLoginAttempted] = useState(false);
   const validatePassword = (pass) => {
     const requirements = [
       { regex: /.{8,}/ },
@@ -41,6 +42,7 @@ export default function LoginPage() {
     const passError = validatePassword(password);
     if (passError) {
       setValidationError(passError);
+      setHasLoginAttempted(true);
       return;
     }
 
@@ -106,7 +108,7 @@ export default function LoginPage() {
                 }
               />
 
-              {isPasswordFocused && (
+              {isPasswordFocused && hasLoginAttempted && (
                 <div className="absolute top-1/2 left-full ml-4 w-64 z-10 -translate-y-1/2 md:w-max opacity-100 transition-opacity">
                   <PasswordValidator password={password} />
                 </div>
