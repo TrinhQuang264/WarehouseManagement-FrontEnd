@@ -1,16 +1,17 @@
 import { Edit, Trash2 } from "lucide-react";
-import { formatCurrency } from "../../../utils/util";
+import { formatCurrency, getProductImageUrl } from "../../../utils/util";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
 import BulkActionBar from "../../../components/ui/BulkActionBar";
 
 function ProductThumbnail({ imageUrl, name }) {
-  const hasImage = Boolean(imageUrl);
+  const fullImageUrl = getProductImageUrl(imageUrl);
+  const hasImage = Boolean(fullImageUrl);
 
   return (
     <div className="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center flex-shrink-0">
       {hasImage ? (
         <img
-          src={imageUrl}
+          src={fullImageUrl}
           alt={name}
           className="w-full h-full object-cover"
           onError={(e) => {

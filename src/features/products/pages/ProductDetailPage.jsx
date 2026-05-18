@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs.jsx';
 import DataTableCard from '../../../components/ui/DataTableCard.jsx';
 import { useHeader } from '../../../contexts/HeaderContext.jsx';
-import { formatCurrency } from '../../../utils/util.js';
+import { formatCurrency, getProductImageUrl } from '../../../utils/util.js';
 import productService from '../api/productsService';
 import categoryService from '../../categories/api/categoriesService';
 
 function ProductImage({ imageUrl, alt, className }) {
-  if (!imageUrl) {
+  const fullImageUrl = getProductImageUrl(imageUrl);
+  if (!fullImageUrl) {
     return (
       <div className={`flex items-center justify-center text-sm font-medium text-slate-400 ${className}`}>
         Không có ảnh
@@ -19,7 +20,7 @@ function ProductImage({ imageUrl, alt, className }) {
 
   return (
     <img
-      src={imageUrl}
+      src={fullImageUrl}
       alt={alt}
       className={className}
       onError={(e) => {
@@ -34,6 +35,8 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const { setTitle } = useHeader();
   const [product, setProduct] = useState(null);
+  const [images, setImages] = useState([]);
+  const [activeImage, setActiveImage] = useState('');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('history');
 
@@ -71,13 +74,18 @@ export default function ProductDetailPage() {
     const fetchProductAndCategories = async () => {
       try {
         setLoading(true);
-        const [productRes, categoriesRes] = await Promise.all([
+        const [productRes, categoriesRes, imagesRes] = await Promise.all([
           productService.getById(id),
-          categoryService.getAll()
+          categoryService.getAll(),
+          productService.getProductImages(id).catch(err => {
+            console.warn('Cannot fetch product images, using fallback', err);
+            return [];
+          })
         ]);
 
         const productData = productRes?.data || productRes;
         const allCategories = Array.isArray(categoriesRes) ? categoriesRes : (categoriesRes?.data || []);
+        const imgList = imagesRes?.data ?? imagesRes ?? [];
 
         if (isMounted && productData) {
           // Find category name
@@ -95,6 +103,14 @@ export default function ProductDetailPage() {
             quantity: productData.quantity ?? productData.Quantity ?? productData.initialStock ?? productData.InitialStock ?? 0,
             imageUrl: productData.imageUrl ?? productData.ImageUrl ?? ''
           });
+
+          const verifiedImgList = Array.isArray(imgList) ? imgList : [];
+          setImages(verifiedImgList);
+          
+          // Set active image to thumbnail or first available image, or product.imageUrl
+          const thumbnail = verifiedImgList.find(img => img.isThumbnail || img.isPrimary);
+          const defaultUrl = thumbnail?.imageUrl ?? thumbnail?.url ?? thumbnail?.path ?? productData.imageUrl ?? productData.ImageUrl ?? '';
+          setActiveImage(defaultUrl);
         }
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu cho trang chi tiết:", error);
@@ -154,14 +170,21 @@ export default function ProductDetailPage() {
   return (
     <div className="relative">
       {/* BREADCRUMB & HEADER */}
-      <div className="mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <Breadcrumbs 
           items={[
             { label: 'Trang chủ', path: '/' },
             { label: 'Sản phẩm', path: '/products' },
             { label: 'Chi tiết sản phẩm' }
           ]}
-        />       
+        />
+        <button
+          onClick={() => navigate(`/products/edit/${product.id}`)}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:text-primary hover:border-primary/30 rounded-lg shadow-sm font-semibold text-xs transition-colors"
+        >
+          <Edit size={14} />
+          Chỉnh sửa & Quản lý ảnh
+        </button>
       </div>
 
       {/* MAIN CONTENT GRID */}
@@ -170,32 +193,38 @@ export default function ProductDetailPage() {
         <div className="col-span-12 lg:col-span-4 space-y-6">
           {/* Image Gallery */}
           <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-100">
-            <div className="aspect-square bg-slate-50 flex items-center justify-center p-8">
+            <div className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative">
               <ProductImage
-                imageUrl={product.imageUrl}
+                imageUrl={activeImage || product.imageUrl}
                 alt={product.name}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain transition-all duration-300"
               />
             </div>
-            <div className="p-4 flex gap-2 overflow-x-auto border-t border-slate-200">
-              <div className="w-20 h-20 rounded-lg border-2 border-primary bg-white flex-shrink-0 p-2">
-                <ProductImage
-                  imageUrl={product.imageUrl}
-                  alt={product.name}
-                  className="w-full h-full object-contain"
-                />
+            {images.length > 0 && (
+              <div className="p-4 flex gap-2 overflow-x-auto border-t border-slate-100 bg-slate-50/50">
+                {images.map((img) => {
+                  const url = img.imageUrl ?? img.url ?? img.path;
+                  const imgId = img.id ?? img.imageId;
+                  const isActive = activeImage === url;
+
+                  return (
+                    <button
+                      key={imgId}
+                      onClick={() => setActiveImage(url)}
+                      className={`w-16 h-16 rounded-lg border-2 bg-white flex-shrink-0 p-1 transition-all ${
+                        isActive ? 'border-primary shadow-sm scale-95' : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <ProductImage
+                        imageUrl={url}
+                        alt="Product thumbnail"
+                        className="w-full h-full object-contain"
+                      />
+                    </button>
+                  );
+                })}
               </div>
-              <div className="w-20 h-20 rounded-lg border border-slate-200 bg-white flex-shrink-0 p-2 hover:border-primary transition-colors cursor-pointer">
-                <ProductImage
-                  imageUrl={product.imageUrl}
-                  alt={product.name}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <button className="w-20 h-20 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-400 hover:text-primary transition-colors">
-                <span className="material-symbols-outlined">add</span>
-              </button>
-            </div>
+            )}
           </div>
         </div>
 

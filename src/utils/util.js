@@ -33,3 +33,17 @@ export function formatCompact(num) {
   if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
   return String(n);
 }
+
+/**
+ * Trả về URL ảnh sản phẩm đầy đủ từ backend
+ * VD: "/images/products/abc.jpg" -> "https://localhost:7161/images/products/abc.jpg"
+ */
+export function getProductImageUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  return `https://localhost:7161${cleanPath}`;
+}
+

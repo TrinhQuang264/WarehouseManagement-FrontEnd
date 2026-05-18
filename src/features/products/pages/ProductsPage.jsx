@@ -50,7 +50,7 @@ const sanitizeImageUrlForPayload = (imageUrl) => {
 export default function ProductsPage() {
   // Route mode + page header controls
   const mode = usePageMode('/products');
-  const { setTitle, setActionButton, setExtraActions, setOnSearch, setSearchValue } = useHeader();
+  const { setTitle, setActionButton, setExtraActions, setOnSearch, setSearchValue, resetHeader } = useHeader();
   const navigate = useNavigate();
   
   // Products list/form/trash states and actions from hook
@@ -100,6 +100,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     if (mode.list) {
+      setTitle('Danh Sách Sản Phẩm');
       setActionButton({
         label: "Thêm sản phẩm",
         icon: <Plus size={18} />,
@@ -134,11 +135,9 @@ export default function ProductsPage() {
     }
     
     return () => {
-      setActionButton(null);
-      setExtraActions([]);
-      setOnSearch(null);
+      resetHeader();
     };
-  }, [mode.current, setTitle, setActionButton, setExtraActions, setOnSearch, setSearchValue, searchProducts, navigate, setIsTrashOpen]);
+  }, [mode.current, setTitle, setActionButton, setExtraActions, setOnSearch, setSearchValue, searchProducts, navigate, setIsTrashOpen, resetHeader]);
 
   // Handle Edit Data Initialization
   useEffect(() => {
@@ -161,16 +160,23 @@ export default function ProductsPage() {
         const productToEdit = response?.data ?? response;
         if (!isMounted || !productToEdit) return;
 
+        const originalPriceVal = productToEdit.originalPrice ?? productToEdit.OriginalPrice ?? productToEdit.importPrice ?? productToEdit.ImportPrice ?? '';
+        const priceVal = productToEdit.price ?? productToEdit.Price ?? productToEdit.sellingPrice ?? productToEdit.SellingPrice ?? '';
+        const quantityVal = productToEdit.quantity ?? productToEdit.Quantity ?? productToEdit.initialStock ?? productToEdit.InitialStock ?? 1;
+
         setFormData({
-          code: productToEdit.code || '',
-          name: productToEdit.name || '',
-          description: productToEdit.description || '',
-          categoryId: productToEdit.categoryId || '',
-          originalPrice: productToEdit.originalPrice ?? productToEdit.importPrice ?? '',
-          importPrice: productToEdit.importPrice || '',
-          price: productToEdit.price ?? productToEdit.sellingPrice ?? '',
-          imageUrl: productToEdit.imageUrl || '',
-          specs: productToEdit.specs || []
+          code: productToEdit.code ?? productToEdit.Code ?? '',
+          name: productToEdit.name ?? productToEdit.Name ?? '',
+          description: productToEdit.description ?? productToEdit.Description ?? '',
+          categoryId: productToEdit.categoryId ?? productToEdit.CategoryId ?? '',
+          originalPrice: originalPriceVal,
+          importPrice: originalPriceVal,
+          price: priceVal,
+          sellingPrice: priceVal,
+          imageUrl: productToEdit.imageUrl ?? productToEdit.ImageUrl ?? '',
+          specs: productToEdit.specs ?? productToEdit.Specs ?? [],
+          initialStock: quantityVal,
+          quantity: quantityVal,
         });
         setImagePreview(productToEdit.imageUrl || null);
         setSelectedImageFile(null);
@@ -298,6 +304,11 @@ export default function ProductsPage() {
                   };
                   reader.readAsDataURL(file);
                 }
+              }}
+              productId={mode.edit ? mode.id : null}
+              onThumbnailChange={(thumbUrl) => {
+                setImagePreview(thumbUrl);
+                setFormData((prev) => ({ ...prev, imageUrl: thumbUrl }));
               }}
             />
           </div>

@@ -5,8 +5,8 @@ const normalizeProductPayload = (data = {}) => {
   const code = String(data.code ?? data.Code ?? '').trim();
   const description = String(data.description ?? data.Description ?? '').trim();
   const categoryId = Number(data.categoryId ?? data.CategoryId ?? 0);
-  const sellingPrice = Number(data.sellingPrice ?? data.price ?? data.SellingPrice ?? 0);
-  const originalPrice = Number(data.originalPrice ?? data.importPrice ?? data.OriginalPrice ?? data.ImportPrice ?? 0);
+  const sellingPrice = Number(data.price ?? data.Price ?? data.sellingPrice ?? data.SellingPrice ?? 0);
+  const originalPrice = Number(data.originalPrice ?? data.OriginalPrice ?? data.importPrice ?? data.ImportPrice ?? 0);
   const initialStock = Number(data.initialStock ?? data.InitialStock ?? data.quantity ?? data.Quantity ?? 1);
   const imageUrl = String(data.imageUrl ?? data.ImageUrl ?? '').trim();
 
@@ -50,20 +50,11 @@ const toProductFormData = (payload = {}) => {
   append('Description', payload.Description);
   append('CategoryId', payload.CategoryId);
   append('SellingPrice', payload.SellingPrice);
-  append('Price', payload.SellingPrice); // Một số backend dùng Price thay vì SellingPrice
+  append('Price', payload.SellingPrice); // Back-compat if needed
   append('OriginalPrice', payload.OriginalPrice);
   append('ImportPrice', payload.ImportPrice);
   append('InitialStock', payload.InitialStock);
-  append('ImageUrl', payload.ImageUrl);
-  
-  // Thêm các biến thể chữ thường để đảm bảo tương thích tối đa
-  append('name', payload.name);
-  append('code', payload.code);
-  append('categoryId', payload.categoryId);
-  append('sellingPrice', payload.sellingPrice);
-  append('originalPrice', payload.originalPrice);
-  append('importPrice', payload.importPrice);
-  append('initialStock', payload.initialStock);
+  append('ImageUrl', payload.ImageUrl || '');
 
   return formData;
 };
