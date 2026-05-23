@@ -43,3 +43,21 @@
 .dark .info-card {
   border-color: #1e293b;
 }
+
+.users-page .action-buttons-group,
+.users-page .action-btn {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.users-page .action-btn {
+  color: #64748b;
+}
+
+.users-page .action-btn:hover {
+  color: #0f172a;
+}
+
+.dark .users-page .action-btn {
+  color: #cbd5e1;
+}
