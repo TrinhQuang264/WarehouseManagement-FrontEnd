@@ -232,16 +232,6 @@ const productService = {
     }
   },
 
-  // PUT /api/Products/bulk-restore
-  async bulkRestore(ids) {
-    try {
-      const response = await api.put('/Products/bulk-restore', { ids });
-      return response.data;
-    } catch (error) {
-      console.error('Error bulk restoring products:', error);
-      throw error;
-    }
-  },
 
   // DELETE /api/Products/{id}/images/{imageId}
   async deleteImage(id, imageId) {
@@ -265,17 +255,6 @@ const productService = {
     }
   },
 
-  // DELETE /api/Products/bulk-soft-delete
-  async bulkSoftDelete(ids) {
-    try {
-      // Gửi đối tượng { ids: [...] } theo định dạng backend yêu cầu
-      const response = await api.delete('/Products/bulk-soft-delete', { data: { ids } });
-      return response.data;
-    } catch (error) {
-      console.error('Error bulk soft deleting products:', error);
-      throw error;
-    }
-  },
 
   // DELETE /api/Products/{id}/permanent-delete
   async permanentDelete(id) {
@@ -288,17 +267,6 @@ const productService = {
     }
   },
 
-  // DELETE /api/Products/bulk-permanent-delete
-  async bulkPermanentDelete(ids) {
-    try {
-      // Gửi đối tượng { ids: [...] } cho DELETE
-      const response = await api.delete('/Products/bulk-permanent-delete', { data: { ids } });
-      return response.data;
-    } catch (error) {
-      console.error('Error bulk permanent deleting products:', error);
-      throw error;
-    }
-  },
 
   
   // GET /api/Products/trash

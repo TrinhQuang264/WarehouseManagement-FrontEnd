@@ -8,38 +8,38 @@ import { formatNumber, formatCurrency } from '../../../utils/util';
 import { useDashboard } from '../hooks/useDashboard.jsx';
 import '../styles/Dashboard.css';
 
-const CustomBarTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 text-sm">
-        <p className="font-bold text-slate-800 dark:text-slate-100 mb-2">{label}</p>
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-            <span className="text-slate-600 dark:text-slate-300">Nhập: <span className="font-semibold text-slate-900 dark:text-white">{payload[1].value}</span></span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-600" />
-            <span className="text-slate-600 dark:text-slate-300">Xuất: <span className="font-semibold text-slate-900 dark:text-white">{payload[0].value}</span></span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
+// const CustomBarTooltip = ({ active, payload, label }) => {
+//   if (active && payload && payload.length) {
+//     return (
+//       <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 text-sm">
+//         <p className="font-bold text-slate-800 dark:text-slate-100 mb-2">{label}</p>
+//         <div className="flex flex-col gap-1">
+//           <div className="flex items-center gap-2">
+//             <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+//             <span className="text-slate-600 dark:text-slate-300">Nhập: <span className="font-semibold text-slate-900 dark:text-white">{payload[1].value}</span></span>
+//           </div>
+//           <div className="flex items-center gap-2">
+//             <span className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-600" />
+//             <span className="text-slate-600 dark:text-slate-300">Xuất: <span className="font-semibold text-slate-900 dark:text-white">{payload[0].value}</span></span>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+//   return null;
+// };
 
-const CustomPieTooltip = ({ active, payload }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 text-sm font-medium">
-        <span className="text-slate-600 dark:text-slate-300">{payload[0].name}: </span>
-        <span className="text-slate-900 dark:text-white">{payload[0].value}%</span>
-      </div>
-    );
-  }
-  return null;
-};
+// const CustomPieTooltip = ({ active, payload }) => {
+//   if (active && payload && payload.length) {
+//     return (
+//       <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 text-sm font-medium">
+//         <span className="text-slate-600 dark:text-slate-300">{payload[0].name}: </span>
+//         <span className="text-slate-900 dark:text-white">{payload[0].value}%</span>
+//       </div>
+//     );
+//   }
+//   return null;
+// };
 
 export default function DashboardPage() {
   const {
@@ -90,10 +90,10 @@ export default function DashboardPage() {
         />
       </section>
 
-      {/* 2. CHARTS */}
+      {/* 2. CHARTS
       <section className="dashboard-charts-grid">
         {/* Biểu đồ cột — Xu hướng Nhập/Xuất */}
-        <div className="lg:col-span-2 chart-container">
+        {/* div className="lg:col-span-2 chart-container">
           <div className="chart-header">
             <h3 className="font-bold text-lg text-slate-900 dark:text-white">Xu hướng Nhập/Xuất</h3>
             <div className="chart-legend">
@@ -126,10 +126,10 @@ export default function DashboardPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </div> */}
 
         {/* Biểu đồ vòng — Phân bổ tồn kho */}
-        <div className="chart-container">
+        {/* <div className="chart-container">
           <h3 className="font-bold text-lg mb-6 text-slate-900 dark:text-white">Phân bổ Tồn kho</h3>
           <div className="flex-1 flex flex-col items-center justify-center">
             
@@ -154,14 +154,14 @@ export default function DashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
               {/* Inner Text Center */}
-              <div className="pie-chart-center">
+            {/*   <div className="pie-chart-center">
                 <span className="text-xs text-slate-400">Tổng</span>
                 <span className="text-xl font-bold text-slate-900 dark:text-white">100%</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Legend */}
-            <div className="pie-legend">
+            {/* <div className="pie-legend">
               {allocation.map((item) => (
                 <div key={item.name} className="pie-legend-item">
                   <div className="flex items-center gap-2">
@@ -174,7 +174,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* 3. TOP PRODUCTS TABLE */}
       <section className="top-products-section">

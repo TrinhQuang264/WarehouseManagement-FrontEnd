@@ -1,7 +1,6 @@
 import { Edit, Trash2 } from "lucide-react";
 import { formatCurrency, getProductImageUrl } from "../../../utils/util";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
-import BulkActionBar from "../../../components/ui/BulkActionBar";
 
 function ProductThumbnail({ imageUrl, name }) {
   const fullImageUrl = getProductImageUrl(imageUrl);
@@ -32,14 +31,7 @@ export default function ProductsTable({
   onEdit,
   onDelete,
   onViewDetail,
-  selectedIds = [],
-  toggleSelect,
-  toggleSelectAll,
-  clearSelection,
-  onBulkDelete,
 }) {
-  const isAllSelected =
-    products.length > 0 && selectedIds.length === products.length;
   const categoryNameById = new Map(categories.map((category) => [Number(category.id), category.name]));
 
   return (
@@ -48,14 +40,6 @@ export default function ProductsTable({
         <table className="table">
           <thead>
             <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
-              <th className="table-th px-6 w-10">
-                <input
-                  type="checkbox"
-                  className="rounded border-slate-300 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
-                  checked={isAllSelected}
-                  onChange={toggleSelectAll}
-                />
-              </th>
               <th className="table-th px-6 text-left">Mã Sản Phẩm</th>
               <th className="table-th px-6 text-left">Thông Tin Sản Phẩm</th>
               <th className="table-th px-6 text-left">Danh Mục</th>
@@ -72,19 +56,8 @@ export default function ProductsTable({
                 <tr
                   key={product.id}
                   onDoubleClick={() => onViewDetail?.(product)}
-                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${selectedIds.includes(product.id) ? "bg-primary/5" : ""}`}
+                  className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
                 >
-                  <td className="px-6 py-4">
-                    <input
-                      type="checkbox"
-                      className="rounded border-slate-300 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
-                      checked={selectedIds.includes(product.id)}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        toggleSelect(product.id);
-                      }}
-                    />
-                  </td>
                   {/* Mã Sản Phẩm */}
                   <td className="px-6 py-4 font-mono text-sm text-primary font-medium">
                     {product.code}
@@ -168,7 +141,7 @@ export default function ProductsTable({
             ) : (
               <tr>
                 <td
-                  colSpan="7"
+                  colSpan="6"
                   className="px-6 py-12 text-center text-slate-400 italic"
                 >
                   Không tìm thấy sản phẩm ...
@@ -178,20 +151,6 @@ export default function ProductsTable({
           </tbody>
         </table>
       </div>
-
-      <BulkActionBar
-        selectedCount={selectedIds.length}
-        isVisible={selectedIds.length > 0}
-        onClearSelection={clearSelection}
-        actions={[
-          {
-            label: "Xóa vào thùng rác",
-            icon: <Trash2 size={16} />,
-            onClick: onBulkDelete,
-            variant: "danger",
-          },
-        ]}
-      />
     </DataTableCard>
   );
 }

@@ -73,16 +73,7 @@ const categoryService = {
     }
   },
 
-  // PUT /api/Categories/bulk-soft-delete
-  async bulkSoftDelete(ids) {
-    try {
-      const response = await api.delete('/Categories/bulk-soft-delete', { data: { ids } });
-      return response.data;
-    } catch (error) {
-      console.error('[categoryService] Lỗi xóa mềm hàng loạt:', error);
-      throw error;
-    }
-  },
+
 
   // DELETE /api/Categories/{id}/permanent-delete
   async permanentDelete(id) {
@@ -95,16 +86,7 @@ const categoryService = {
     }
   },
 
-  // DELETE /api/Categories/bulk-permanent-delete 
-  async bulkPermanentDelete(ids) {
-    try {
-      const response = await api.delete('/Categories/bulk-permanent-delete', { data: { ids } });
-      return response.data;
-    } catch (error) {
-      console.error('[categoryService] Lỗi xóa vĩnh viễn hàng loạt:', error);
-      throw error;
-    }
-  },
+
   
   // PUT /api/Categories/{id}/restore
   async restore(id) {

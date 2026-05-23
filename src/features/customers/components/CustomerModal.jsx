@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Hash, Phone, Mail, MapPin } from "lucide-react";
+import { User, Phone, Mail, MapPin } from "lucide-react";
 import Modal from "../../../components/ui/Modal";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
@@ -47,7 +47,7 @@ export default function CustomerModal({
     const newErrors = {};
     if (!formData.fullName.trim())
       newErrors.fullName = "Tên khách hàng không được để trống";
-    if (!formData.code.trim()) newErrors.code = "Mã KH không được để trống";
+
     if (!formData.phoneNumber.trim())
       newErrors.phoneNumber = "Số điện thoại không được để trống";
     if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email)) {
@@ -90,15 +90,6 @@ export default function CustomerModal({
               setFormData({ ...formData, fullName: e.target.value })
             }
             error={errors.fullName}
-            required
-          />
-          <Input
-            label="Mã khách hàng"
-            placeholder="KH001"
-            icon={<Hash size={18} />}
-            value={formData.code}
-            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-            error={errors.code}
             required
           />
         </div>

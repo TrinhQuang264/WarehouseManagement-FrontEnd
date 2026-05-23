@@ -69,8 +69,7 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  // UI state: chọn hàng, modal xác nhận, và drawer thùng rác
-  const [selectedIds, setSelectedIds] = useState([]);
+  // UI state: modal xác nhận, và drawer thùng rác
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isTrashOpen, setIsTrashOpen] = useState(false);
@@ -300,36 +299,7 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     setSelectedProduct(null);
   };
 
-  // --- Bulk Actions ---
 
-  const toggleSelect = (id) => {
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.length === products.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(products.map(p => p.id));
-    }
-  };
-
-  const handleBulkSoftDelete = async () => {
-    if (selectedIds.length === 0) return;
-    setIsSubmitting(true);
-    try {
-      await productService.bulkSoftDelete(selectedIds);
-      toast.success(`Đã chuyển ${selectedIds.length} sản phẩm vào thùng rác`);
-      setSelectedIds([]);
-      fetchProducts();
-    } catch (error) {
-      toast.error("Lỗi khi xóa hàng loạt.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const clearSelection = () => setSelectedIds([]);
 
   const resetFilters = () => {
     setSearch("");
@@ -378,18 +348,13 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     selectedProduct,
     isTrashOpen,
     setIsTrashOpen,
-    selectedIds,
 
     // Actions
     handleAddProduct,
     handleUpdateProduct,
     handleSoftDelete,
     handleSoftDeleteById,
-    handleBulkSoftDelete,
     openDeleteModal,
-    toggleSelect,
-    toggleSelectAll,
-    clearSelection,
     searchProducts,
     refreshList: fetchProducts,
   };

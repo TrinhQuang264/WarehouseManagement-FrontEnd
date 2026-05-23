@@ -1,112 +1,127 @@
-import { useState, useCallback, useMemo } from "react";
-import { customers as mockCustomers } from "../../../utils/mockData";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import customersService from "../api/customersService";
 import { toast } from "../../../utils/toast";
 
 export function useCustomers() {
-  // 1. Quản lý danh sách khách hàng
-  const [customers, setCustomers] = useState(
-    mockCustomers.map((c, index) => ({
-      ...c,
-      code: `KH${String(c.id || index + 1).padStart(3, "0")}`,
-      email: `${(c.fullName || "customer").toLowerCase().replace(/\s+/g, ".")}@gmail.com`,
-    })),
-  );
-
-  // 2. State cho Modal Form (Thêm/Sửa)
+  // State
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingCustomer, setEditingCustomer] = useState(null);
 
-  // 3. State cho Modal Xác nhận xóa
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
+  const [editingCustomer, setEditingCustomer] = useState(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingCustomer, setDeletingCustomer] = useState(null);
-
-  // 4. State cho tìm kiếm
   const [searchQuery, setSearchQuery] = useState("");
 
-  // --- TÌM KIẾM VÀ LỌC ---
+  // Fetch all customers on mount
+  useEffect(() => {
+    customersService
+      .getAll()
+      .then(data => {
+        setCustomers(data);
+        setError(null);
+      })
+      .catch(err => {
+        console.error("Error fetching customers:", err);
+        setError(err);
+        toast.error("Failed to load customers");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Filtered customers based on search query
   const filteredCustomers = useMemo(() => {
-    if (!searchQuery || !searchQuery.trim()) {
-      return customers;
-    }
+    if (!searchQuery || !searchQuery.trim()) return customers;
     const query = searchQuery.toLowerCase();
-    return customers.filter(
-      (c) =>
-        c.fullName?.toLowerCase().includes(query) ||
-        c.code?.toLowerCase().includes(query) ||
-        c.email?.toLowerCase().includes(query) ||
-        c.phone?.toLowerCase().includes(query),
+    return customers.filter(c =>
+      c.fullName?.toLowerCase().includes(query) ||
+      c.code?.toLowerCase().includes(query) ||
+      c.email?.toLowerCase().includes(query) ||
+      c.phoneNumber?.toLowerCase().includes(query)
     );
   }, [customers, searchQuery]);
 
-  const searchCustomers = useCallback((query) => {
-    setSearchQuery(query);
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredCustomers.length / pageSize) || 1;
+  const paginatedCustomers = useMemo(() => {
+    const startIdx = (currentPage - 1) * pageSize;
+    return filteredCustomers.slice(startIdx, startIdx + pageSize);
+  }, [filteredCustomers, currentPage, pageSize]);
 
-    /* === API CALL (uncomment when API is ready) ===
-    // Gọi API tìm kiếm khách hàng
-    // import customersService from '../api/customersService';
-    
-    if (query.trim()) {
-      customersService.search({ keyword: query })
-        .then(data => {
-          setCustomers(data);
-        })
-        .catch(error => {
-          console.error('Lỗi tìm kiếm:', error);
-          toast.error('Lỗi khi tìm kiếm khách hàng');
+  const searchCustomers = useCallback(query => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+    if (query && query.trim()) {
+      customersService
+        .search({ keyword: query })
+        .then(data => setCustomers(data))
+        .catch(err => {
+          console.error("Search error:", err);
+          toast.error("Search failed");
         });
     } else {
-      // Nếu query rỗng, fetch toàn bộ danh sách
-      customersService.getAll()
-        .then(data => {
-          setCustomers(data);
-        })
-        .catch(error => {
-          console.error('Lỗi lấy dữ liệu:', error);
-        });
+      customersService
+        .getAll()
+        .then(data => setCustomers(data))
+        .catch(err => console.error(err));
     }
-    === END API CALL ===*/
   }, []);
 
-  // --- XỬ LÝ SỰ KIỆN ---
+  // CRUD operations
   const handleOpenAdd = useCallback(() => {
     setEditingCustomer(null);
     setIsFormOpen(true);
   }, []);
 
-  const handleOpenEdit = useCallback((customer) => {
+  const handleOpenEdit = useCallback(customer => {
     setEditingCustomer(customer);
     setIsFormOpen(true);
   }, []);
 
-  const handleSave = useCallback(
-    (formData) => {
-      setCustomers((prev) => {
-        if (editingCustomer) {
-          toast.success("Cập nhật khách hàng thành công");
-          return prev.map((c) =>
-            c.id === editingCustomer.id ? { ...c, ...formData } : c,
-          );
-        } else {
-          const newId =
-            prev.length > 0 ? Math.max(...prev.map((c) => c.id)) + 1 : 1;
-          toast.success("Thêm khách hàng mới thành công");
-          return [{ id: newId, ...formData }, ...prev];
-        }
-      });
-      setIsFormOpen(false);
-    },
-    [editingCustomer],
-  );
+  const handleSave = useCallback(async formData => {
+    if (editingCustomer) {
+      try {
+        const updated = await customersService.update(editingCustomer.id, formData);
+        setCustomers(prev => prev.map(c => (c.id === editingCustomer.id ? updated : c)));
+        toast.success("Cập nhật khách hàng thành công");
+      } catch (err) {
+        console.error(err);
+        toast.error("Lỗi khi cập nhật khách hàng");
+      }
+    } else {
+      try {
+        const newCode = `KH${String(customers.length + 1).padStart(3, "0")}`;
+        const created = await customersService.create({ ...formData, code: newCode });
+        setCustomers(prev => [created, ...prev]);
+        toast.success("Thêm khách hàng mới thành công");
+      } catch (err) {
+        console.error(err);
+        toast.error("Lỗi khi tạo khách hàng");
+      }
+    }
+    setIsFormOpen(false);
+  }, [editingCustomer, customers.length]);
 
-  const handleOpenDelete = useCallback((customer) => {
+  const handleOpenDelete = useCallback(customer => {
     setDeletingCustomer(customer);
     setIsDeleteOpen(true);
   }, []);
 
-  const confirmDelete = useCallback(() => {
-    setCustomers((prev) => prev.filter((c) => c.id !== deletingCustomer.id));
+  const confirmDelete = useCallback(async () => {
+    if (!deletingCustomer) return;
+    try {
+      await customersService.delete(deletingCustomer.id);
+      setCustomers(prev => prev.filter(c => c.id !== deletingCustomer.id));
+      toast.success("Xóa khách hàng thành công");
+    } catch (err) {
+      console.error(err);
+      toast.error("Lỗi khi xóa khách hàng");
+    }
     setIsDeleteOpen(false);
-    toast.success("Xóa khách hàng thành công");
   }, [deletingCustomer]);
 
   const nextCode = `KH${String(customers.length + 1).padStart(3, "0")}`;
@@ -114,6 +129,9 @@ export function useCustomers() {
   return {
     customers,
     filteredCustomers,
+    paginatedCustomers,
+    loading,
+    error,
     isFormOpen,
     setIsFormOpen,
     editingCustomer,
@@ -127,5 +145,10 @@ export function useCustomers() {
     confirmDelete,
     searchCustomers,
     nextCode,
+    // pagination
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    pageSize,
   };
 }

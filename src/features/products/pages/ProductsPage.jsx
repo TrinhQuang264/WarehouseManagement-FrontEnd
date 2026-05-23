@@ -69,13 +69,6 @@ export default function ProductsPage() {
     resetFilters,
     searchProducts,
     
-    // Selection & Bulk actions
-    selectedIds,
-    toggleSelect,
-    toggleSelectAll,
-    clearSelection,
-    handleBulkSoftDelete,
-
     // Form handlers - these will be managed locally now
     handleAddProduct,
     handleUpdateProduct,
@@ -362,11 +355,6 @@ export default function ProductsPage() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onViewDetail={handleViewDetail}
-            selectedIds={selectedIds}
-            toggleSelect={toggleSelect}
-            toggleSelectAll={toggleSelectAll}
-            clearSelection={clearSelection}
-            onBulkDelete={handleBulkSoftDelete}
           />
 
           {totalCount > 0 && (

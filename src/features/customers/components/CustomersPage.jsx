@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from "react";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Plus } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import ConfirmModal from "../../../components/ui/ConfirmModal";
+import PaginationBar from "../../../components/ui/PaginationBar";
 import CustomerTable from "./CustomerTable";
 import CustomerModal from "./CustomerModal";
 import CustomerDetailPage from "./CustomerDetailPage.jsx";
@@ -71,6 +72,7 @@ export default function CustomersPage() {
   const params = useParams();
   const {
     filteredCustomers,
+    paginatedCustomers,
     customers,
     isFormOpen,
     setIsFormOpen,
@@ -85,6 +87,10 @@ export default function CustomersPage() {
     confirmDelete,
     searchCustomers,
     nextCode,
+    loading,
+    currentPage,
+    setCurrentPage,
+    pageSize,
   } = useCustomers();
 
   const { setActionButton, setOnSearch, setTitle, resetHeader } = useHeader();
@@ -201,40 +207,20 @@ export default function CustomersPage() {
       </div>
 
       <CustomerTable
-        customers={filteredCustomers}
+        customers={paginatedCustomers}
+        loading={loading}
         onEdit={handleOpenEdit}
         onDelete={handleOpenDelete}
         onViewDetail={(customer) => navigate(CUSTOMER_URLS.detail(customer.id))}
       />
 
-      <div className="pagination-container">
-        <span className="pagination-info">
-          Hiển thị{" "}
-          <span className="font-bold text-slate-900 dark:text-white">
-            1-{filteredCustomers.length}
-          </span>{" "}
-          của{" "}
-          <span className="font-bold text-slate-900 dark:text-white">
-            {customers.length}
-          </span>{" "}
-          kết quả
-        </span>
-        <div className="pagination-controls">
-          <button className="pagination-btn">
-            <ChevronLeft size={18} />
-          </button>
-          <div className="pagination-page-list">
-            <button className="pagination-page-btn pagination-page-btn-active">
-              1
-            </button>
-            <button className="pagination-page-btn">2</button>
-            <button className="pagination-page-btn">3</button>
-          </div>
-          <button className="pagination-btn">
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
+      <PaginationBar
+        currentPage={currentPage}
+        pageSize={pageSize}
+        totalCount={filteredCustomers.length}
+        onPageChange={setCurrentPage}
+        resourceName="khách hàng"
+      />
 
       <CustomerModal
         isOpen={isFormOpen}

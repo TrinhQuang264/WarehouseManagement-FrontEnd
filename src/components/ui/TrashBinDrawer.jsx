@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { X, RotateCcw, Trash2, Package, Search, Check } from 'lucide-react';
 import Button from './Button';
 import Loading from './Loading';
-import BulkActionBar from './BulkActionBar';
 import ConfirmModal from './ConfirmModal';
 import toast from '../../utils/toast';
 
@@ -18,9 +17,8 @@ export default function TrashBinDrawer({
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedIds, setSelectedIds] = useState([]);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
-  const [deleteTargetId, setDeleteTargetId] = useState(null); // null means bulk delete
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
 
   const fetchTrash = useCallback(async () => {
     if (!isOpen) return;
@@ -64,48 +62,17 @@ export default function TrashBinDrawer({
     }
   };
 
-  const handleBulkRestore = async () => {
-    if (selectedIds.length === 0) return;
-    try {
-      await service.bulkRestore(selectedIds);
-      toast.success(`Đã khôi phục ${selectedIds.length} mục`);
-      setSelectedIds([]);
-      fetchTrash();
-      onDataChange?.();
-    } catch (error) {
-      toast.error('Lỗi khi khôi phục hàng loạt');
-    }
-  };
-
   const handlePermanentDelete = async () => {
     try {
       if (deleteTargetId) {
         await service.permanentDelete(deleteTargetId);
         toast.success('Đã xóa vĩnh viễn');
-      } else {
-        await service.bulkPermanentDelete(selectedIds);
-        toast.success(`Đã xóa vĩnh viễn ${selectedIds.length} mục`);
-        setSelectedIds([]);
       }
       setIsConfirmDeleteOpen(false);
       fetchTrash();
       onDataChange?.();
     } catch (error) {
       toast.error('Lỗi khi xóa vĩnh viễn');
-    }
-  };
-
-  const toggleSelect = (id) => {
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.length === items.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(items.map(item => item.id));
     }
   };
 
@@ -170,31 +137,16 @@ export default function TrashBinDrawer({
             </div>
           ) : items.length > 0 ? (
             <div className="space-y-3">
-              <div className="flex items-center justify-between mb-4 px-2">
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="checkbox"
-                    className="rounded border-slate-300 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
-                    checked={items.length > 0 && selectedIds.length === items.length}
-                    onChange={toggleSelectAll}
-                  />
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Chọn tất cả</span>
-                </div>
+              <div className="flex items-center justify-end mb-4 px-2">
                 <span className="text-sm text-slate-500">{items.length} mục</span>
               </div>
 
               {items.map((item) => (
                 <div 
                   key={item.id}
-                  className={`group p-4 bg-white dark:bg-slate-800 border ${selectedIds.includes(item.id) ? 'border-primary bg-primary/5' : 'border-slate-100 dark:border-slate-800'} rounded-2xl hover:border-primary/30 transition-all flex items-center justify-between gap-4`}
+                  className="group p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-2xl hover:border-primary/30 transition-all flex items-center justify-between gap-4"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <input 
-                      type="checkbox"
-                      className="rounded border-slate-300 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
-                      checked={selectedIds.includes(item.id)}
-                      onChange={() => toggleSelect(item.id)}
-                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-bold text-slate-900 dark:text-white truncate">
@@ -251,42 +203,16 @@ export default function TrashBinDrawer({
           )}
         </div>
 
-        {/* Footer actions for bulk */}
-        <BulkActionBar
-          selectedCount={selectedIds.length}
-          isVisible={selectedIds.length > 0}
-          onClearSelection={() => setSelectedIds([])}
-          actions={[
-            {
-              label: "Khôi phục",
-              icon: <RotateCcw size={16} />,
-              onClick: handleBulkRestore,
-            },
-            {
-              label: "Xóa vĩnh viễn",
-              icon: <Trash2 size={16} />,
-              onClick: () => {
-                setDeleteTargetId(null);
-                setIsConfirmDeleteOpen(true);
-              },
-              variant: "danger",
-            },
-          ]}
+        <ConfirmModal 
+          isOpen={isConfirmDeleteOpen}
+          onClose={() => setIsConfirmDeleteOpen(false)}
+          onConfirm={handlePermanentDelete}
+          title="Xóa vĩnh viễn"
+          message="Bạn có chắc chắn muốn xóa vĩnh viễn mục này? Hành động này không thể hoàn tác."
+          variant="danger"
+          confirmText="Xóa vĩnh viễn"
         />
       </div>
-
-      <ConfirmModal 
-        isOpen={isConfirmDeleteOpen}
-        onClose={() => setIsConfirmDeleteOpen(false)}
-        onConfirm={handlePermanentDelete}
-        title="Xóa vĩnh viễn"
-        message={deleteTargetId 
-          ? "Bạn có chắc chắn muốn xóa vĩnh viễn mục này? Hành động này không thể hoàn tác." 
-          : `Bạn có chắc chắn muốn xóa vĩnh viễn ${selectedIds.length} mục đã chọn? Hành động này không thể hoàn tác.`
-        }
-        variant="danger"
-        confirmText="Xóa vĩnh viễn"
-      />
     </div>
   );
 

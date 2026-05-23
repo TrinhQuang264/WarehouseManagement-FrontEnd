@@ -1,6 +1,78 @@
 import api from "../../../lib/axios";
 
-cosnt customersService = {
-
-    
+const customersService = {
+  // GET /api/Customers/all
+  async getAll() {
+    try {
+      const response = await api.get('/Customers/all');
+      return response.data || [];
+    } catch (error) {
+      console.warn('[customersService] getAll error:', error);
+      return [];
+    }
+  },
+  // GET /api/Customers/filter
+  async filter(params = {}) {
+    try {
+      const response = await api.get('/Customers/filter', {
+        params: { isDeleted: false, ...params },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('[customersService] filter error:', error);
+      throw error;
+    }
+  },
+  // GET /api/Customers/{id}
+  async getById(id) {
+    try {
+      const response = await api.get(`/Customers/${id}`);
+      return response.data;
+    } catch (error) {
+      console.warn('[customersService] getById error, returning null:', error);
+      return null;
+    }
+  },
+  // POST /api/Customers
+  async create(data) {
+    try {
+      const response = await api.post('/Customers', data);
+      return response.data;
+    } catch (error) {
+      console.error('[customersService] create error:', error);
+      throw error;
+    }
+  },
+  // PUT /api/Customers/{id}
+  async update(id, data) {
+    try {
+      const response = await api.put(`/Customers/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error('[customersService] update error:', error);
+      throw error;
+    }
+  },
+  // DELETE /api/Customers/{id}
+  async delete(id) {
+    try {
+      const response = await api.delete(`/Customers/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('[customersService] delete error:', error);
+      throw error;
+    }
+  },
+  // PUT /api/Customers/{id}/restore
+  async restore(id) {
+    try {
+      const response = await api.put(`/Customers/${id}/restore`);
+      return response.data;
+    } catch (error) {
+      console.error('[customersService] restore error:', error);
+      throw error;
+    }
+  },
 };
+
+export default customersService;
