@@ -21,6 +21,16 @@ const usersService = {
   },
 
   /**
+   * GET /Users/filter - Tìm kiếm user theo từ khóa
+   */
+  async search(params = {}) {
+    const response = await api.get('/Users/filter', {
+      params: { isDeleted: false, ...params },
+    });
+    return response.data;
+  },
+
+  /**
    * GET /Users/{id} - Lấy thông tin user theo ID
    */
   async getUserById(id) {

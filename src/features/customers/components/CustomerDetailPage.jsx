@@ -49,7 +49,7 @@ export default function CustomerDetailPage({ customer, history = [], onEdit }) {
                 to={COMMON_URLS.dashboard}
                 className="hover:text-primary transition-colors"
               >
-                Trang chủ
+                Tổng quan
               </Link>
               <span className="mx-2 text-slate-300">/</span>
               <Link
@@ -246,3 +246,4 @@ export default function CustomerDetailPage({ customer, history = [], onEdit }) {
     </div>
   );
 }
+

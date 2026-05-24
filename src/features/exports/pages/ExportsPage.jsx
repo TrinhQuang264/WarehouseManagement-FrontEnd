@@ -176,12 +176,12 @@ export default function ExportsPage() {
 
   if (isDetailMode) {
     if (!sourceReceipt) {
-      return <div className="imports-page"><div className="page-header"><Breadcrumbs items={[{ label: 'Trang chủ', path: COMMON_URLS.dashboard }, { label: 'Xuất kho', path: EXPORT_URLS.list }, { label: 'Không tìm thấy phiếu' }]} /></div><div className="imports-card p-8 text-center text-slate-500">Phiếu xuất không tồn tại hoặc đã bị xóa.</div></div>;
+      return <div className="imports-page"><div className="page-header"><Breadcrumbs items={[{ label: 'Tổng quan', path: COMMON_URLS.dashboard }, { label: 'Xuất kho', path: EXPORT_URLS.list }, { label: 'Không tìm thấy phiếu' }]} /></div><div className="imports-card p-8 text-center text-slate-500">Phiếu xuất không tồn tại hoặc đã bị xóa.</div></div>;
     }
     return (
       <div className="imports-page">
         <div className="page-header imports-detail-topbar">
-          <Breadcrumbs items={[{ label: 'Trang chủ', path: COMMON_URLS.dashboard }, { label: 'Xuất kho', path: EXPORT_URLS.list }, { label: sourceReceipt.code }]} />
+          <Breadcrumbs items={[{ label: 'Tổng quan', path: COMMON_URLS.dashboard }, { label: 'Xuất kho', path: EXPORT_URLS.list }, { label: sourceReceipt.code }]} />
           <label className="imports-view-toggle">
             <span>Hiển thị phiếu</span>
             <button
@@ -201,12 +201,12 @@ export default function ExportsPage() {
   }
 
   if (isFormMode) {
-    return <div className="imports-page"><div className="page-header"><Breadcrumbs items={[{ label: 'Trang chủ', path: COMMON_URLS.dashboard }, { label: 'Xuất kho', path: EXPORT_URLS.list }, { label: pageTitle }]} /></div><ExportReceiptForm mode={isEditMode ? 'edit' : 'create'} receipt={formReceipt} customers={customers} products={products} draftItem={draftItem} onMetaChange={handleMetaChange} onDraftItemChange={handleDraftItemChange} onAddItem={handleAddItem} onIncreaseQty={handleIncreaseQty} onDecreaseQty={handleDecreaseQty} onRemoveItem={handleRemoveItem} onSaveDraft={handleSaveDraft} onSubmit={handleSubmit} onCancel={closeForm} /></div>;
+    return <div className="imports-page"><div className="page-header"><Breadcrumbs items={[{ label: 'Tổng quan', path: COMMON_URLS.dashboard }, { label: 'Xuất kho', path: EXPORT_URLS.list }, { label: pageTitle }]} /></div><ExportReceiptForm mode={isEditMode ? 'edit' : 'create'} receipt={formReceipt} customers={customers} products={products} draftItem={draftItem} onMetaChange={handleMetaChange} onDraftItemChange={handleDraftItemChange} onAddItem={handleAddItem} onIncreaseQty={handleIncreaseQty} onDecreaseQty={handleDecreaseQty} onRemoveItem={handleRemoveItem} onSaveDraft={handleSaveDraft} onSubmit={handleSubmit} onCancel={closeForm} /></div>;
   }
 
   return (
     <div className="imports-page">
-      <div className="page-header"><Breadcrumbs items={[{ label: 'Trang chủ', path: COMMON_URLS.dashboard }, { label: 'Xuất kho' }]} /></div>
+      <div className="page-header"><Breadcrumbs items={[{ label: 'Tổng quan', path: COMMON_URLS.dashboard }, { label: 'Xuất kho' }]} /></div>
       <ExportStats stats={stats} />
       <section className="imports-table-section"><ExportFilters customers={customers} selectedCustomer={selectedCustomer} setSelectedCustomer={setSelectedCustomer} selectedStatus={selectedStatus} setSelectedStatus={setSelectedStatus} selectedDateRange={selectedDateRange} setSelectedDateRange={setSelectedDateRange} /><ExportTable receipts={paginatedReceipts} onEdit={openEdit} onViewDetail={openDetail} onDelete={handleDeleteClick} /></section>
       <ExportPagination currentPage={currentPage} setCurrentPage={setCurrentPage} pageSize={pageSize} totalCount={totalCount} totalPages={totalPages} />
@@ -214,3 +214,4 @@ export default function ExportsPage() {
     </div>
   );
 }
+

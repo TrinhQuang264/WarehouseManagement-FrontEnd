@@ -3,6 +3,13 @@ import customersService from "../api/customersService";
 import { toast } from "../../../utils/toast";
 
 export function useCustomers() {
+  const normalizeCustomers = useCallback((data) => {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.items)) return data.items;
+    return [];
+  }, []);
+
   // State
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +29,7 @@ export function useCustomers() {
     customersService
       .getAll()
       .then(data => {
-        setCustomers(data);
+        setCustomers(normalizeCustomers(data));
         setError(null);
       })
       .catch(err => {
@@ -35,9 +42,10 @@ export function useCustomers() {
 
   // Filtered customers based on search query
   const filteredCustomers = useMemo(() => {
-    if (!searchQuery || !searchQuery.trim()) return customers;
+    const safeCustomers = Array.isArray(customers) ? customers : [];
+    if (!searchQuery || !searchQuery.trim()) return safeCustomers;
     const query = searchQuery.toLowerCase();
-    return customers.filter(c =>
+    return safeCustomers.filter(c =>
       c.fullName?.toLowerCase().includes(query) ||
       c.code?.toLowerCase().includes(query) ||
       c.email?.toLowerCase().includes(query) ||
@@ -58,7 +66,11 @@ export function useCustomers() {
     if (query && query.trim()) {
       customersService
         .search({ keyword: query })
-        .then(data => setCustomers(data))
+        .then(data => {
+          const normalized = normalizeCustomers(data);
+          console.log("[useCustomers] search keyword:", query, "result:", normalized);
+          setCustomers(normalized);
+        })
         .catch(err => {
           console.error("Search error:", err);
           toast.error("Search failed");
@@ -66,10 +78,10 @@ export function useCustomers() {
     } else {
       customersService
         .getAll()
-        .then(data => setCustomers(data))
+        .then(data => setCustomers(normalizeCustomers(data)))
         .catch(err => console.error(err));
     }
-  }, []);
+  }, [normalizeCustomers]);
 
   // CRUD operations
   const handleOpenAdd = useCallback(() => {

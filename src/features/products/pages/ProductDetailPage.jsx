@@ -147,7 +147,7 @@ export default function ProductDetailPage() {
         <div className="mb-8">
           <Breadcrumbs 
             items={[
-              { label: 'Trang chủ', path: '/' },
+              { label: 'Tổng quan', path: '/' },
               { label: 'Sản phẩm', path: '/products' }
             ]}
           />
@@ -173,7 +173,7 @@ export default function ProductDetailPage() {
       <div className="mb-8 flex items-center justify-between">
         <Breadcrumbs 
           items={[
-            { label: 'Trang chủ', path: '/' },
+            { label: 'Tổng quan', path: '/' },
             { label: 'Sản phẩm', path: '/products' },
             { label: 'Chi tiết sản phẩm' }
           ]}
@@ -411,3 +411,4 @@ export default function ProductDetailPage() {
     </div>
   );
 }
+

@@ -23,6 +23,10 @@ const customersService = {
       throw error;
     }
   },
+  // Alias for compatibility with hooks/pages that call `search`
+  async search(params = {}) {
+    return this.filter(params);
+  },
   // GET /api/Customers/{id}
   async getById(id) {
     try {

@@ -1,32 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Plus, Trash2 } from 'lucide-react';
-import usePageMode from '../../../hooks/usePageMode';
-import { useHeader } from '../../../contexts/HeaderContext';
-import { useProducts } from '../hooks/useProducts';
-import TrashBinDrawer from '../../../components/ui/TrashBinDrawer';
-import productService from '../api/productsService';
+import React, { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Plus, Trash2 } from "lucide-react";
+import usePageMode from "../../../hooks/usePageMode";
+import { useHeader } from "../../../contexts/HeaderContext";
+import { useProducts } from "../hooks/useProducts";
+import TrashBinDrawer from "../../../components/ui/TrashBinDrawer";
+import productService from "../api/productsService";
 
-import '../styles/Products.css';
+import "../styles/Products.css";
 
-import ProductsSearchFilter from '../components/ProductsSearchFilter';
-import ProductsTable from '../components/ProductsTable';
-import ProductsPagination from '../components/ProductsPagination';
-import ProductForm from '../components/ProductForm';
-import ProductImageUpload from '../components/ProductImageUpload';
-import ProductDetailPage from './ProductDetailPage';
-import ConfirmModal from '../../../components/ui/ConfirmModal.jsx';
-import toast from '../../../utils/toast';
+import ProductsSearchFilter from "../components/ProductsSearchFilter";
+import ProductsTable from "../components/ProductsTable";
+import ProductsPagination from "../components/ProductsPagination";
+import ProductForm from "../components/ProductForm";
+import ProductImageUpload from "../components/ProductImageUpload";
+import ProductDetailPage from "./ProductDetailPage";
+import ConfirmModal from "../../../components/ui/ConfirmModal.jsx";
+import toast from "../../../utils/toast";
 
 const DEFAULT_PRODUCT_FORM = {
-  code: '',
-  name: '',
-  description: '',
-  categoryId: '',
-  originalPrice: '',
-  importPrice: '',
-  price: '',
-  imageUrl: '',
+  code: "",
+  name: "",
+  description: "",
+  categoryId: "",
+  originalPrice: "",
+  importPrice: "",
+  price: "",
+  imageUrl: "",
   specs: [],
 };
 
@@ -38,21 +38,28 @@ const pickProductId = (responseEntity, fallbackId = null) => {
 };
 
 const pickImageUrl = (image = {}) =>
-  image?.imageUrl || image?.url || image?.path || image?.thumbnailUrl || '';
+  image?.imageUrl || image?.url || image?.path || image?.thumbnailUrl || "";
 
 const sanitizeImageUrlForPayload = (imageUrl) => {
-  const value = String(imageUrl || '').trim();
-  if (!value) return '';
-  if (value.startsWith('data:image/')) return '';
+  const value = String(imageUrl || "").trim();
+  if (!value) return "";
+  if (value.startsWith("data:image/")) return "";
   return value;
 };
 
 export default function ProductsPage() {
   // Route mode + page header controls
-  const mode = usePageMode('/products');
-  const { setTitle, setActionButton, setExtraActions, setOnSearch, setSearchValue, resetHeader } = useHeader();
+  const mode = usePageMode("/products");
+  const {
+    setTitle,
+    setActionButton,
+    setExtraActions,
+    setOnSearch,
+    setSearchValue,
+    resetHeader,
+  } = useHeader();
   const navigate = useNavigate();
-  
+
   // Products list/form/trash states and actions from hook
   const {
     filteredProducts,
@@ -68,7 +75,7 @@ export default function ProductsPage() {
     setCurrentPage,
     resetFilters,
     searchProducts,
-    
+
     // Form handlers - these will be managed locally now
     handleAddProduct,
     handleUpdateProduct,
@@ -82,22 +89,21 @@ export default function ProductsPage() {
     selectedProduct,
     handleSoftDelete,
     openDeleteModal,
-    isSubmitting
+    isSubmitting,
   } = useProducts(8);
 
   // Local UI state for add/edit form
   const [formData, setFormData] = useState(DEFAULT_PRODUCT_FORM);
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedImageFile, setSelectedImageFile] = useState(null);
-  const [selectedImageName, setSelectedImageName] = useState('');
+  const [selectedImageName, setSelectedImageName] = useState("");
 
   useEffect(() => {
     if (mode.list) {
-      setTitle('Danh Sách Sản Phẩm');
       setActionButton({
         label: "Thêm sản phẩm",
         icon: <Plus size={18} />,
-        onClick: () => navigate('/products/new'),
+        onClick: () => navigate("/products/new"),
         className: "shadow-lg shadow-primary/20",
       });
 
@@ -107,30 +113,41 @@ export default function ProductsPage() {
           icon: <Trash2 size={18} />,
           onClick: () => setIsTrashOpen(true),
           className: "bg-red-500 text-white hover:bg-red-600",
-        }
+        },
       ]);
-      
+
       setOnSearch(() => searchProducts);
-      
+
       if (setSearchValue) {
-        setSearchValue('');
+        setSearchValue("");
       }
     } else if (mode.add) {
-      setTitle('Thêm Sản Phẩm Mới');
+      setTitle("Thêm Sản Phẩm Mới");
       setActionButton(null);
       setExtraActions([]);
       setOnSearch(null);
     } else if (mode.edit) {
-      setTitle('Cập Nhật Sản Phẩm');
+      setTitle("Cập Nhật Sản Phẩm");
       setActionButton(null);
       setExtraActions([]);
       setOnSearch(null);
     }
-    
+
     return () => {
       resetHeader();
     };
-  }, [mode.current, setTitle, setActionButton, setExtraActions, setOnSearch, setSearchValue, searchProducts, navigate, setIsTrashOpen, resetHeader]);
+  }, [
+    mode.current,
+    setTitle,
+    setActionButton,
+    setExtraActions,
+    setOnSearch,
+    setSearchValue,
+    searchProducts,
+    navigate,
+    setIsTrashOpen,
+    resetHeader,
+  ]);
 
   // Handle Edit Data Initialization
   useEffect(() => {
@@ -138,7 +155,7 @@ export default function ProductsPage() {
       setFormData(DEFAULT_PRODUCT_FORM);
       setImagePreview(null);
       setSelectedImageFile(null);
-      setSelectedImageName('');
+      setSelectedImageName("");
     }
   }, [mode.add, setFormData]);
 
@@ -153,29 +170,46 @@ export default function ProductsPage() {
         const productToEdit = response?.data ?? response;
         if (!isMounted || !productToEdit) return;
 
-        const originalPriceVal = productToEdit.originalPrice ?? productToEdit.OriginalPrice ?? productToEdit.importPrice ?? productToEdit.ImportPrice ?? '';
-        const priceVal = productToEdit.price ?? productToEdit.Price ?? productToEdit.sellingPrice ?? productToEdit.SellingPrice ?? '';
-        const quantityVal = productToEdit.quantity ?? productToEdit.Quantity ?? productToEdit.initialStock ?? productToEdit.InitialStock ?? 1;
+        const originalPriceVal =
+          productToEdit.originalPrice ??
+          productToEdit.OriginalPrice ??
+          productToEdit.importPrice ??
+          productToEdit.ImportPrice ??
+          "";
+        const priceVal =
+          productToEdit.price ??
+          productToEdit.Price ??
+          productToEdit.sellingPrice ??
+          productToEdit.SellingPrice ??
+          "";
+        const quantityVal =
+          productToEdit.quantity ??
+          productToEdit.Quantity ??
+          productToEdit.initialStock ??
+          productToEdit.InitialStock ??
+          1;
 
         setFormData({
-          code: productToEdit.code ?? productToEdit.Code ?? '',
-          name: productToEdit.name ?? productToEdit.Name ?? '',
-          description: productToEdit.description ?? productToEdit.Description ?? '',
-          categoryId: productToEdit.categoryId ?? productToEdit.CategoryId ?? '',
+          code: productToEdit.code ?? productToEdit.Code ?? "",
+          name: productToEdit.name ?? productToEdit.Name ?? "",
+          description:
+            productToEdit.description ?? productToEdit.Description ?? "",
+          categoryId:
+            productToEdit.categoryId ?? productToEdit.CategoryId ?? "",
           originalPrice: originalPriceVal,
           importPrice: originalPriceVal,
           price: priceVal,
           sellingPrice: priceVal,
-          imageUrl: productToEdit.imageUrl ?? productToEdit.ImageUrl ?? '',
+          imageUrl: productToEdit.imageUrl ?? productToEdit.ImageUrl ?? "",
           specs: productToEdit.specs ?? productToEdit.Specs ?? [],
           initialStock: quantityVal,
           quantity: quantityVal,
         });
         setImagePreview(productToEdit.imageUrl || null);
         setSelectedImageFile(null);
-        setSelectedImageName('');
+        setSelectedImageName("");
       } catch (error) {
-        console.error('ProductsPage - loadProductDetail error:', error);
+        console.error("ProductsPage - loadProductDetail error:", error);
       }
     };
 
@@ -220,7 +254,10 @@ export default function ProductsPage() {
 
     if (productId && selectedImageFile) {
       try {
-        const uploadedResponse = await productService.uploadProductImage(productId, selectedImageFile);
+        const uploadedResponse = await productService.uploadProductImage(
+          productId,
+          selectedImageFile,
+        );
         const uploadedEntity = getEntityFromResponse(uploadedResponse);
         const uploadedImages = Array.isArray(uploadedEntity)
           ? uploadedEntity
@@ -234,25 +271,32 @@ export default function ProductsPage() {
           await productService.updateThumbnail(productId, imageId);
         }
 
-        const refreshedImagesResponse = await productService.getProductImages(productId);
-        const refreshedImagesEntity = getEntityFromResponse(refreshedImagesResponse);
+        const refreshedImagesResponse =
+          await productService.getProductImages(productId);
+        const refreshedImagesEntity = getEntityFromResponse(
+          refreshedImagesResponse,
+        );
         const refreshedImages = Array.isArray(refreshedImagesEntity)
           ? refreshedImagesEntity
           : Array.isArray(refreshedImagesEntity?.images)
             ? refreshedImagesEntity.images
             : [];
-        const thumbnailImage = refreshedImages.find((img) => img?.isThumbnail || img?.isPrimary) || refreshedImages[0];
+        const thumbnailImage =
+          refreshedImages.find((img) => img?.isThumbnail || img?.isPrimary) ||
+          refreshedImages[0];
         const serverImageUrl = pickImageUrl(thumbnailImage);
         if (serverImageUrl) {
           setFormData((prev) => ({ ...prev, imageUrl: serverImageUrl }));
         }
       } catch (error) {
         console.error("ProductsPage - limit upload error:", error);
-        toast.error("Sản phẩm đã được lưu nhưng không thể tải ảnh lên. Bạn có thể thử lại sau.");
+        toast.error(
+          "Sản phẩm đã được lưu nhưng không thể tải ảnh lên. Bạn có thể thử lại sau.",
+        );
       }
     }
 
-    navigate('/products');
+    navigate("/products");
   };
 
   // Render switches based on mode
@@ -267,30 +311,33 @@ export default function ProductsPage() {
           <div>
             <nav className="flex text-sm text-slate-500 mb-2">
               <Link to="/" className="hover:text-primary transition-colors">
-                Trang chủ
+                Tổng quan
               </Link>
               <span className="mx-2 text-slate-300">/</span>
-              <Link to="/products" className="hover:text-primary transition-colors">
+              <Link
+                to="/products"
+                className="hover:text-primary transition-colors"
+              >
                 Sản phẩm
               </Link>
               <span className="mx-2 text-slate-300">/</span>
               <span className="text-slate-900 dark:text-white font-medium">
-                {mode.add ? 'Thêm mới' : 'Cập nhật'}
+                {mode.add ? "Thêm mới" : "Cập nhật"}
               </span>
             </nav>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-12 lg:col-span-4 space-y-6">
-            <ProductImageUpload 
+            <ProductImageUpload
               imagePreview={imagePreview}
               selectedImageName={selectedImageName}
               handleImageChange={(e) => {
                 const file = e.target.files[0];
                 if (file) {
                   setSelectedImageFile(file);
-                  setSelectedImageName(file.name || '');
+                  setSelectedImageName(file.name || "");
                   const reader = new FileReader();
                   reader.onloadend = () => {
                     setImagePreview(reader.result);
@@ -308,12 +355,12 @@ export default function ProductsPage() {
 
           <div className="col-span-12 lg:col-span-8 space-y-6">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-              <ProductForm 
-                formData={formData} 
-                setFormData={setFormData} 
+              <ProductForm
+                formData={formData}
+                setFormData={setFormData}
                 categories={categories}
                 onSubmit={onSubmit}
-                onCancel={() => navigate('/products')}
+                onCancel={() => navigate("/products")}
               />
             </div>
           </div>
@@ -330,7 +377,7 @@ export default function ProductsPage() {
           <div>
             <nav className="flex text-sm text-slate-500 mb-2">
               <Link to="/" className="hover:text-primary transition-colors">
-                Trang chủ
+                Tổng quan
               </Link>
               <span className="mx-2 text-slate-300">/</span>
               <span className="text-slate-900 dark:text-white font-medium">
@@ -340,15 +387,15 @@ export default function ProductsPage() {
           </div>
         </div>
         <div className="space-y-6">
-          <ProductsSearchFilter 
+          <ProductsSearchFilter
             minPrice={minPrice}
             setMinPrice={setMinPrice}
             maxPrice={maxPrice}
             setMaxPrice={setMaxPrice}
             onResetFilters={resetFilters}
           />
-          
-          <ProductsTable 
+
+          <ProductsTable
             products={filteredProducts}
             categories={categories}
             loading={loading}
@@ -358,7 +405,7 @@ export default function ProductsPage() {
           />
 
           {totalCount > 0 && (
-            <ProductsPagination 
+            <ProductsPagination
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
               pageSize={pageSize}
@@ -368,15 +415,15 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <TrashBinDrawer 
+      <TrashBinDrawer
         isOpen={isTrashOpen}
         onClose={() => setIsTrashOpen(false)}
         title="Thùng rác sản phẩm"
         service={productService}
         onDataChange={refreshList}
         columns={[
-          { label: 'Giá', key: 'price' },
-          { label: 'Tồn kho', key: 'quantity' }
+          { label: "Giá", key: "price" },
+          { label: "Tồn kho", key: "quantity" },
         ]}
       />
 

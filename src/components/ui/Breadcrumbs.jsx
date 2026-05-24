@@ -20,7 +20,7 @@ const routeLabels = {
 /**
  * Breadcrumbs component
  * @param {Array} items - Custom breadcrumb items: [{ label: string, path?: string }]
- * Example: [{ label: 'Trang chủ' }, { label: 'Sản phẩm', path: '/products' }, { label: 'Thêm mới' }]
+ * Example: [{ label: 'Tổng quan' }, { label: 'Sản phẩm', path: '/products' }, { label: 'Thêm mới' }]
  */
 export default function Breadcrumbs({ items = null }) {
   const location = useLocation();
@@ -115,3 +115,4 @@ export default function Breadcrumbs({ items = null }) {
     </nav>
   );
 }
+

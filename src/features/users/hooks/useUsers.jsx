@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import userService from "../api/usersService";
 import toast from "../../../utils/toast";
 
@@ -18,29 +18,33 @@ export function useUsers() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [roles, setRoles] = useState([]);
-  const totalUsers = 24;
+  const pageSize = 10;
+
+  const mapUsers = useCallback((userList) => {
+    const normalizedList = Array.isArray(userList)
+      ? userList
+      : userList?.data || userList?.items || [];
+
+    return normalizedList.map((u) => ({
+      id: u.id,
+      firstName: u.firstName || "",
+      lastName: u.lastName || "",
+      fullName: `${u.firstName || ""} ${u.lastName || ""}`.trim() || "N/A",
+      username: u.userName || "N/A",
+      userName: u.userName || "",
+      email: u.email || "",
+      phoneNumber: u.phoneNumber || "",
+      role: u.role || "staff",
+      roleLabel:
+        u.roleLabel || (u.role === "admin" ? "Quản trị viên" : "Nhân viên"),
+      isActive: u.isActive !== undefined ? u.isActive : true,
+    }));
+  }, []);
 
   const fetchUsers = useCallback(async () => {
     try {
       const data = await userService.getAll();
-      const userList = Array.isArray(data)
-        ? data
-        : data.data || data.items || [];
-
-      const mappedUsers = userList.map((u) => ({
-        id: u.id,
-        firstName: u.firstName || "",
-        lastName: u.lastName || "",
-        fullName: `${u.firstName || ""} ${u.lastName || ""}`.trim() || "N/A",
-        username: u.userName || "N/A",
-        userName: u.userName || "",
-        email: u.email || "",
-        phoneNumber: u.phoneNumber || "",
-        role: u.role || "staff",
-        roleLabel:
-          u.roleLabel || (u.role === "admin" ? "Quản trị viên" : "Nhân viên"),
-        isActive: u.isActive !== undefined ? u.isActive : true,
-      }));
+      const mappedUsers = mapUsers(data);
 
       setUsers(mappedUsers);
 
@@ -71,7 +75,7 @@ export function useUsers() {
     } catch (error) {
       console.error("[useUsers] Lỗi API:", error);
     }
-  }, []);
+  }, [mapUsers]);
 
   const fetchRoles = useCallback(async () => {
     try {
@@ -160,36 +164,77 @@ export function useUsers() {
     [fetchUsers],
   );
 
+  const handleSearch = useCallback(
+    async (query) => {
+      const keyword = String(query ?? "").trim();
+      console.log("[useUsers] onSearch keyword:", keyword);
+      setSearch(keyword);
+      setCurrentPage(1);
+
+      try {
+        const data = keyword
+          ? await userService.search({ keyword })
+          : await userService.getAll();
+        let mapped = mapUsers(data);
+        if (keyword) {
+          const lowerKeyword = keyword.toLowerCase();
+          mapped = mapped.filter((u) =>
+            [u.fullName, u.username, u.email, u.phoneNumber, u.roleLabel].some((value) =>
+              String(value ?? "").toLowerCase().includes(lowerKeyword),
+            ),
+          );
+        }
+        console.log("[useUsers] search raw response:", data);
+        console.log("[useUsers] mapped users count:", mapped.length, mapped);
+        setUsers(mapped);
+      } catch (error) {
+        console.error("[useUsers] Lỗi tìm kiếm:", error);
+        if (!keyword) {
+          toast.error("Không thể tải danh sách người dùng");
+          return;
+        }
+        // Fallback local filter to keep search usable when filter API shape differs.
+        setUsers((prev) =>
+          prev.filter((u) =>
+            [u.fullName, u.username, u.email, u.phoneNumber, u.roleLabel]
+              .some((value) =>
+                String(value ?? "")
+                  .toLowerCase()
+                  .includes(keyword.toLowerCase()),
+              ),
+          ),
+        );
+      }
+    },
+    [mapUsers],
+  );
+
   const filteredUsers = useMemo(() => {
-    const searchLower = String(search ?? "")
-      .trim()
-      .toLowerCase();
-
-    if (!searchLower) {
-      return users;
-    }
-
-    return users.filter((u) => {
-      return [u.fullName, u.username, u.email, u.phoneNumber].some((value) =>
-        String(value ?? "")
-          .toLowerCase()
-          .includes(searchLower),
-      );
-    });
+    const keyword = String(search ?? "").trim().toLowerCase();
+    if (!keyword) return users;
+    return users.filter((u) =>
+      [u.fullName, u.username, u.email, u.phoneNumber, u.roleLabel].some((value) =>
+        String(value ?? "").toLowerCase().includes(keyword),
+      ),
+    );
   }, [users, search]);
 
-  const handleSearch = useCallback((query) => {
-    setSearch(String(query ?? ""));
-  }, []);
+  const totalUsers = filteredUsers.length;
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredUsers.slice(start, start + pageSize);
+  }, [filteredUsers, currentPage]);
 
   return {
-    users: filteredUsers,
+    users: paginatedUsers,
+    filteredUsers,
     loading,
     search,
     setSearch: handleSearch,
     currentPage,
     setCurrentPage,
     totalUsers,
+    pageSize,
     roles,
     createUserWithRoles,
     updateUserAccount,

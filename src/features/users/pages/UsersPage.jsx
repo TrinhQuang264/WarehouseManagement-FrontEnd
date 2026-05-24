@@ -19,7 +19,7 @@ const EMPTY_FORM = {
 };
 
 export default function UsersPage() {
-  const { users, loading, setSearch, currentPage, setCurrentPage, totalUsers, roles, createUserWithRoles, updateUserAccount, updateUserRoles, deleteUser, userRolesMap } = useUsers();
+  const { users, loading, setSearch, currentPage, setCurrentPage, totalUsers, pageSize, roles, createUserWithRoles, updateUserAccount, updateUserRoles, deleteUser, userRolesMap } = useUsers();
   const { setActionButton, setOnSearch, resetHeader } = useHeader();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -40,7 +40,7 @@ export default function UsersPage() {
       onClick: () => setIsCreateOpen(true),
       searchPlaceholder: "Tìm kiếm theo tên đăng nhập hoặc vai trò...",
     });
-    setOnSearch(setSearch);
+    setOnSearch(() => setSearch);
     return () => resetHeader();
   }, [setActionButton, setOnSearch, setSearch, resetHeader]);
 
@@ -122,7 +122,7 @@ export default function UsersPage() {
 
   return (
     <>
-      <UsersPageLayout users={users} currentPage={currentPage} setCurrentPage={setCurrentPage} totalUsers={totalUsers} onEditRoles={openEditModal} />
+      <UsersPageLayout users={users} currentPage={currentPage} setCurrentPage={setCurrentPage} totalUsers={totalUsers} pageSize={pageSize} onEditRoles={openEditModal} />
 
       <UserAccountModal
         isOpen={isCreateOpen}

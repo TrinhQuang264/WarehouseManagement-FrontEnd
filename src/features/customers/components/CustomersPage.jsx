@@ -125,7 +125,7 @@ export default function CustomersPage() {
         className:
           "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
       });
-      setOnSearch(searchCustomers);
+      setOnSearch(() => searchCustomers);
       setTitle("");
     }
     return () => resetHeader();
@@ -150,7 +150,7 @@ export default function CustomersPage() {
                 to={COMMON_URLS.dashboard}
                 className="hover:text-primary transition-colors"
               >
-                Trang chủ
+                Tổng quan
               </Link>
               <span className="mx-2 text-slate-300">/</span>
               <Link
@@ -196,7 +196,7 @@ export default function CustomersPage() {
         <div>
           <nav className="flex text-sm text-slate-500 mb-2">
             <Link to="/" className="hover:text-primary transition-colors">
-              Trang chủ
+              Tổng quan
             </Link>
             <span className="mx-2 text-slate-300">/</span>
             <span className="text-slate-900 dark:text-white font-medium">
@@ -240,3 +240,4 @@ export default function CustomersPage() {
     </div>
   );
 }
+

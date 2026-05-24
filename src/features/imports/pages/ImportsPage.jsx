@@ -310,7 +310,7 @@ export default function ImportsPage() {
       return (
         <div className="imports-page">
           <div className="page-header">
-            <Breadcrumbs items={[{ label: 'Trang chủ', path: COMMON_URLS.dashboard }, { label: 'Nhập kho', path: IMPORT_URLS.list }, { label: 'Không tìm thấy phiếu' }]} />
+            <Breadcrumbs items={[{ label: 'Tổng quan', path: COMMON_URLS.dashboard }, { label: 'Nhập kho', path: IMPORT_URLS.list }, { label: 'Không tìm thấy phiếu' }]} />
           </div>
           <div className="imports-card p-8 text-center text-slate-500">Phiếu nhập không tồn tại hoặc đã bị xóa.</div>
         </div>
@@ -320,7 +320,7 @@ export default function ImportsPage() {
     return (
       <div className="imports-page">
         <div className="page-header imports-detail-topbar">
-          <Breadcrumbs items={[{ label: 'Trang chủ', path: COMMON_URLS.dashboard }, { label: 'Nhập kho', path: IMPORT_URLS.list }, { label: sourceReceipt.code }]} />
+          <Breadcrumbs items={[{ label: 'Tổng quan', path: COMMON_URLS.dashboard }, { label: 'Nhập kho', path: IMPORT_URLS.list }, { label: sourceReceipt.code }]} />
           <label className="imports-view-toggle">
             <span>Hiển thị phiếu</span>
             <button
@@ -343,7 +343,7 @@ export default function ImportsPage() {
     return (
       <div className="imports-page">
         <div className="page-header">
-          <Breadcrumbs items={[{ label: 'Trang chủ', path: COMMON_URLS.dashboard }, { label: 'Nhập kho', path: IMPORT_URLS.list }, { label: pageTitle }]} />
+          <Breadcrumbs items={[{ label: 'Tổng quan', path: COMMON_URLS.dashboard }, { label: 'Nhập kho', path: IMPORT_URLS.list }, { label: pageTitle }]} />
         </div>
         <ImportReceiptForm
           mode={isEditMode ? 'edit' : 'create'}
@@ -369,7 +369,7 @@ export default function ImportsPage() {
   return (
     <div className="imports-page">
       <div className="page-header">
-        <Breadcrumbs items={[{ label: 'Trang chủ', path: COMMON_URLS.dashboard }, { label: 'Nhập kho' }]} />
+        <Breadcrumbs items={[{ label: 'Tổng quan', path: COMMON_URLS.dashboard }, { label: 'Nhập kho' }]} />
       </div>
 
       <ImportStats stats={stats} />
@@ -402,3 +402,4 @@ export default function ImportsPage() {
     </div>
   );
 }
+
