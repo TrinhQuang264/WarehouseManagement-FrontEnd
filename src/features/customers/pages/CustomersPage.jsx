@@ -1,13 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Plus } from "lucide-react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { Plus, Trash2 } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import ConfirmModal from "../../../components/ui/ConfirmModal";
-import PaginationBar from "../../../components/ui/PaginationBar";
-import CustomerTable from "./CustomerTable";
-import CustomerModal from "./CustomerModal";
-import CustomerDetailPage from "./CustomerDetailPage.jsx";
+import ConfirmModal from "../../../components/ui/ConfirmModal.jsx";
+import PaginationBar from "../../../components/ui/PaginationBar.jsx";
+import CustomerTable from "../components/CustomerTable.jsx";
+import CustomerModal from "../components/CustomerModal.jsx";
+import CustomerDetailPage from "../components/CustomerDetailPage.jsx";
 import { useCustomers } from "../hooks/useCustomers.jsx";
-import { useHeader } from "../../../contexts/HeaderContext";
+import { useHeader } from "../../../contexts/HeaderContext.jsx";
+import TrashBinDrawer from "../../../components/ui/TrashBinDrawer.jsx";
+import customersService from "../api/customersService.js";
 import {
   COMMON_URLS,
   CUSTOMER_URLS,
@@ -70,43 +72,76 @@ export default function CustomersPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
+
+  // Gọi các thuộc tính chính xác từ hook mới cập nhật
   const {
-    filteredCustomers,
-    paginatedCustomers,
-    customers,
-    isFormOpen,
-    setIsFormOpen,
-    editingCustomer,
-    isDeleteOpen,
-    setIsDeleteOpen,
-    deletingCustomer,
-    handleOpenAdd,
-    handleOpenEdit,
-    handleSave,
-    handleOpenDelete,
-    confirmDelete,
-    searchCustomers,
-    nextCode,
+    customers, // Danh sách khách hàng đã phân trang
+    allActiveCustomers, // Toàn bộ khách hàng chưa xóa
     loading,
+    isSubmitting,
+    search,
+    setSearch,
     currentPage,
     setCurrentPage,
     pageSize,
+    totalCount,
+    isModalOpen,
+    setIsModalOpen,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isTrashOpen,
+    setIsTrashOpen,
+    selectedCustomer, // Đại diện chung cho editingCustomer và deletingCustomer
+    setSelectedCustomer,
+    handleAddCustomer,
+    handleUpdateCustomer,
+    handleDeleteCustomer,
+    openEditModal,
+    openDeleteModal,
+    nextCode,
+    refreshList,
   } = useCustomers();
 
-  const { setActionButton, setOnSearch, setTitle, resetHeader } = useHeader();
+  const {
+    setActionButton,
+    setOnSearch,
+    setTitle,
+    resetHeader,
+    setExtraActions,
+  } = useHeader();
+
+  // Trạng thái hiển thị Chi tiết hay Danh sách
   const isDetailMode =
     location.pathname !== CUSTOMER_URLS.list && Boolean(params.id);
+
+  // Tìm khách hàng hiện tại dựa trên ID từ URL params
   const currentCustomer = useMemo(
     () =>
-      customers.find((customer) => String(customer.id) === String(params.id)) ||
-      null,
-    [customers, params.id],
+      allActiveCustomers.find(
+        (customer) => String(customer.id) === String(params.id),
+      ) || null,
+    [allActiveCustomers, params.id],
   );
+
+  // Xây dựng lịch sử giao dịch giả lập dựa trên ID khách hàng
   const customerHistory = useMemo(
     () => (currentCustomer ? buildCustomerHistory(currentCustomer.id) : []),
     [currentCustomer],
   );
+  const closeTrash = useCallback(() => setIsTrashOpen(false), [setIsTrashOpen]);
+  const openTrash = useCallback(() => setIsTrashOpen(true), [setIsTrashOpen]);
+  // Hàm handle trung gian kết nối Modal Form với các hàm xử lý Async CRUD của hook
+  const handleSaveCustomer = useCallback(
+    async (data) => {
+      if (selectedCustomer) {
+        return await handleUpdateCustomer(selectedCustomer.id, data);
+      }
+      return await handleAddCustomer(data);
+    },
+    [handleAddCustomer, handleUpdateCustomer, selectedCustomer],
+  );
 
+  // Đồng bộ hóa trạng thái Header Layout với Context toàn cục
   useEffect(() => {
     if (isDetailMode) {
       setActionButton(null);
@@ -120,12 +155,20 @@ export default function CustomersPage() {
       setActionButton({
         label: "Thêm khách hàng",
         icon: <Plus size={18} />,
-        onClick: handleOpenAdd,
+        onClick: () => setIsModalOpen(true), // Mở modal thêm mới với selectedCustomer = null mặc định
         searchPlaceholder: "Tìm kiếm khách hàng...",
         className:
           "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
       });
-      setOnSearch(() => searchCustomers);
+      setExtraActions([
+        {
+          label: "Thùng rác",
+          icon: <Trash2 size={18} />,
+          onClick: openTrash,
+          className: "bg-red-500 text-red-600 hover:bg-red-300",
+        },
+      ]);
+      setOnSearch(() => setSearch); // Gắn hook state thay đổi text vào thanh tìm kiếm chung trên Header
       setTitle("");
     }
     return () => resetHeader();
@@ -134,12 +177,14 @@ export default function CustomersPage() {
     currentCustomer,
     setActionButton,
     setOnSearch,
+    setSearch,
     setTitle,
+    setExtraActions,
     resetHeader,
-    handleOpenAdd,
-    searchCustomers,
+    setIsModalOpen,
   ]);
 
+  // --- RENDERING ROUTE: CHI TIẾT KHÁCH HÀNG ---
   if (isDetailMode) {
     if (!currentCustomer) {
       return (
@@ -175,19 +220,24 @@ export default function CustomersPage() {
         <CustomerDetailPage
           customer={currentCustomer}
           history={customerHistory}
-          onEdit={handleOpenEdit}
+          onEdit={openEditModal}
         />
         <CustomerModal
-          isOpen={isFormOpen}
-          onClose={() => setIsFormOpen(false)}
-          onSave={handleSave}
-          editingCustomer={editingCustomer}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedCustomer(null);
+          }}
+          onSave={handleSaveCustomer}
+          editingCustomer={selectedCustomer}
           nextCode={nextCode}
+          isSubmitting={isSubmitting}
         />
       </>
     );
   }
 
+  // --- RENDERING ROUTE: DANH SÁCH KHÁCH HÀNG ---
   return (
     <div className="customers-page">
       <div className="page-header">
@@ -203,35 +253,54 @@ export default function CustomersPage() {
       </div>
 
       <CustomerTable
-        customers={paginatedCustomers}
+        customers={customers}
         loading={loading}
-        onEdit={handleOpenEdit}
-        onDelete={handleOpenDelete}
+        onEdit={openEditModal}
+        onDelete={openDeleteModal}
         onViewDetail={(customer) => navigate(CUSTOMER_URLS.detail(customer.id))}
       />
 
       <PaginationBar
         currentPage={currentPage}
         pageSize={pageSize}
-        totalCount={filteredCustomers.length}
+        totalCount={totalCount}
         onPageChange={setCurrentPage}
         resourceName="khách hàng"
       />
 
+      {/* Modal Thêm & Sửa khách hàng */}
       <CustomerModal
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSave={handleSave}
-        editingCustomer={editingCustomer}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedCustomer(null);
+        }}
+        onSave={handleSaveCustomer}
+        editingCustomer={selectedCustomer}
         nextCode={nextCode}
+        isSubmitting={isSubmitting}
       />
+
+      {/* Modal xác nhận xóa mềm khách hàng */}
       <ConfirmModal
-        isOpen={isDeleteOpen}
-        onClose={() => setIsDeleteOpen(false)}
-        onConfirm={confirmDelete}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedCustomer(null);
+        }}
+        onConfirm={handleDeleteCustomer}
         title="Xác nhận xóa"
-        message={`Bạn có chắc chắn muốn xóa khách hàng "${deletingCustomer?.fullName}"? Toàn bộ dữ liệu liên quan sẽ không thể phục hồi.`}
-        confirmLabel="Vâng, Xóa ngay"
+        message={`Bạn có chắc chắn muốn xóa khách hàng "${selectedCustomer?.fullName}"? Toàn bộ dữ liệu liên quan sẽ không thể phục hồi.`}
+        confirmLabel="Xóa"
+        isSubmitting={isSubmitting}
+      />
+      <TrashBinDrawer
+        isOpen={isTrashOpen}
+        onClose={closeTrash}
+        title="Thùng rác dữ liệu khách hàng "
+        service={customersService}
+        onDataChange={refreshList}
+        columns={[{ key: "fullName" }]}
       />
     </div>
   );

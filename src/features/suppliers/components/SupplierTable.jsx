@@ -21,7 +21,7 @@ function SupplierTable({ suppliers, loading, onEdit, onDelete, onViewDetail }) {
           >
             {suppliers.length > 0 ? (
               suppliers.map((supplier) => (
-                <tr key={supplier.id} className="group table-row-hover">
+                <tr key={supplier.id} className="group table-row-hover h-20">
                   <td className="px-6 py-4">
                     <div>
                       <p className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">

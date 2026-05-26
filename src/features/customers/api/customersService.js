@@ -57,23 +57,50 @@ const customersService = {
       throw error;
     }
   },
-  // DELETE /api/Customers/{id}
+  // Soft delete: Lấy dữ liệu và set isDeleted = true
   async delete(id) {
+    try {
+      const customer = await this.getById(id);
+      if (!customer) throw new Error("Customer not found");
+      const updatedData = { ...customer, isDeleted: true };
+      const response = await api.put(`/Customers/${id}`, updatedData);
+      return response.data;
+    } catch (error) {
+      console.error('[customersService] delete (soft) error:', error);
+      throw error;
+    }
+  },
+  // Khôi phục: Lấy dữ liệu và set isDeleted = false
+  async restore(id) {
+    try {
+      const customer = await this.getById(id);
+      if (!customer) throw new Error("Customer not found");
+      const updatedData = { ...customer, isDeleted: false };
+      const response = await api.put(`/Customers/${id}`, updatedData);
+      return response.data;
+    } catch (error) {
+      console.error('[customersService] restore error:', error);
+      throw error;
+    }
+  },
+  // Lấy danh sách thùng rác: Lấy toàn bộ và lọc theo isDeleted === true
+  async getTrash() {
+    try {
+      const response = await api.get('/Customers/all');
+      const allData = response.data || [];
+      return allData.filter(item => item.isDeleted === true);
+    } catch (error) {
+      console.error('[customersService] getTrash error:', error);
+      throw error;
+    }
+  },
+  // Xóa vĩnh viễn: Sử dụng API DELETE /api/Customers/{id}
+  async permanentDelete(id) {
     try {
       const response = await api.delete(`/Customers/${id}`);
       return response.data;
     } catch (error) {
-      console.error('[customersService] delete error:', error);
-      throw error;
-    }
-  },
-  // PUT /api/Customers/{id}/restore
-  async restore(id) {
-    try {
-      const response = await api.put(`/Customers/${id}/restore`);
-      return response.data;
-    } catch (error) {
-      console.error('[customersService] restore error:', error);
+      console.error('[customersService] permanentDelete error:', error);
       throw error;
     }
   },

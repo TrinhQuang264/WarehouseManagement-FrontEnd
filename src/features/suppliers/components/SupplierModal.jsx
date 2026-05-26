@@ -30,6 +30,15 @@ export default function SupplierModal({
         email: editingSupplier.email || "",
         address: editingSupplier.address || "",
       });
+    } else if (location.state?.autoFillSupplier) {
+      const autoData = location.state.autoFillSupplier;
+      setFormData({
+        supplierName: autoData.supplierName || "",
+        contactPerson: autoData.contactPerson || "",
+        phone: autoData.phone || "",
+        email: autoData.email || "",
+        address: autoData.address || "",
+      });
     } else {
       setFormData({
         supplierName: "",

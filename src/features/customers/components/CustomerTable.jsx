@@ -26,12 +26,9 @@ export default function CustomerTable({
           >
             {customers.length > 0 ? (
               customers.map((customer) => (
-                <tr key={customer.id} className="group table-row-hover">
+                <tr key={customer.id} className="group table-row-hover h-20 ">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                        <User size={16} />
-                      </div>
                       <div>
                         <p className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">
                           {customer.fullName}

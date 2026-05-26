@@ -35,11 +35,14 @@ export default function TrashBinDrawer({
       // Vẫn áp dụng tìm kiếm trong thùng rác (Client-side)
       if (search) {
         const searchLower = search.toLowerCase();
-        trashItems = trashItems.filter(
-          (item) =>
-            (item.name && item.name.toLowerCase().includes(searchLower)) ||
-            (item.code && item.code.toLowerCase().includes(searchLower)),
-        );
+        trashItems = trashItems.filter((item) => {
+          const itemName =
+            item.name || item.fullName || item.supplierName || "";
+          return (
+            itemName.toLowerCase().includes(searchLower) ||
+            (item.code && item.code.toLowerCase().includes(searchLower))
+          );
+        });
       }
 
       setItems(trashItems);
@@ -106,11 +109,14 @@ export default function TrashBinDrawer({
       <div className="relative w-full max-w-2xl bg-white shadow-2xl h-full flex flex-col animate-slideInRight">
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white z-10">
-          <div>
+          <div className="flex">
             <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
               <Trash2 className="text-red-500" size={24} />
               {title}
             </h3>
+            <span className="flex items-center justify-end ml-4 pl-4 border-l border-slate-200 text-xs">
+              <span className="text-sm text-slate-500">{items.length} mục</span>
+            </span>
           </div>
           <button
             onClick={onClose}
@@ -146,13 +152,7 @@ export default function TrashBinDrawer({
             </div>
           ) : items.length > 0 ? (
             <div className="space-y-3">
-              <div className="flex items-center justify-end mb-4 px-2">
-                <span className="text-sm text-slate-500">
-                  {items.length} mục
-                </span>
-              </div>
-
-              {items.map((item) => (
+              {items.map((item, idx) => (
                 <div
                   key={item.id}
                   className="group p-4 bg-white border border-slate-100 rounded-2xl hover:border-primary/30 transition-all flex items-center justify-between gap-4"
@@ -161,23 +161,12 @@ export default function TrashBinDrawer({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-bold text-slate-900 truncate">
-                          {item.name || item.code}
+                          {idx + 1}.{" "}
+                          {item.name ||
+                            item.fullName ||
+                            item.supplierName ||
+                            item.code}
                         </span>
-                        {item.code && item.name && (
-                          <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 font-mono">
-                            {item.code}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-slate-500">
-                        {columns.map((col, idx) => (
-                          <span key={idx} className="flex items-center gap-1">
-                            {col.label}:{" "}
-                            <strong className="text-slate-700">
-                              {item[col.key]}
-                            </strong>
-                          </span>
-                        ))}
                       </div>
                     </div>
                   </div>

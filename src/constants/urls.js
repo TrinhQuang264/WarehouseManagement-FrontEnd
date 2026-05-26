@@ -29,6 +29,7 @@ export const CUSTOMER_URLS = {
 export const SUPPLIER_URLS = {
   list: '/suppliers',
   new: '/suppliers/create',
+  create: '/suppliers/create',
   edit: (id) => `/suppliers/update/${id}`,
   detail: (id) => `/suppliers/${id}`,
 };

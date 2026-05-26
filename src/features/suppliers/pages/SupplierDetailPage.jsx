@@ -131,9 +131,6 @@ export default function SupplierDetailPage({ supplier, history = [], onEdit }) {
                 </div>
               </div>
             </div>
-            <div className="border-t border-slate-100 bg-slate-50 p-4 text-center text-xs font-bold uppercase tracking-widest text-primary">
-              Xem tất cả địa điểm
-            </div>
           </div>
           <div className="grid gap-4">
             <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -162,31 +159,10 @@ export default function SupplierDetailPage({ supplier, history = [], onEdit }) {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-4 rounded-2xl border border-red-200 bg-white p-5 shadow-sm">
-              <div className="rounded-xl bg-red-50 p-3 text-red-600">
-                <ShieldCheck size={20} />
-              </div>
-              <div className="flex-1">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                  Công nợ hiện tại
-                </p>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-lg font-bold text-red-600">
-                    {formatCurrency(debt)}
-                  </p>
-                  <button
-                    type="button"
-                    className="rounded-md bg-primary/10 px-2 py-1 text-[10px] font-bold uppercase text-primary"
-                  >
-                    Thanh toán
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
+        <div className="col-span-12 lg:col-span-8 flex flex-col gap-6 h-[1000px]">
           <DataTableCard>
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
               <h3 className="text-lg font-bold text-slate-900">
@@ -265,7 +241,7 @@ export default function SupplierDetailPage({ supplier, history = [], onEdit }) {
                 </span>
               }
             >
-              <div className="pagination-controls">
+              <div className="pagination-controls m">
                 <button className="pagination-btn" disabled>
                   {"<"}
                 </button>
@@ -285,4 +261,3 @@ export default function SupplierDetailPage({ supplier, history = [], onEdit }) {
     </div>
   );
 }
-

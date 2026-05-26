@@ -25,7 +25,7 @@ const SuppliersPage = lazy(
   () => import("../features/suppliers/pages/SuppliersPage"),
 );
 const CustomersPage = lazy(
-  () => import("../features/customers/components/CustomersPage"),
+  () => import("../features/customers/pages/CustomersPage"),
 );
 const ProfilePage = lazy(() => import("../features/profile/pages/ProfilePage"));
 const ReportsPage = lazy(() => import("../features/reports/pages/ReportsPage"));
