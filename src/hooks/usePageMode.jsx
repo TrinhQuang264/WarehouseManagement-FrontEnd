@@ -26,14 +26,14 @@ export function usePageMode(basePath) {
   const normalizedBase = basePath.replace(/^\/|\/$/g, '');
   
   // Extract ID from edit or detail routes
-  const editMatch = path.match(new RegExp(`^/${normalizedBase}/edit/(\\d+)$`));
+  const editMatch = path.match(new RegExp(`^/${normalizedBase}/(?:edit|update)/(\\d+)$`));
   const detailMatch = path.match(new RegExp(`^/${normalizedBase}/(\\d+)$`));
   
   const id = editMatch?.[1] || detailMatch?.[1];
   
   // Determine mode
   const modeList = path === `/${normalizedBase}`;
-  const modeAdd = path === `/${normalizedBase}/new`;
+  const modeAdd = path === `/${normalizedBase}/new` || path === `/${normalizedBase}/create`;
   const modeEdit = !!editMatch;
   const modeDetail = !!detailMatch && !modeEdit;  // Detail must not be edit
   

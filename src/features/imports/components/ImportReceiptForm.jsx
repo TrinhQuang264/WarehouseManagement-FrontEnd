@@ -158,7 +158,7 @@ export default function ImportReceiptForm({
                   onChange={(event) =>
                     onMetaChange("referenceCode", event.target.value)
                   }
-                  placeholder="VD: PO-202603-9001"
+                  placeholder=""
                 />
               </label>
 

@@ -1,96 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { products, suppliers, users } from "../../../utils/mockData.js";
-
-const RECEIPT_SEED = [
-  {
-    id: 1,
-    code: "NK-20260323-001",
-    supplierId: 1,
-    createdById: users[0]?.id,
-    date: "2026-03-23T09:15:00",
-    note: "Nhập lô màn hình OLED và pin thay thế theo kế hoạch tuần 12.",
-    warehouse: "Kho Linh kiện A",
-    referenceCode: "PO-202603-8821",
-    status: "completed",
-    items: [
-      { productId: 1, quantity: 10, unitPrice: 1200000 },
-      { productId: 2, quantity: 6, unitPrice: 2800000 },
-      { productId: 5, quantity: 12, unitPrice: 900000 },
-    ],
-  },
-  {
-    id: 2,
-    code: "NK-20260323-002",
-    supplierId: 2,
-    createdById: users[1]?.id,
-    date: "2026-03-23T11:40:00",
-    note: "Chờ đối chiếu chứng từ gốc từ nhà cung cấp.",
-    warehouse: "Kho Linh kiện A",
-    referenceCode: "PO-202603-8870",
-    status: "pending",
-    items: [
-      { productId: 3, quantity: 18, unitPrice: 350000 },
-      { productId: 4, quantity: 25, unitPrice: 180000 },
-    ],
-  },
-  {
-    id: 3,
-    code: "NK-20260322-014",
-    supplierId: 3,
-    createdById: users[0]?.id,
-    date: "2026-03-22T15:10:00",
-    note: "Bổ sung SSD cho đơn hàng doanh nghiệp.",
-    warehouse: "Kho Phụ kiện B",
-    referenceCode: "PO-202603-8744",
-    status: "completed",
-    items: [{ productId: 5, quantity: 30, unitPrice: 920000 }],
-  },
-  {
-    id: 4,
-    code: "NK-20260322-013",
-    supplierId: 5,
-    createdById: users[2]?.id,
-    date: "2026-03-22T08:25:00",
-    note: "Hủy do sai giá nhập trên hóa đơn.",
-    warehouse: "Kho Linh kiện A",
-    referenceCode: "PO-202603-8701",
-    status: "cancelled",
-    items: [
-      { productId: 6, quantity: 14, unitPrice: 610000 },
-      { productId: 3, quantity: 20, unitPrice: 345000 },
-    ],
-  },
-  {
-    id: 5,
-    code: "NK-20260321-009",
-    supplierId: 4,
-    createdById: users[3]?.id,
-    date: "2026-03-21T16:45:00",
-    note: "Nhập hàng phụ kiện tai nghe phục vụ mùa khuyến mãi.",
-    warehouse: "Kho Phụ kiện B",
-    referenceCode: "PO-202603-8615",
-    status: "completed",
-    items: [
-      { productId: 6, quantity: 22, unitPrice: 600000 },
-      { productId: 4, quantity: 16, unitPrice: 182000 },
-    ],
-  },
-  {
-    id: 6,
-    code: "NK-20260320-005",
-    supplierId: 2,
-    createdById: users[1]?.id,
-    date: "2026-03-20T10:05:00",
-    note: "Chờ kho xác nhận số lượng thực nhận.",
-    warehouse: "Kho Linh kiện A",
-    referenceCode: "PO-202603-8542",
-    status: "pending",
-    items: [
-      { productId: 1, quantity: 12, unitPrice: 1210000 },
-      { productId: 2, quantity: 4, unitPrice: 2790000 },
-    ],
-  },
-];
+import purchasesService from "../api/purchasesService";
+import productsService from "../../products/api/productsService";
+import suppliersService from "../../suppliers/api/suppliersService";
+import { toast } from "../../../utils/toast";
 
 const STATUS_LABELS = {
   completed: "Đã nhập kho",
@@ -101,9 +13,11 @@ const STATUS_LABELS = {
 
 const DATE_RANGE_FILTERS = {
   all: () => true,
-  last7: (date) => new Date(date) >= new Date("2026-03-17T00:00:00"),
-  last14: (date) => new Date(date) >= new Date("2026-03-10T00:00:00"),
-  month: (date) => new Date(date).getMonth() === 2,
+  last7: (date) =>
+    new Date(date) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+  last14: (date) =>
+    new Date(date) >= new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+  month: (date) => new Date(date).getMonth() === new Date().getMonth(),
 };
 
 function formatUserName(user) {
@@ -115,81 +29,33 @@ function formatUserName(user) {
   );
 }
 
-function enrichReceipt(receipt) {
-  const supplier = suppliers.find((item) => item.id === receipt.supplierId);
-  const user = users.find((item) => item.id === receipt.createdById);
-  const items = (receipt.items || []).map((item, index) => {
-    const product = products.find(
-      (productItem) => productItem.id === item.productId,
-    );
-    const lineTotal = item.quantity * item.unitPrice;
-
-    return {
-      ...item,
-      id: `${receipt.id}-${item.productId}-${index}`,
-      productName: product?.name || "Sản phẩm chưa xác định",
-      imageUrl: product?.imageUrl || "",
-      sku: product?.code || "N/A",
-      unit: "Cái",
-      lineTotal,
-      categoryId: product?.categoryId,
-      description: product?.description || "",
-    };
-  });
-
-  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subTotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
-  const vatAmount = 0;
-  const totalAmount = subTotal + vatAmount;
-
-  return {
-    ...receipt,
-    supplierName: supplier?.supplierName || "Nhà cung cấp chưa xác định",
-    operatorName: formatUserName(user),
-    supplierAddress: supplier?.address || "Chưa cập nhật",
-    totalQuantity,
-    itemCount: items.length,
-    subTotal,
-    vatAmount,
-    totalAmount,
-    statusLabel: STATUS_LABELS[receipt.status] || "Không xác định",
-    itemSummary: items
-      .map((item) => `${item.quantity} x ${item.productName}`)
-      .join(", "),
-    items,
-  };
-}
-
-function buildReceipts() {
-  return RECEIPT_SEED.map(enrichReceipt).sort(
-    (a, b) => new Date(b.date) - new Date(a.date),
-  );
-}
-
-function buildEmptyReceipt() {
+function buildEmptyReceipt(products) {
+  const defaultProduct = products && products.length > 0 ? products[0] : null;
   return {
     id: null,
-    code: "NK-DRAFT-001",
+    code: "NK-DRAFT",
     supplierId: "",
-    createdById: users[0]?.id,
-    date: "2026-03-23",
+    createdById: null,
+    date: new Date().toISOString().slice(0, 10),
     note: "",
-    warehouse: "Kho Linh kiện A",
+    warehouse: "1",
     referenceCode: "",
     status: "draft",
-    items: [
-      {
-        id: "draft-1",
-        productId: products[0]?.id || "",
-        productName: products[0]?.name || "",
-        imageUrl: products[0]?.imageUrl || "",
-        sku: products[0]?.code || "",
-        quantity: 1,
-        unitPrice: products[0]?.importPrice || 0,
-        lineTotal: products[0]?.importPrice || 0,
-        unit: "Cái",
-      },
-    ],
+    items: defaultProduct
+      ? [
+          {
+            id: "draft-1",
+            productId: defaultProduct.id,
+            productName: defaultProduct.name || "",
+            imageUrl: defaultProduct.imageUrl || "",
+            sku: defaultProduct.code || "",
+            quantity: 1,
+            unitPrice: defaultProduct.importPrice || 0,
+            lineTotal: defaultProduct.importPrice || 0,
+            unit: "Cái",
+          },
+        ]
+      : [],
   };
 }
 
@@ -199,8 +65,118 @@ export function useImports() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedDateRange, setSelectedDateRange] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [receipts, setReceipts] = useState(() => buildReceipts());
   const pageSize = 5;
+
+  const [products, setProducts] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [receipts, setReceipts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const [productsData, suppliersData, purchasesData] = await Promise.all([
+        productsService.getAll(),
+        suppliersService.getAll(),
+        purchasesService.getAll(),
+      ]);
+
+      // Handle potentially wrapped responses
+      const fetchedProducts = productsData.data || productsData || [];
+      const fetchedSuppliers = suppliersData.data || suppliersData || [];
+      const fetchedPurchases = purchasesData.data || purchasesData || [];
+
+      setProducts(Array.isArray(fetchedProducts) ? fetchedProducts : []);
+      setSuppliers(Array.isArray(fetchedSuppliers) ? fetchedSuppliers : []);
+
+      // Map purchases to receipts format
+      const mappedReceipts = (
+        Array.isArray(fetchedPurchases) ? fetchedPurchases : []
+      )
+        .map((p) => {
+          const supplier = (
+            Array.isArray(fetchedSuppliers) ? fetchedSuppliers : []
+          ).find((s) => s.id === p.supplierId);
+
+          let items = p.items || [];
+          if (items.length === 0 && p.id) {
+            // If items are not included in getAll, they might need to be fetched separately,
+            // but for now we map what we have.
+          }
+
+          const mappedItems = items.map((item, index) => {
+            const product = (
+              Array.isArray(fetchedProducts) ? fetchedProducts : []
+            ).find((prod) => prod.id === item.productId);
+            const qty = item.quantity || 1;
+            const price = item.unitCost || item.unitPrice || 0;
+            return {
+              ...item,
+              id: item.id || `${p.id}-${item.productId}-${index}`,
+              productName:
+                product?.name || item.productName || "Sản phẩm chưa xác định",
+              imageUrl: product?.imageUrl || "",
+              sku: product?.code || "N/A",
+              unit: "Cái",
+              quantity: qty,
+              unitPrice: price,
+              lineTotal: qty * price,
+              categoryId: product?.categoryId,
+              description: product?.description || "",
+            };
+          });
+
+          const totalQuantity = mappedItems.reduce(
+            (sum, item) => sum + item.quantity,
+            0,
+          );
+          const subTotal = mappedItems.reduce(
+            (sum, item) => sum + item.lineTotal,
+            0,
+          );
+
+          return {
+            ...p,
+            id: p.id,
+            code: p.referenceCode || `NK-${p.id}`,
+            supplierId: p.supplierId,
+            date: p.receiptDate || p.createdAt || new Date().toISOString(),
+            note: p.note || "",
+            referenceCode: p.referenceCode || "",
+            status: p.status || "completed", // Mock status
+            supplierName:
+              p.supplierName ||
+              supplier?.supplierName ||
+              "Nhà cung cấp chưa xác định",
+            supplierAddress: supplier?.address || "Chưa cập nhật",
+            operatorName: "Hệ thống",
+            items: mappedItems,
+            itemCount: mappedItems.length,
+            totalQuantity,
+            subTotal,
+            vatAmount: 0,
+            totalAmount: subTotal,
+            statusLabel:
+              STATUS_LABELS[p.status || "completed"] || "Không xác định",
+            itemSummary: mappedItems
+              .map((item) => `${item.quantity} x ${item.productName}`)
+              .join(", "),
+          };
+        })
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      setReceipts(mappedReceipts);
+    } catch (error) {
+      console.error("Error fetching data for imports:", error);
+      toast.error("Không thể tải dữ liệu nhập kho.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const filteredReceipts = useMemo(() => {
     const keyword = String(search ?? "")
@@ -275,22 +251,97 @@ export function useImports() {
       receipts.find((receipt) => String(receipt.id) === String(id)) || null,
     [receipts],
   );
-  const createEmptyReceipt = useCallback(() => buildEmptyReceipt(), []);
+
+  const createEmptyReceipt = useCallback(
+    () => buildEmptyReceipt(products),
+    [products],
+  );
+
   const deleteReceipt = useCallback((id) => {
+    // We would call an API here if we had a DELETE endpoint
+    // purchasesService.delete(id);
     setReceipts((prev) =>
       prev.filter((receipt) => String(receipt.id) !== String(id)),
     );
   }, []);
 
+  const createReceipt = async (receiptData) => {
+    const supplier = suppliers.find(
+      (s) => String(s.id) === String(receiptData.supplierId),
+    );
+    const payload = {
+      supplierId: receiptData.supplierId,
+      warehouseId: 1,
+      supplierName: supplier
+        ? supplier.supplierName
+        : "Nhà cung cấp chưa xác định",
+      receiptDate: receiptData.date
+        ? new Date(receiptData.date).toISOString()
+        : new Date().toISOString(),
+      referenceCode: receiptData.referenceCode || "",
+      note: receiptData.note || "",
+      items: (receiptData.items || []).map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitCost: item.unitPrice || 0,
+      })),
+    };
+
+    try {
+      const response = await purchasesService.create(payload);
+
+      // Update local state by re-fetching or optimistic UI update
+      // For simplicity, we just trigger a page reload or let the component do it
+      // but returning response is enough.
+      return response;
+    } catch (error) {
+      console.error("Error creating receipt:", error);
+      throw error;
+    }
+  };
+
+  const updateReceipt = async (id, receiptData) => {
+    const supplier = suppliers.find(
+      (s) => String(s.id) === String(receiptData.supplierId),
+    );
+    const payload = {
+      id: id,
+      supplierId: receiptData.supplierId,
+      warehouseId: 1,
+      supplierName: supplier
+        ? supplier.supplierName
+        : "Nhà cung cấp chưa xác định",
+      receiptDate: receiptData.date
+        ? new Date(receiptData.date).toISOString()
+        : new Date().toISOString(),
+      referenceCode: receiptData.referenceCode || "",
+      note: receiptData.note || "",
+      items: (receiptData.items || []).map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitCost: item.unitPrice || 0,
+      })),
+    };
+
+    try {
+      const response = await purchasesService.update(id, payload);
+      return response;
+    } catch (error) {
+      console.error("Error updating receipt:", error);
+      throw error;
+    }
+  };
+
   return {
     products,
     suppliers,
-    users,
     receipts,
     paginatedReceipts,
     getReceiptById,
     buildEmptyReceipt: createEmptyReceipt,
     deleteReceipt,
+    createReceipt,
+    updateReceipt,
     stats,
     search,
     setSearch,
@@ -305,5 +356,7 @@ export function useImports() {
     totalCount,
     pageSize,
     totalPages,
+    isLoading,
+    refreshList: fetchData,
   };
 }

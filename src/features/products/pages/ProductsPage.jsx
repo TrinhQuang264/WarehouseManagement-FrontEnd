@@ -17,14 +17,15 @@ import ProductImageUpload from "../components/ProductImageUpload";
 import ProductDetailPage from "./ProductDetailPage";
 import ConfirmModal from "../../../components/ui/ConfirmModal.jsx";
 import toast from "../../../utils/toast";
+import { PRODUCT_URLS } from "../../../constants/urls";
 
 const DEFAULT_PRODUCT_FORM = {
   code: "",
   name: "",
   description: "",
   categoryId: "",
-  originalPrice: "",
-  importPrice: "",
+  originalPrice: 1,
+  importPrice: 1,
   price: "",
   imageUrl: "",
   specs: [],
@@ -103,7 +104,7 @@ export default function ProductsPage() {
       setActionButton({
         label: "Thêm sản phẩm",
         icon: <Plus size={18} />,
-        onClick: () => navigate("/products/new"),
+        onClick: () => navigate(PRODUCT_URLS.new),
         className: "shadow-lg shadow-primary/20",
       });
 
@@ -171,11 +172,11 @@ export default function ProductsPage() {
         if (!isMounted || !productToEdit) return;
 
         const originalPriceVal =
-          productToEdit.originalPrice ??
-          productToEdit.OriginalPrice ??
-          productToEdit.importPrice ??
-          productToEdit.ImportPrice ??
-          "";
+          productToEdit.originalPrice ||
+          productToEdit.OriginalPrice ||
+          productToEdit.importPrice ||
+          productToEdit.ImportPrice ||
+          1;
         const priceVal =
           productToEdit.price ??
           productToEdit.Price ??
@@ -221,7 +222,7 @@ export default function ProductsPage() {
   }, [mode.edit, mode.id]);
 
   const handleEdit = (product) => {
-    navigate(`/products/edit/${product.id}`);
+    navigate(PRODUCT_URLS.edit(product.id));
   };
 
   const handleDelete = (product) => {
@@ -229,15 +230,15 @@ export default function ProductsPage() {
   };
 
   const handleViewDetail = (product) => {
-    navigate(`/products/${product.id}`);
+    navigate(PRODUCT_URLS.detail(product.id));
   };
 
   const onSubmit = async (data) => {
     const safeImageUrl = sanitizeImageUrlForPayload(data.imageUrl);
     const payload = {
       ...data,
-      originalPrice: data.originalPrice ?? data.importPrice ?? 0,
-      importPrice: data.originalPrice ?? data.importPrice ?? 0,
+      originalPrice: data.originalPrice || data.importPrice || 1,
+      importPrice: data.originalPrice || data.importPrice || 1,
       imageUrl: safeImageUrl,
     };
 
@@ -296,7 +297,8 @@ export default function ProductsPage() {
       }
     }
 
-    navigate("/products");
+    refreshList();
+    navigate(PRODUCT_URLS.list);
   };
 
   // Render switches based on mode
@@ -360,7 +362,7 @@ export default function ProductsPage() {
                 setFormData={setFormData}
                 categories={categories}
                 onSubmit={onSubmit}
-                onCancel={() => navigate("/products")}
+                onCancel={() => navigate(PRODUCT_URLS.list)}
               />
             </div>
           </div>
