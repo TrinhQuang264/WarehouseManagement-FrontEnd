@@ -109,10 +109,10 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
 
   return (
     <section className="profile-section mb-6">
-      <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="material-icons text-primary">person_outline</span>
-          <h3 className="font-bold text-lg text-slate-900 dark:text-white">Thông tin cá nhân</h3>
+          <h3 className="font-bold text-lg text-slate-900 ">Thông tin cá nhân</h3>
         </div>
         <button
           onClick={() => {
@@ -130,22 +130,6 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
 
       <div className="p-8">
         <div className="flex flex-col md:flex-row items-start gap-12">
-          {/*<div className="profile-avatar-box">
-            <div className="relative">
-              <img
-                alt="Avatar"
-                className="profile-avatar-img"
-                src={avatarUrl}
-              />
-              <button className="profile-avatar-btn">
-                <span className="material-icons text-[18px]">camera_alt</span>
-              </button>
-            </div>
-            <p className="text-[10px] text-slate-400 text-center uppercase tracking-widest font-bold">
-              Ảnh đại diện
-            </p>
-          </div>*/}
-
           <div className="profile-input-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="profile-input-group">
               {!isEditing ? (
@@ -230,7 +214,7 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
         </div>
 
         {isEditing && (
-          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
+          <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end gap-3">
             <button
               onClick={() => {
                 resetForm();

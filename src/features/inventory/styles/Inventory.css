@@ -27,11 +27,6 @@
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dark .inventory-stat-card {
-  background-color: #0f172a;
-  border-color: #1e293b;
-}
-
 .inventory-stat-card:hover {
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
@@ -43,11 +38,6 @@
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   overflow: hidden;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dark .inventory-table-wrapper {
-  background-color: #0f172a;
-  border-color: #1e293b;
 }
 
 .inventory-table-wrapper:hover {
@@ -66,15 +56,7 @@
   transition: all 0.3s;
 }
 
-.dark .inventory-icon-box {
-  background-color: #1e293b;
-}
-
 .group:hover .inventory-icon-box {
   background-color: #ffffff;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-
-.dark .group:hover .inventory-icon-box {
-  background-color: #334155;
 }

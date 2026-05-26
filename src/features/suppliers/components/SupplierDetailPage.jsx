@@ -52,7 +52,7 @@ export default function SupplierDetailPage({ supplier, history = [], onEdit }) {
                 Nhà cung cấp
               </Link>
               <span className="mx-2 text-slate-300">/</span>
-              <span className="text-slate-900 dark:text-white font-medium">
+              <span className="text-slate-900 font-medium">
                 Chi tiết nhà cung cấp
               </span>
             </div>

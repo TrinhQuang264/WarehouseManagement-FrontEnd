@@ -14,11 +14,6 @@
   overflow: hidden;
 }
 
-.dark .users-table-wrapper {
-  background-color: #0f172a;
-  border-color: #1e293b;
-}
-
 .users-info-cards {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -39,11 +34,6 @@
   align-items: start;
   gap: 0.75rem;
 }
-
-.dark .info-card {
-  border-color: #1e293b;
-}
-
 .users-page .action-buttons-group,
 .users-page .action-btn {
   opacity: 1 !important;
@@ -58,6 +48,3 @@
   color: #0f172a;
 }
 
-.dark .users-page .action-btn {
-  color: #cbd5e1;
-}

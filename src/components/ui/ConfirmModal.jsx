@@ -46,11 +46,11 @@ export default function ConfirmModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} footer={footer} size="sm">
       <div className="flex items-start gap-4">
-        <div className={`p-3 rounded-full shrink-0 ${variant === 'danger' ? 'bg-red-100 text-red-600 dark:bg-red-900/30' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30'}`}>
+        <div className={`p-3 rounded-full shrink-0 ${variant === 'danger' ? 'bg-red-100 text-red-600 ' : 'bg-blue-100 text-blue-600 '}`}>
           <AlertTriangle size={24} />
         </div>
         <div>
-          <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+          <p className="text-slate-600 text-sm leading-relaxed">
             {message}
           </p>
         </div>

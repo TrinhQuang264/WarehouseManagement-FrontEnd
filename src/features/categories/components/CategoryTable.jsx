@@ -11,14 +11,14 @@ function CategoryTable({
     <div className="table-wrapper">
       <table className="table">
         <thead>
-          <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
+          <tr className="bg-slate-50/80 border-b border-slate-200">
             <th className="table-th px-6">Tên Danh Mục</th>
             <th className="table-th px-6">Mô Tả SEO</th>
             <th className="table-th px-6 text-right">Thao Tác</th>
           </tr>
         </thead>
         <tbody
-          className={`divide-y divide-slate-100 dark:divide-slate-800/50 transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+          className={`divide-y divide-slate-100 transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
         >
           {categories.length > 0 ? (
             categories.map((category) => (
@@ -29,7 +29,7 @@ function CategoryTable({
                       <FolderOpen size={20} />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+                      <span className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">
                         {category.name}
                       </span>
                       {category.seoAlias && (

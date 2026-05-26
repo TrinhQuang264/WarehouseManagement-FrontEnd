@@ -16,11 +16,6 @@
   margin-bottom: 1rem;
 }
 
-.dark .search-filter-bar {
-  background-color: #0f172a;
-  border-color: #1e293b;
-}
-
 .search-filter-bar:hover {
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
@@ -40,11 +35,6 @@
   .price-filter-group {
     width: auto;
   }
-}
-
-.dark .price-filter-group {
-  background-color: rgba(30, 41, 59, 0.5);
-  border-color: #334155;
 }
 
 .price-input-wrapper {
@@ -82,12 +72,6 @@
   }
 }
 
-.dark .price-input {
-  background-color: #1e293b;
-  border-color: #334155;
-  color: #ffffff;
-}
-
 .price-input:focus {
   box-shadow: 0 0 0 2px rgba(19, 127, 236, 0.2);
   border-color: var(--color-primary);
@@ -100,11 +84,6 @@
   border: 1px solid #e2e8f0;
   overflow: hidden;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dark .product-table-wrapper {
-  background-color: #0f172a;
-  border-color: #1e293b;
 }
 
 .product-table-wrapper:hover {

@@ -15,7 +15,7 @@ export default function Select({
     <div className="w-full text-left">
       {/* Nhãn (label) */}
       {label && (
-        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5 ml-1">
+        <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">
           {label}
         </label>
       )}
@@ -32,8 +32,8 @@ export default function Select({
         {/* Ô select chính */}
         <select
           className={`
-            block w-full rounded-2xl border border-slate-200 dark:border-slate-700
-            bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white
+            block w-full rounded-2xl border border-slate-200 
+            bg-slate-50 text-slate-900 
             focus:ring-2 focus:ring-primary/20 focus:border-primary
             transition-all outline-none text-sm appearance-none
             ${icon ? 'pl-10' : 'pl-4'}

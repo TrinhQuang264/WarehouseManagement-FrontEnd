@@ -37,7 +37,7 @@ export default function ProfilePage() {
               Tổng quan
             </Link>
             <span className="mx-2 text-slate-300">/</span>
-            <span className="text-slate-900 dark:text-white font-medium">
+            <span className="text-slate-900 font-medium">
               Thông tin cá nhân
             </span>
           </nav>

@@ -67,9 +67,9 @@ export default function ChangePassword({ authUser }) {
 
   return (
     <section className="profile-section">
-      <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+      <div className="px-6 py-5 border-b border-slate-100  flex items-center gap-3">
         <span className="material-icons text-primary">lock_open</span>
-        <h3 className="font-bold text-lg text-slate-900 dark:text-white">Đổi mật khẩu</h3>
+        <h3 className="font-bold text-lg text-slate-900 ">Đổi mật khẩu</h3>
       </div>
       <div className="p-8">
         <div className="password-input-grid">
@@ -129,7 +129,7 @@ export default function ChangePassword({ authUser }) {
           </div>
         </div>
         <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md">
+          <p className="text-xs text-slate-500 max-w-md">
             Mật khẩu của bạn phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự
             đặc biệt để đảm bảo an toàn.
           </p>

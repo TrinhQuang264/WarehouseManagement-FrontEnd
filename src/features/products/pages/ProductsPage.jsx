@@ -321,7 +321,7 @@ export default function ProductsPage() {
                 Sản phẩm
               </Link>
               <span className="mx-2 text-slate-300">/</span>
-              <span className="text-slate-900 dark:text-white font-medium">
+              <span className="text-slate-900 font-medium">
                 {mode.add ? "Thêm mới" : "Cập nhật"}
               </span>
             </nav>
@@ -380,7 +380,7 @@ export default function ProductsPage() {
                 Tổng quan
               </Link>
               <span className="mx-2 text-slate-300">/</span>
-              <span className="text-slate-900 dark:text-white font-medium">
+              <span className="text-slate-900 font-medium">
                 Sản phẩm
               </span>
             </nav>

@@ -160,9 +160,7 @@ export default function CustomersPage() {
                 Khách hàng
               </Link>
               <span className="mx-2 text-slate-300">/</span>
-              <span className="text-slate-900 dark:text-white font-medium">
-                Không tìm thấy
-              </span>
+              <span className="text-slate-900 font-medium">Không tìm thấy</span>
             </nav>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500 shadow-sm">
@@ -199,9 +197,7 @@ export default function CustomersPage() {
               Tổng quan
             </Link>
             <span className="mx-2 text-slate-300">/</span>
-            <span className="text-slate-900 dark:text-white font-medium">
-              Khách hàng
-            </span>
+            <span className="text-slate-900 font-medium">Khách hàng</span>
           </nav>
         </div>
       </div>
@@ -240,4 +236,3 @@ export default function CustomersPage() {
     </div>
   );
 }
-

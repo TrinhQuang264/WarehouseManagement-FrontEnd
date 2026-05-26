@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { createPortal } from 'react-dom';
-import { X, RotateCcw, Trash2, Package, Search, Check } from 'lucide-react';
-import Button from './Button';
-import Loading from './Loading';
-import ConfirmModal from './ConfirmModal';
-import toast from '../../utils/toast';
+import React, { useEffect, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
+import { X, RotateCcw, Trash2, Package, Search, Check } from "lucide-react";
+import Button from "./Button";
+import Loading from "./Loading";
+import ConfirmModal from "./ConfirmModal";
+import toast from "../../utils/toast";
 
 export default function TrashBinDrawer({
   isOpen,
@@ -16,7 +16,7 @@ export default function TrashBinDrawer({
 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
 
@@ -26,22 +26,26 @@ export default function TrashBinDrawer({
     try {
       // Sử dụng API chuyên dụng cho thùng rác theo yêu cầu
       const response = await service.getTrash();
-      
-      let trashItems = response.items || response.data || (Array.isArray(response) ? response : []);
+
+      let trashItems =
+        response.items ||
+        response.data ||
+        (Array.isArray(response) ? response : []);
 
       // Vẫn áp dụng tìm kiếm trong thùng rác (Client-side)
       if (search) {
         const searchLower = search.toLowerCase();
-        trashItems = trashItems.filter(item => 
-          (item.name && item.name.toLowerCase().includes(searchLower)) || 
-          (item.code && item.code.toLowerCase().includes(searchLower))
+        trashItems = trashItems.filter(
+          (item) =>
+            (item.name && item.name.toLowerCase().includes(searchLower)) ||
+            (item.code && item.code.toLowerCase().includes(searchLower)),
         );
       }
-      
+
       setItems(trashItems);
     } catch (error) {
-      console.error('[TrashBinDrawer] Error fetching trash:', error);
-      toast.error('Không thể tải danh sách thùng rác');
+      console.error("[TrashBinDrawer] Error fetching trash:", error);
+      toast.error("Không thể tải danh sách thùng rác");
     } finally {
       setLoading(false);
     }
@@ -54,11 +58,11 @@ export default function TrashBinDrawer({
   const handleRestore = async (id) => {
     try {
       await service.restore(id);
-      toast.success('Đã khôi phục thành công');
+      toast.success("Đã khôi phục thành công");
       fetchTrash();
       onDataChange?.();
     } catch (error) {
-      toast.error('Lỗi khi khôi phục');
+      toast.error("Lỗi khi khôi phục");
     }
   };
 
@@ -66,24 +70,26 @@ export default function TrashBinDrawer({
     try {
       if (deleteTargetId) {
         await service.permanentDelete(deleteTargetId);
-        toast.success('Đã xóa vĩnh viễn');
+        toast.success("Đã xóa vĩnh viễn");
       }
       setIsConfirmDeleteOpen(false);
       fetchTrash();
       onDataChange?.();
     } catch (error) {
-      toast.error('Lỗi khi xóa vĩnh viễn');
+      toast.error("Lỗi khi xóa vĩnh viễn");
     }
   };
 
   // Prevent scrolling when drawer is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
-    return () => { document.body.style.overflow = 'unset'; };
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -91,37 +97,40 @@ export default function TrashBinDrawer({
   const drawerContent = (
     <div className="fixed inset-0 z-[1000] flex justify-end overflow-hidden">
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity animate-fadeIn"
         onClick={onClose}
       />
-      
+
       {/* Drawer */}
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 shadow-2xl h-full flex flex-col animate-slideInRight">
+      <div className="relative w-full max-w-2xl bg-white shadow-2xl h-full flex flex-col animate-slideInRight">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-white dark:bg-slate-900 z-10">
+        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white z-10">
           <div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
               <Trash2 className="text-red-500" size={24} />
               {title}
             </h3>
           </div>
-          <button 
+          <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
           >
             <X size={24} />
           </button>
         </div>
 
         {/* Toolbar */}
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 shrink-0">
+        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 shrink-0">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={18}
+            />
+            <input
               type="text"
               placeholder="Tìm kiếm trong thùng rác..."
-              className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -138,22 +147,24 @@ export default function TrashBinDrawer({
           ) : items.length > 0 ? (
             <div className="space-y-3">
               <div className="flex items-center justify-end mb-4 px-2">
-                <span className="text-sm text-slate-500">{items.length} mục</span>
+                <span className="text-sm text-slate-500">
+                  {items.length} mục
+                </span>
               </div>
 
               {items.map((item) => (
-                <div 
+                <div
                   key={item.id}
-                  className="group p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-2xl hover:border-primary/30 transition-all flex items-center justify-between gap-4"
+                  className="group p-4 bg-white border border-slate-100 rounded-2xl hover:border-primary/30 transition-all flex items-center justify-between gap-4"
                 >
                   <div className="flex items-center gap-4 flex-1">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-slate-900 dark:text-white truncate">
+                        <span className="font-bold text-slate-900 truncate">
                           {item.name || item.code}
                         </span>
                         {item.code && item.name && (
-                          <span className="text-[10px] bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-slate-500 font-mono">
+                          <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 font-mono">
                             {item.code}
                           </span>
                         )}
@@ -161,22 +172,25 @@ export default function TrashBinDrawer({
                       <div className="flex items-center gap-4 text-xs text-slate-500">
                         {columns.map((col, idx) => (
                           <span key={idx} className="flex items-center gap-1">
-                            {col.label}: <strong className="text-slate-700 dark:text-slate-300">{item[col.key]}</strong>
+                            {col.label}:{" "}
+                            <strong className="text-slate-700">
+                              {item[col.key]}
+                            </strong>
                           </span>
                         ))}
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
+                    <button
                       onClick={() => handleRestore(item.id)}
                       className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
                       title="Khôi phục"
                     >
                       <RotateCcw size={18} />
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         setDeleteTargetId(item.id);
                         setIsConfirmDeleteOpen(true);
@@ -192,18 +206,20 @@ export default function TrashBinDrawer({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-400 p-12 text-center">
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-full">
+              <div className="bg-slate-50 p-6 rounded-full">
                 <Package size={64} strokeWidth={1.5} />
               </div>
               <div>
-                <p className="text-lg font-bold text-slate-600 dark:text-slate-300">Thùng rác trống</p>
+                <p className="text-lg font-bold text-slate-600">
+                  Thùng rác trống
+                </p>
                 <p className="text-sm">Mọi thứ bạn xóa sẽ xuất hiện ở đây</p>
               </div>
             </div>
           )}
         </div>
 
-        <ConfirmModal 
+        <ConfirmModal
           isOpen={isConfirmDeleteOpen}
           onClose={() => setIsConfirmDeleteOpen(false)}
           onConfirm={handlePermanentDelete}

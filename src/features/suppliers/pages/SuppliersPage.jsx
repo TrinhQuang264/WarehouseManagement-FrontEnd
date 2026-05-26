@@ -125,7 +125,8 @@ export default function SuppliersPage() {
   const openTrash = useCallback(() => setIsTrashOpen(true), [setIsTrashOpen]);
   const handleSaveSupplier = useCallback(
     (data) => {
-      if (selectedSupplier) return handleUpdateSupplier(selectedSupplier.id, data);
+      if (selectedSupplier)
+        return handleUpdateSupplier(selectedSupplier.id, data);
       return handleAddSupplier(data);
     },
     [handleAddSupplier, handleUpdateSupplier, selectedSupplier],
@@ -215,9 +216,7 @@ export default function SuppliersPage() {
                 Nhà cung cấp
               </Link>
               <span className="mx-2 text-slate-300">/</span>
-              <span className="text-slate-900 dark:text-white font-medium">
-                Không tìm thấy
-              </span>
+              <span className="text-slate-900 font-medium">Không tìm thấy</span>
             </nav>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500 shadow-sm">
@@ -297,4 +296,3 @@ export default function SuppliersPage() {
     </>
   );
 }
-

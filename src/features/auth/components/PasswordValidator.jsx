@@ -11,13 +11,13 @@ export default function PasswordValidator({ password }) {
   ];
 
   return (
-    <div className="p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg text-sm">
-      <p className="text-slate-700 dark:text-slate-300 font-medium mb-2">Mật khẩu phải bao gồm:</p>
+    <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-lg text-sm">
+      <p className="text-slate-700 font-medium mb-2">Mật khẩu phải bao gồm:</p>
       <div className="space-y-2">
         {requirements.map((req) => {
           const isValid = req.regex.test(password);
           return (
-            <div key={req.id} className={`flex items-center gap-2 ${isValid ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+            <div key={req.id} className={`flex items-center gap-2 ${isValid ? 'text-green-600' : 'text-red-600'}`}>
               {isValid ? <CheckCircle2 size={16} /> : <CircleX size={16} />}
               <span>{req.text}</span>
             </div>

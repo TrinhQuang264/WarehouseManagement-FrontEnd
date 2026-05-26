@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Smartphone,
@@ -9,14 +9,12 @@ import {
   Store,
   BarChart3,
   Users,
-  Settings,
   LogOut,
   FolderTree,
   Users2,
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
-import Avatar from "../ui/Avatar";
 
 // Danh sách menu chính
 const mainMenu = [
@@ -24,7 +22,6 @@ const mainMenu = [
   { to: "/import", icon: Download, label: "Nhập kho" },
   { to: "/export", icon: Upload, label: "Xuất kho" },
   { to: "/inventory", icon: Package, label: "Tồn kho" },
-  { to: "/settings", icon: Settings, label: "Cài đặt" },
 ];
 
 const managerMenu = [
@@ -33,6 +30,7 @@ const managerMenu = [
   { to: "/customers", icon: Users2, label: "Khách hàng" },
   { to: "/suppliers", icon: Store, label: "Nhà cung cấp" },
 ];
+
 // Danh sách menu hệ thống
 const systemMenu = [
   { to: "/users", icon: Users, label: "Người dùng" },
@@ -40,11 +38,24 @@ const systemMenu = [
 ];
 
 export default function Sidebar({ user, onLogout }) {
-  const [expandedSections, setExpandedSections] = useState({
-    manager: false,
-    system: false,
+  // Lấy trạng thái từ localStorage khi load trang
+  const [expandedSections, setExpandedSections] = useState(() => {
+    const saved = localStorage.getItem("sidebar-expanded");
+
+    return saved
+      ? JSON.parse(saved)
+      : {
+          manager: false,
+          system: false,
+        };
   });
 
+  // Tự động lưu mỗi khi state thay đổi
+  useEffect(() => {
+    localStorage.setItem("sidebar-expanded", JSON.stringify(expandedSections));
+  }, [expandedSections]);
+
+  // Toggle mở/đóng section
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -63,16 +74,19 @@ export default function Sidebar({ user, onLogout }) {
       </div>
 
       <nav className="sidebar-nav">
+        {/* Menu chính */}
         {mainMenu.map((item) => (
           <SidebarLink key={item.to} item={item} />
         ))}
 
+        {/* Quản lý */}
         <div
-          className="sidebar-section-title flex justify-between items-center"
+          className="sidebar-section-title flex justify-between items-center cursor-pointer"
           onClick={() => toggleSection("manager")}
           aria-expanded={expandedSections.manager}
         >
           <span>Quản lý</span>
+
           <span className="icon-box">
             {expandedSections.manager ? (
               <ChevronDown size={16} />
@@ -81,15 +95,18 @@ export default function Sidebar({ user, onLogout }) {
             )}
           </span>
         </div>
+
         {expandedSections.manager &&
           managerMenu.map((item) => <SidebarLink key={item.to} item={item} />)}
 
+        {/* Hệ thống */}
         <div
-          className="sidebar-section-title flex justify-between items-center"
+          className="sidebar-section-title flex justify-between items-center cursor-pointer"
           onClick={() => toggleSection("system")}
           aria-expanded={expandedSections.system}
         >
           <span>Hệ thống</span>
+
           <span className="icon-box">
             {expandedSections.system ? (
               <ChevronDown size={16} />
@@ -98,6 +115,7 @@ export default function Sidebar({ user, onLogout }) {
             )}
           </span>
         </div>
+
         {expandedSections.system &&
           systemMenu.map((item) => <SidebarLink key={item.to} item={item} />)}
       </nav>
@@ -111,19 +129,14 @@ export default function Sidebar({ user, onLogout }) {
               `flex items-center gap-3 flex-1 overflow-hidden group cursor-pointer p-2 rounded-lg transition-all ${
                 isActive
                   ? "bg-primary/10 text-primary border-l-4 border-primary"
-                  : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                  : "hover:bg-slate-100"
               }`
             }
           >
-            <Avatar
-              src={user?.avatar}
-              name={user?.fullName || user?.userName || "User"}
-              size="md"
-            />
             <div className="overflow-hidden flex-1">
               <p
                 className={`text-sm font-semibold truncate transition-colors ${
-                  user?.role ? "text-slate-900 dark:text-white" : "text-primary"
+                  user?.role ? "text-slate-900" : "text-primary"
                 }`}
               >
                 {user?.fullName ||
@@ -133,14 +146,16 @@ export default function Sidebar({ user, onLogout }) {
                   user?.userName ||
                   "Người dùng"}
               </p>
+
               <p className="text-xs text-slate-500 truncate">
                 {user?.role || "Nhân viên"}
               </p>
             </div>
           </NavLink>
+
           <button
             onClick={onLogout}
-            className="text-slate-400 hover:text-accent-red transition-colors p-1"
+            className="text-slate-400 hover:text-red-500 transition-colors p-1"
             title="Đăng xuất"
           >
             <LogOut size={18} />
@@ -163,7 +178,7 @@ function SidebarLink({ item }) {
       }
     >
       <Icon size={20} />
-      {item.label}
+      <span>{item.label}</span>
     </NavLink>
   );
 }

@@ -10,7 +10,7 @@ export default function Input({
     <div className="w-full">
       {/* Nhãn (label) */}
       {label && (
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+        <label className="block text-sm font-medium text-slate-700 mb-1.5">
           {label}
         </label>
       )}
@@ -27,8 +27,8 @@ export default function Input({
         {/* Ô input chính */}
         <input
           className={`
-            block w-full rounded-xl border border-slate-300 dark:border-slate-700
-            bg-white dark:bg-slate-800 text-slate-900 dark:text-white
+            block w-full rounded-xl border border-slate-300 
+            bg-white text-slate-900 
             focus:ring-2 focus:ring-primary focus:border-primary
             transition-all outline-none text-sm
             ${icon ? 'pl-10' : 'pl-3'}

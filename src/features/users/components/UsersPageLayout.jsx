@@ -21,7 +21,7 @@ export default function UsersPageLayout({
             Tổng quan
           </Link>
           <span className="mx-2 text-slate-300">/</span>
-          <span className="text-slate-900 dark:text-white font-medium">
+          <span className="text-slate-900  font-medium">
             Tài khoản
           </span>
         </nav>

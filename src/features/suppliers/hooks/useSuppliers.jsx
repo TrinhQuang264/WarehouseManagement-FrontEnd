@@ -74,7 +74,9 @@ export function useSuppliers() {
       const response = await suppliersService.getAll();
       if (signal.aborted) return;
 
-      const allItems = Array.isArray(response) ? response : response?.data || [];
+      const allItems = Array.isArray(response)
+        ? response
+        : response?.data || [];
       const activeItems = allItems.filter((item) => item.isDeleted === false);
       setAllActiveSuppliers(activeItems);
 
@@ -87,7 +89,7 @@ export function useSuppliers() {
             item.code?.toLowerCase().includes(searchLower) ||
             item.phone?.toLowerCase().includes(searchLower) ||
             item.email?.toLowerCase().includes(searchLower) ||
-            item.address?.toLowerCase().includes(searchLower)
+            item.address?.toLowerCase().includes(searchLower),
         );
       }
 
@@ -127,8 +129,11 @@ export function useSuppliers() {
       return true;
     } catch (error) {
       console.error("useSuppliers - handleAddSupplier error:", error);
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
-      toast.error(serverMsg || "Không thể thêm nhà cung cấp. Vui lòng thử lại.");
+      const serverMsg =
+        error?.response?.data?.message || error?.response?.data?.error;
+      toast.error(
+        serverMsg || "Không thể thêm nhà cung cấp. Vui lòng thử lại.",
+      );
       return false;
     } finally {
       setIsSubmitting(false);
@@ -147,8 +152,11 @@ export function useSuppliers() {
       return true;
     } catch (error) {
       console.error("useSuppliers - handleUpdateSupplier error:", error);
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
-      toast.error(serverMsg || "Lỗi khi cập nhật nhà cung cấp. Hãy kiểm tra lại dữ liệu.");
+      const serverMsg =
+        error?.response?.data?.message || error?.response?.data?.error;
+      toast.error(
+        serverMsg || "Lỗi khi cập nhật nhà cung cấp. Hãy kiểm tra lại dữ liệu.",
+      );
       return false;
     } finally {
       setIsSubmitting(false);
@@ -172,7 +180,8 @@ export function useSuppliers() {
       return true;
     } catch (error) {
       console.error("useSuppliers - handleDeleteSupplier error:", error);
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      const serverMsg =
+        error?.response?.data?.message || error?.response?.data?.error;
       toast.error(serverMsg || "Không thể xóa nhà cung cấp này.");
       return false;
     } finally {

@@ -1,21 +1,19 @@
 import { Edit, Ban, CheckCircle } from "lucide-react";
 import Badge from "../../../components/ui/Badge";
-import Avatar from "../../../components/ui/Avatar";
 
 function UserRow({ user, onEditRoles }) {
   return (
     <tr className="table-row-hover">
       <td className="px-6 py-4">
         <div className="flex items-center gap-3">
-          <Avatar name={user.fullName} size="sm" />
           <div>
-            <p className="text-sm font-medium text-slate-900 dark:text-white">{user.fullName}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
+            <p className="text-sm font-medium text-slate-900 ">{user.fullName}</p>
+            <p className="text-xs text-slate-500 ">{user.email}</p>
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">{user.username}</td>
-      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">{user.phoneNumber || "—"}</td>
+      <td className="px-6 py-4 text-sm font-medium text-slate-600">{user.username}</td>
+      <td className="px-6 py-4 text-sm text-slate-600 ">{user.phoneNumber || "—"}</td>
       <td className="px-6 py-4">
         <Badge variant={user.role === "admin" ? "blue" : "gray"}>{user.roleLabel}</Badge>
       </td>
@@ -62,7 +60,7 @@ export default function UsersTable({ users, onEditRoles }) {
             <th className="table-th px-6 text-right">Thao tác</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+        <tbody className="divide-y divide-slate-100 ">
           {users.map((user) => <UserRow key={user.id} user={user} onEditRoles={onEditRoles} />)}
         </tbody>
       </table>

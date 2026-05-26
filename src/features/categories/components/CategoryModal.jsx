@@ -149,11 +149,11 @@ export default function CategoryModal({
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+          <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
             <FileText size={18} /> Mô tả danh mục
           </label>
           <textarea
-            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm outline-none focus:border-primary transition-all min-h-[100px] resize-none"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-primary transition-all min-h-[100px] resize-none"
             placeholder="Nhập mô tả ngắn cho danh mục này..."
             value={formData.seoDescription}
             onChange={(e) =>

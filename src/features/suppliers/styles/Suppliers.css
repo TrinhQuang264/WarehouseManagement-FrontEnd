@@ -2,9 +2,8 @@
 .suppliers-page {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   animation: fadeInUp 0.5s ease-out both;
-  padding-bottom: 3rem;
 }
 
 
@@ -25,11 +24,5 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   border: 1px solid #e2e8f0;
-}
-
-.dark .supplier-code-badge {
-  background-color: #1e293b;
-  color: #cbd5e1;
-  border-color: #334155;
 }
 

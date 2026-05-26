@@ -14,11 +14,6 @@
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dark .category-table-wrapper {
-  background-color: #0f172a;
-  border-color: #1e293b;
-}
-
 .category-table-wrapper:hover {
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }

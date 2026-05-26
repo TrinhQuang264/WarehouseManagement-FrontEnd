@@ -2,19 +2,13 @@ import React from "react";
 import { Edit, Eye, Trash2 } from "lucide-react";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
 
-function SupplierTable({
-  suppliers,
-  loading,
-  onEdit,
-  onDelete,
-  onViewDetail,
-}) {
+function SupplierTable({ suppliers, loading, onEdit, onDelete, onViewDetail }) {
   return (
     <DataTableCard className="min-h-[500px] flex flex-col relative">
       <div className="table-wrapper">
         <table className="table">
           <thead>
-            <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
+            <tr className="bg-slate-50/80 border-b border-slate-200">
               <th className="table-th px-6">Tên Nhà Cung Cấp</th>
               <th className="table-th px-6">Người liên hệ</th>
               <th className="table-th px-6">Số Điện Thoại</th>
@@ -23,32 +17,32 @@ function SupplierTable({
             </tr>
           </thead>
           <tbody
-            className={`divide-y divide-slate-100 dark:divide-slate-800/50 transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+            className={`divide-y divide-slate-100transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
           >
             {suppliers.length > 0 ? (
               suppliers.map((supplier) => (
                 <tr key={supplier.id} className="group table-row-hover">
                   <td className="px-6 py-4">
                     <div>
-                      <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+                      <p className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">
                         {supplier.supplierName}
                       </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      <p className="text-xs text-slate-500 mt-0.5">
                         {supplier.email}
                       </p>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <span className="text-sm font-medium text-slate-700">
                       {supplier.contactPerson || "-"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">
+                  <td className="px-6 py-4 text-sm font-medium text-slate-600 ">
                     {supplier.phone}
                   </td>
                   <td className="px-6 py-4">
                     <p
-                      className="text-sm text-slate-600 dark:text-slate-400 line-clamp-1 max-w-xs xl:max-w-md"
+                      className="text-sm text-slate-600 line-clamp-1 max-w-xs xl:max-w-md"
                       title={supplier.address}
                     >
                       {supplier.address}

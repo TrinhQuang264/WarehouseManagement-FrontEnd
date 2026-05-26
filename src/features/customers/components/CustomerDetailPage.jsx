@@ -59,7 +59,7 @@ export default function CustomerDetailPage({ customer, history = [], onEdit }) {
                 Khách hàng
               </Link>
               <span className="mx-2 text-slate-300">/</span>
-              <span className="text-slate-900 dark:text-white font-medium">
+              <span className="text-slate-900 font-medium">
                 Chi tiết khách hàng
               </span>
             </div>
@@ -246,4 +246,3 @@ export default function CustomerDetailPage({ customer, history = [], onEdit }) {
     </div>
   );
 }
-

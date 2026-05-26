@@ -1,26 +1,35 @@
-import { Package, AlertTriangle, LogIn, LogOut } from 'lucide-react';
-import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import StatCard from '../../../components/ui/StatCard';
-import Badge from '../../../components/ui/Badge';
-import Loading from '../../../components/ui/Loading';
-import DataTableCard from '../../../components/ui/DataTableCard.jsx';
-import { formatNumber, formatCurrency } from '../../../utils/util';
-import { useDashboard } from '../hooks/useDashboard.jsx';
-import '../styles/Dashboard.css';
+import { Package, AlertTriangle, LogIn, LogOut } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import StatCard from "../../../components/ui/StatCard";
+import Badge from "../../../components/ui/Badge";
+import Loading from "../../../components/ui/Loading";
+import DataTableCard from "../../../components/ui/DataTableCard.jsx";
+import { formatNumber, formatCurrency } from "../../../utils/util";
+import { useDashboard } from "../hooks/useDashboard.jsx";
+import "../styles/Dashboard.css";
 
 // const CustomBarTooltip = ({ active, payload, label }) => {
 //   if (active && payload && payload.length) {
 //     return (
-//       <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 text-sm">
-//         <p className="font-bold text-slate-800 dark:text-slate-100 mb-2">{label}</p>
+//       <div className="bg-white p-3 rounded-lg shadow-md border border-slate-100  text-sm">
+//         <p className="font-bold text-slate-800  mb-2">{label}</p>
 //         <div className="flex flex-col gap-1">
 //           <div className="flex items-center gap-2">
 //             <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-//             <span className="text-slate-600 dark:text-slate-300">Nhập: <span className="font-semibold text-slate-900 dark:text-white">{payload[1].value}</span></span>
+//             <span className="text-slate-600 ">Nhập: <span className="font-semibold text-slate-900">{payload[1].value}</span></span>
 //           </div>
 //           <div className="flex items-center gap-2">
-//             <span className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-600" />
-//             <span className="text-slate-600 dark:text-slate-300">Xuất: <span className="font-semibold text-slate-900 dark:text-white">{payload[0].value}</span></span>
+//             <span className="w-2.5 h-2.5 rounded-full bg-slate-200 " />
+//             <span className="text-slate-600">Xuất: <span className="font-semibold text-slate-900">{payload[0].value}</span></span>
 //           </div>
 //         </div>
 //       </div>
@@ -32,9 +41,9 @@ import '../styles/Dashboard.css';
 // const CustomPieTooltip = ({ active, payload }) => {
 //   if (active && payload && payload.length) {
 //     return (
-//       <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 text-sm font-medium">
-//         <span className="text-slate-600 dark:text-slate-300">{payload[0].name}: </span>
-//         <span className="text-slate-900 dark:text-white">{payload[0].value}%</span>
+//       <div className="bg-white p-3 rounded-lg shadow-md border border-slate-100 text-sm font-medium">
+//         <span className="text-slate-600">{payload[0].name}: </span>
+//         <span className="text-slate-900">{payload[0].value}%</span>
 //       </div>
 //     );
 //   }
@@ -42,13 +51,7 @@ import '../styles/Dashboard.css';
 // };
 
 export default function DashboardPage() {
-  const {
-    stats,
-    loading,
-    chartData,
-    allocation,
-    topProducts
-  } = useDashboard();
+  const { stats, loading, chartData, allocation, topProducts } = useDashboard();
 
   if (loading) return <Loading text="Đang tải dữ liệu dashboard..." />;
 
@@ -77,7 +80,9 @@ export default function DashboardPage() {
           value={formatNumber(stats.todayImport)}
           icon={<LogIn size={24} className="text-accent-green" />}
           iconBgClass="bg-emerald-50"
-          trend={<span className="text-slate-400 text-xs font-medium">Hôm nay</span>}
+          trend={
+            <span className="text-slate-400 text-xs font-medium">Hôm nay</span>
+          }
           subtitle="Tăng 5% so với hôm qua"
         />
         <StatCard
@@ -85,7 +90,9 @@ export default function DashboardPage() {
           value={formatNumber(stats.todayExport)}
           icon={<LogOut size={24} className="text-accent-orange" />}
           iconBgClass="bg-amber-50"
-          trend={<span className="text-slate-400 text-xs font-medium">Hôm nay</span>}
+          trend={
+            <span className="text-slate-400 text-xs font-medium">Hôm nay</span>
+          }
           subtitle="32 đơn hàng đã hoàn tất"
         />
       </section>
@@ -93,17 +100,17 @@ export default function DashboardPage() {
       {/* 2. CHARTS
       <section className="dashboard-charts-grid">
         {/* Biểu đồ cột — Xu hướng Nhập/Xuất */}
-        {/* div className="lg:col-span-2 chart-container">
+      {/* div className="lg:col-span-2 chart-container">
           <div className="chart-header">
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white">Xu hướng Nhập/Xuất</h3>
+            <h3 className="font-bold text-lg text-slate-900">Xu hướng Nhập/Xuất</h3>
             <div className="chart-legend">
               <div className="chart-legend-item">
                 <span className="w-3 h-3 bg-primary rounded-full" /> Nhập
               </div>
               <div className="chart-legend-item ml-4">
-                <span className="w-3 h-3 bg-slate-200 dark:bg-slate-700 rounded-full" /> Xuất
+                <span className="w-3 h-3 bg-slate-200  rounded-full" /> Xuất
               </div>
-              <select className="ml-4 text-xs bg-slate-50 dark:bg-slate-800/50 border-none rounded-lg focus:ring-0 outline-none p-1 px-2 cursor-pointer dark:text-white">
+              <select className="ml-4 text-xs bg-slate-50 border-none rounded-lg focus:ring-0 outline-none p-1 px-2 cursor-pointer">
                 <option>7 ngày qua</option>
                 <option>30 ngày qua</option>
               </select>
@@ -128,9 +135,9 @@ export default function DashboardPage() {
           </div>
         </div> */}
 
-        {/* Biểu đồ vòng — Phân bổ tồn kho */}
-        {/* <div className="chart-container">
-          <h3 className="font-bold text-lg mb-6 text-slate-900 dark:text-white">Phân bổ Tồn kho</h3>
+      {/* Biểu đồ vòng — Phân bổ tồn kho */}
+      {/* <div className="chart-container">
+          <h3 className="font-bold text-lg mb-6 text-slate-900">Phân bổ Tồn kho</h3>
           <div className="flex-1 flex flex-col items-center justify-center">
             
             <div className="pie-chart-wrapper">
@@ -154,21 +161,21 @@ export default function DashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
               {/* Inner Text Center */}
-            {/*   <div className="pie-chart-center">
+      {/*   <div className="pie-chart-center">
                 <span className="text-xs text-slate-400">Tổng</span>
-                <span className="text-xl font-bold text-slate-900 dark:text-white">100%</span>
+                <span className="text-xl font-bold text-slate-900">100%</span>
               </div>
             </div> */}
 
-            {/* Legend */}
-            {/* <div className="pie-legend">
+      {/* Legend */}
+      {/* <div className="pie-legend">
               {allocation.map((item) => (
                 <div key={item.name} className="pie-legend-item">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{item.name}</span>
+                    <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">{item.name}</span>
                   </div>
-                  <span className="text-sm font-semibold text-slate-900 dark:text-white">{item.value}%</span>
+                  <span className="text-sm font-semibold text-slate-900">{item.value}%</span>
                 </div>
               ))}
             </div>
@@ -179,7 +186,9 @@ export default function DashboardPage() {
       {/* 3. TOP PRODUCTS TABLE */}
       <section className="top-products-section">
         <div className="top-products-header">
-          <h3 className="font-bold text-lg text-slate-900 dark:text-white">Top sản phẩm bán chạy</h3>
+          <h3 className="font-bold text-lg text-slate-900">
+            Top sản phẩm bán chạy
+          </h3>
           <button className="text-primary text-sm font-medium hover:underline transition-colors">
             Xem tất cả
           </button>
@@ -188,7 +197,7 @@ export default function DashboardPage() {
           <div className="table-wrapper">
             <table className="table">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-800/80">
+                <tr className="bg-slate-50">
                   <th className="table-th px-6">Sản phẩm</th>
                   <th className="table-th px-6">Mã SKU</th>
                   <th className="table-th px-6">Đã bán</th>
@@ -197,7 +206,7 @@ export default function DashboardPage() {
                   <th className="table-th px-6">Trạng thái</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+              <tbody className="divide-y divide-slate-100">
                 {topProducts.map((product) => (
                   <tr key={product.id} className="table-row-hover">
                     <td className="px-6 py-4">
@@ -210,18 +219,36 @@ export default function DashboardPage() {
                           />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">{product.name}</p>
-                          <p className="text-xs text-slate-500">Loại: {product.type}</p>
+                          <p className="text-sm font-semibold text-slate-900 mb-0.5">
+                            {product.name}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            Loại: {product.type}
+                          </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm font-mono text-slate-600 dark:text-slate-400">{product.sku}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{formatNumber(product.sold)}</td>
-                    <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{formatNumber(product.stock)}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-primary">{formatCurrency(product.revenue)}</td>
+                    <td className="px-6 py-4 text-sm font-mono text-slate-600">
+                      {product.sku}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                      {formatNumber(product.sold)}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">
+                      {formatNumber(product.stock)}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-semibold text-primary">
+                      {formatCurrency(product.revenue)}
+                    </td>
                     <td className="px-6 py-4">
-                      <Badge variant={product.status === 'selling' ? 'green' : 'orange'}>
-                        {product.status === 'selling' ? 'Đang bán tốt' : 'Sắp hết'}
+                      <Badge
+                        variant={
+                          product.status === "selling" ? "green" : "orange"
+                        }
+                      >
+                        {product.status === "selling"
+                          ? "Đang bán tốt"
+                          : "Sắp hết"}
                       </Badge>
                     </td>
                   </tr>
