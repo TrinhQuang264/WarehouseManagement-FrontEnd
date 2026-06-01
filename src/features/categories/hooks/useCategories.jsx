@@ -1,14 +1,9 @@
-<<<<<<< HEAD
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import categoryService from "../api/categoriesService";
 import toast from "../../../utils/toast";
 
 const PAGE_SIZE = 7;
-=======
-import { useState, useEffect } from 'react';
-import categoryService from '../api/categoriesService';
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
 export function useCategories() {
   // URL query params: đồng bộ search/page với URL

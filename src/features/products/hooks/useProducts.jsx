@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import productService from "../api/productsService";
@@ -9,11 +8,6 @@ const PAGE_SIZE = 10;
 const extractApiErrorMessage = (error, fallback) => {
   const data = error?.response?.data;
   if (!data) return fallback;
-=======
-import { useState, useEffect, useMemo } from 'react';
-import productService from '../api/productsService';
-import categoryService from '../../categories/api/categoriesService';
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
   const directMessage = data.message || data.error || data.title || data.detail;
   if (directMessage) return directMessage;
@@ -70,7 +64,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [totalCount, setTotalCount] = useState(0);
 
-<<<<<<< HEAD
   // Filter state
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialCategoryId);
   const [minPrice, setMinPrice] = useState("");
@@ -94,72 +87,8 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     if (pageSize !== defaultPageSize) params.set("pageSize", pageSize);
     setSearchParams(params, { replace: true });
   }, [currentPage, debouncedSearch, selectedCategoryId, pageSize, defaultPageSize, setSearchParams]);
-=======
-  // Lấy danh mục
-  const fetchCategories = async () => {
-    try {
-      const data = await categoryService.getAll();
-      setCategories(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('[useProducts] Lỗi lấy danh mục:', error);
-    }
-  };
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Debounce search
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [search]);
-
-  // Reset về trang 1 khi tìm kiếm thay đổi
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch]);
-
-  // Fetch sản phẩm
-  const fetchProducts = async (isInitial = false) => {
-    setLoading(true);
-    if (isInitial) setIsFirstFetch(true);
-    
-    try {
-      const response = await productService.filter({
-        filter: debouncedSearch,
-        pageIndex: currentPage,
-        pageSize: pageSize
-      });
-      
-      let items = [];
-      let total = 0;
-
-      if (response) {
-        if (Array.isArray(response)) {
-          items = response;
-          total = response.length;
-        } else {
-          items = response.items || response.data || response.results || response.products || [];
-          total = response.totalCount || response.totalItems || response.count || response.total || items.length;
-        }
-      }
-      
-      setProducts(Array.isArray(items) ? items : []);
-      setTotalCount(total);
-    } catch (error) {
-      console.error('[useProducts] Lỗi API:', error);
-    } finally {
-      setLoading(false);
-      setIsFirstFetch(false);
-    }
-  };
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
-
-  useEffect(() => {
-<<<<<<< HEAD
     if (isFirstMount.current) {
       isFirstMount.current = false;
       return;
@@ -196,8 +125,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
 
     setLoading(true);
     try {
-      // Use getAll to handle flexible client-side filtering as requested by the user's structure
-      // or alternate between getAll and getTrash based on isTrashOpen
       let response;
       if (isTrashOpen) {
         response = await productService.getTrash();
@@ -210,29 +137,21 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
       let allItems = Array.isArray(response) ? response : (response.data || []);
       allItems = allItems.map(normalizeProduct);
 
-      // Deduplicate: API trả về flat list tất cả variants.
-      // Chỉ giữ lại variant mặc định (isDefault: true) để hiển thị bảng danh sách.
-      // Nếu không có variant nào isDefault, fallback lấy cái đầu tiên của mỗi mã.
+      // Deduplicate
       const seen = new Map();
       for (const item of allItems) {
         const key = item.code || item.id;
         if (!seen.has(key)) {
           seen.set(key, item);
         } else if (item.isDefault === true) {
-          // Ưu tiên variant isDefault
           seen.set(key, item);
         }
       }
       allItems = Array.from(seen.values());
 
-      // Rule: isActive determines visibility in main list vs trash if not already split by API
-      // However, since we have a dedicated /trash endpoint, we'll trust the API response but 
-      // can still double-check isActive if needed.
-      // Client-side Filtering
       let filteredItems = [...allItems];
 
-
-      // 1. Search (Name/Code/Description)
+      // 1. Search
       if (debouncedSearch) {
         const lowerSearch = debouncedSearch.toLowerCase();
         filteredItems = filteredItems.filter(item => 
@@ -249,7 +168,7 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
         );
       }
 
-      // 3. Price Filter (Selling Price)
+      // 3. Price Filter
       if (minPrice !== "") {
         filteredItems = filteredItems.filter(item => item.price >= Number(minPrice));
       }
@@ -285,10 +204,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     fetchProducts();
     return () => abortControllerRef.current?.abort();
   }, [fetchProducts]);
-=======
-    fetchProducts(isFirstFetch);
-  }, [currentPage, pageSize, debouncedSearch]);
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
   // --- Handlers ---
 
@@ -330,9 +245,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
   const handleUpdateProduct = async (id, data) => {
     setIsSubmitting(true);
     try {
-      // Assuming a generic update or specifically updateStatus if that's what's available
-      // If backend doesn't have a generic PUT /Products/{id}, we might need to adjust.
-      // For now, mapping to updateStatus or create if it handles both (generic pattern)
       const updated = await productService.update(id, data);
       toast.success("Cập nhật thông tin sản phẩm thành công!");
       setSelectedProduct(null);
@@ -373,8 +285,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     setSelectedProduct(null);
   };
 
-
-
   const resetFilters = () => {
     setSearch("");
     setMinPrice("");
@@ -383,7 +293,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     setCurrentPage(1);
   };
 
-<<<<<<< HEAD
   const searchProducts = useCallback((value) => {
     setSearch(value);
   }, []);
@@ -395,18 +304,13 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
 
   return {
     products,
-    filteredProducts: products, // Alias for compatibility
-=======
-  return {
-    products: filteredProducts,
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+    filteredProducts: products,
     categories,
     loading,
     isSubmitting,
 
     search,
     setSearch,
-<<<<<<< HEAD
     debouncedSearch,
     currentPage,
     setCurrentPage,
@@ -416,13 +320,10 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     // Filters
     selectedCategoryId,
     setSelectedCategoryId,
-=======
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
     minPrice,
     setMinPrice,
     maxPrice,
     setMaxPrice,
-<<<<<<< HEAD
     resetFilters,
 
     // Modals & Selection
@@ -440,13 +341,5 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     openDeleteModal,
     searchProducts,
     refreshList: fetchProducts,
-=======
-    currentPage,
-    setCurrentPage,
-    pageSize,
-    setPageSize,
-    totalCount,
-    resetFilters
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   };
 }

@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-import { useState, useEffect, useMemo } from 'react';
-import userService from '../api/usersService';
-=======
 import { useState, useEffect, useCallback, useMemo } from "react";
 import userService from "../api/usersService";
 import toast from "../../../utils/toast";
->>>>>>> develop
 
 const ROLE_LABEL_MAP = {
   Admin: "Quản lý kho",
@@ -198,7 +193,6 @@ export function useUsers() {
           toast.error("Không thể tải danh sách người dùng");
           return;
         }
-        // Fallback local filter to keep search usable when filter API shape differs.
         setUsers((prev) =>
           prev.filter((u) =>
             [u.fullName, u.username, u.email, u.phoneNumber, u.roleLabel]

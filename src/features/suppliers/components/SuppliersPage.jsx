@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-import React from 'react';
-import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import Button from '../../../components/ui/Button';
-import ConfirmModal from '../../../components/ui/ConfirmModal';
-import SupplierTable from './SupplierTable';
-import SupplierModal from './SupplierModal';
-import { useSuppliers } from '../hooks/useSuppliers.jsx';
-import '../styles/Suppliers.css';
-
-export default function SuppliersPage() {
-  const {
-    suppliers,
-=======
 import React, { useEffect, useMemo } from "react";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -76,68 +61,42 @@ export default function SuppliersPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
+
   const {
     suppliers,
-    filteredSuppliers,
->>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
-    isFormOpen,
-    setIsFormOpen,
-    editingSupplier,
-    isDeleteOpen,
-    setIsDeleteOpen,
-    deletingSupplier,
-    handleOpenAdd,
-    handleOpenEdit,
-    handleSave,
-    handleOpenDelete,
-    confirmDelete,
-<<<<<<< HEAD
-    nextCode
-  } = useSuppliers();
-
-  return (
-    <div className="suppliers-page">
-      {/* HEADER */}
-      <div className="page-header">
-        <div>
-          <nav className="flex text-sm text-slate-500 mb-2">
-            <Link to="/" className="hover:text-primary transition-colors">Trang chủ</Link>
-            <span className="mx-2 text-slate-300">/</span>
-            <span className="text-slate-900 dark:text-white font-medium">Nhà cung cấp</span>
-          </nav>
-          <h1 className="page-title">Danh sách Nhà cung cấp</h1>
-          <p className="page-subtitle">Quản lý và cập nhật thông tin các đối tác cung ứng của bạn</p>
-        </div>
-        <Button onClick={handleOpenAdd} icon={<Plus size={18} />} className="shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]">
-          Thêm nhà cung cấp
-        </Button>
-      </div>
-
-      {/* TABLE CONTENT */}
-      <SupplierTable 
-        suppliers={suppliers} 
-        onEdit={handleOpenEdit} 
-        onDelete={handleOpenDelete} 
-      />
-
-      {/* PAGINATION */}
-      <div className="pagination-container">
-        <span className="pagination-info">
-          Hiển thị <span className="font-bold text-slate-900 dark:text-white">1-{suppliers.length}</span> của <span className="font-bold text-slate-900 dark:text-white">48</span> kết quả
-=======
-    searchSuppliers,
+    isFetching,
+    isSubmitting,
+    setSearch,
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    totalCount,
+    totalPages,
+    isModalOpen,
+    setIsModalOpen,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    selectedSupplier,
+    setSelectedSupplier,
+    handleAddSupplier,
+    handleUpdateSupplier,
+    handleDeleteSupplier,
+    openEditModal,
+    openDeleteModal,
     nextCode,
   } = useSuppliers();
 
   const { setActionButton, setOnSearch, setTitle, resetHeader } = useHeader();
   const isDetailMode =
     location.pathname !== SUPPLIER_URLS.list && Boolean(params.id);
+
   const currentSupplier = useMemo(
     () =>
       suppliers.find((supplier) => String(supplier.id) === String(params.id)) ||
       null,
     [suppliers, params.id],
   );
+
   const supplierHistory = useMemo(
     () => (currentSupplier ? buildSupplierHistory(currentSupplier.id) : []),
     [currentSupplier],
@@ -156,12 +115,12 @@ export default function SuppliersPage() {
       setActionButton({
         label: "Thêm nhà cung cấp",
         icon: <Plus size={18} />,
-        onClick: handleOpenAdd,
+        onClick: () => openEditModal(null),
         searchPlaceholder: "Tìm kiếm nhà cung cấp...",
         className:
           "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
       });
-      setOnSearch(searchSuppliers);
+      setOnSearch(setSearch);
       setTitle("");
     }
     return () => resetHeader();
@@ -172,8 +131,8 @@ export default function SuppliersPage() {
     setOnSearch,
     setTitle,
     resetHeader,
-    handleOpenAdd,
-    searchSuppliers,
+    setSearch,
+    openEditModal,
   ]);
 
   if (isDetailMode) {
@@ -213,14 +172,15 @@ export default function SuppliersPage() {
         <SupplierDetailPage
           supplier={currentSupplier}
           history={supplierHistory}
-          onEdit={handleOpenEdit}
+          onEdit={openEditModal}
         />
         <SupplierModal
-          isOpen={isFormOpen}
-          onClose={() => setIsFormOpen(false)}
-          onSave={handleSave}
-          editingSupplier={editingSupplier}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={selectedSupplier?.id ? (data) => handleUpdateSupplier(selectedSupplier.id, data) : handleAddSupplier}
+          editingSupplier={selectedSupplier}
           nextCode={nextCode}
+          isSubmitting={isSubmitting}
         />
       </>
     );
@@ -228,83 +188,72 @@ export default function SuppliersPage() {
 
   return (
     <div className="suppliers-page">
-      <div className="page-header">
-        <div>
-          <nav className="flex text-sm text-slate-500 mb-2">
-            <Link to="/" className="hover:text-primary transition-colors">
-              Trang chủ
-            </Link>
-            <span className="mx-2 text-slate-300">/</span>
-            <span className="text-slate-900 dark:text-white font-medium">
-              Nhà cung cấp
-            </span>
-          </nav>
-        </div>
-      </div>
       <SupplierTable
-        suppliers={filteredSuppliers}
-        onEdit={handleOpenEdit}
-        onDelete={handleOpenDelete}
+        suppliers={suppliers}
+        loading={isFetching}
+        onEdit={openEditModal}
+        onDelete={openDeleteModal}
         onViewDetail={(supplier) => navigate(SUPPLIER_URLS.detail(supplier.id))}
       />
+
       <div className="pagination-container">
         <span className="pagination-info">
-          Hiển thị
+          Hiển thị{" "}
           <span className="font-bold text-slate-900 dark:text-white">
-            1-{filteredSuppliers.length}
+            {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, totalCount)}
           </span>{" "}
           của{" "}
           <span className="font-bold text-slate-900 dark:text-white">
-            {suppliers.length}
+            {totalCount}
           </span>{" "}
           kết quả
->>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
         </span>
         <div className="pagination-controls">
-          <button className="pagination-btn">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn disabled:opacity-50"
+          >
             <ChevronLeft size={18} />
           </button>
           <div className="pagination-page-list">
-<<<<<<< HEAD
-            <button className="pagination-page-btn pagination-page-btn-active">1</button>
-=======
-            <button className="pagination-page-btn pagination-page-btn-active">
-              1
-            </button>
->>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
-            <button className="pagination-page-btn">2</button>
-            <button className="pagination-page-btn">3</button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`pagination-page-btn ${
+                  currentPage === page ? "pagination-page-btn-active" : ""
+                }`}
+              >
+                {page}
+              </button>
+            ))}
           </div>
-          <button className="pagination-btn">
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="pagination-btn disabled:opacity-50"
+          >
             <ChevronRight size={18} />
           </button>
         </div>
       </div>
-<<<<<<< HEAD
 
-      {/* MODAL FORM */}
-      <SupplierModal 
-=======
       <SupplierModal
->>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSave={handleSave}
-        editingSupplier={editingSupplier}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={selectedSupplier?.id ? (data) => handleUpdateSupplier(selectedSupplier.id, data) : handleAddSupplier}
+        editingSupplier={selectedSupplier}
         nextCode={nextCode}
+        isSubmitting={isSubmitting}
       />
-<<<<<<< HEAD
 
-      {/* MODAL XÁC NHẬN XÓA */}
-      <ConfirmModal 
-=======
       <ConfirmModal
->>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
-        isOpen={isDeleteOpen}
-        onClose={() => setIsDeleteOpen(false)}
-        onConfirm={confirmDelete}
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteSupplier}
         title="Xác nhận xóa"
-        message={`Bạn có chắc chắn muốn xóa đối tác "${deletingSupplier?.supplierName}"? Toàn bộ dữ liệu liên quan sẽ không thể phục hồi.`}
+        message={`Bạn có chắc chắn muốn xóa đối tác "${selectedSupplier?.supplierName}"? Toàn bộ dữ liệu liên quan sẽ không thể phục hồi.`}
         confirmLabel="Vâng, Xóa ngay"
       />
     </div>

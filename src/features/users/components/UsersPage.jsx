@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React from 'react';
 
 import {
   Plus,
@@ -18,6 +18,7 @@ import SearchBar from '../../../components/ui/SearchBar';
 import Badge from '../../../components/ui/Badge';
 import Avatar from '../../../components/ui/Avatar';
 import Loading from '../../../components/ui/Loading';
+import PaginationBar from '../../../components/ui/PaginationBar.jsx';
 import { useUsers } from '../hooks/useUsers.jsx';
 import '../styles/Users.css';
 
@@ -36,10 +37,10 @@ export default function UsersPage() {
 
   return (
     <div className="users-page">
-      // HEADER
+      {/* HEADER */}
       <div className="page-header">
         <div>
-          // Breadcrumb
+          {/* Breadcrumb */}
           <nav className="flex text-sm text-slate-500 mb-2">
             <a href="/" className="hover:text-primary transition-colors">Trang chủ</a>
             <span className="mx-2 text-slate-300">/</span>
@@ -53,7 +54,7 @@ export default function UsersPage() {
         </Button>
       </div>
 
-      // SEARCH & FILTER BAR
+      {/* SEARCH & FILTER BAR */}
       <div className="search-filter-bar">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
           <SearchBar
@@ -73,7 +74,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      // USER TABLE
+      {/* USER TABLE */}
       <div className="users-table-wrapper">
         <div className="table-wrapper">
           <table className="table">
@@ -95,53 +96,13 @@ export default function UsersPage() {
           </table>
         </div>
 
-<<<<<<< HEAD
-      <PaginationBar
-        currentPage={currentPage}
-        pageSize={10} // Giả định pageSize là 10 dựa trên dữ liệu mẫu
-        totalCount={totalUsers}
-        onPageChange={setCurrentPage}
-        resourceName="người dùng"
-      />
-=======
-        // PAGINATION
-        <div className="pagination-container">
-          <span className="pagination-info">
-            Hiển thị <span className="font-medium text-slate-900 dark:text-white">1 - {users.length}</span> trong tổng số <span className="font-medium text-slate-900 dark:text-white">{totalUsers}</span> người dùng
-          </span>
-          <div className="pagination-controls">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
-              className="pagination-btn"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            {[1, 2, 3].map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`pagination-page-btn ${currentPage === page ? 'pagination-page-btn-active' : ''}`}
-              >
-                {page}
-              </button>
-            ))}
-            <span className="text-slate-400 mx-1">...</span>
-            <button
-              onClick={() => setCurrentPage(6)}
-              className="pagination-page-btn"
-            >
-              6
-            </button>
-            <button
-              onClick={() => setCurrentPage((p) => p + 1)}
-              className="pagination-btn"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+        <PaginationBar
+          currentPage={currentPage}
+          pageSize={10}
+          totalCount={totalUsers}
+          onPageChange={setCurrentPage}
+          resourceName="người dùng"
+        />
       </div>
 
       <div className="users-info-cards">
@@ -194,7 +155,7 @@ function UserRow({ user }) {
       <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">
         {user.username}
       </td>
-i
+
       <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
         {user.phoneNumber || '—'}
       </td>

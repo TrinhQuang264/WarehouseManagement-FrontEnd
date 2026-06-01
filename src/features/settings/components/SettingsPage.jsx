@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
-import { useBlocker } from 'react-router-dom';
-import { useTheme } from '../../../contexts/ThemeContext';
-import '../styles/Settings.css';
-import Breadcrumbs from '../../../components/ui/Breadcrumbs';
-=======
 import { Link, useBlocker } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+import '../styles/Settings.css';
+
+// Local stub for useTheme since ThemeContext has been removed
+const useTheme = () => {
+  const [theme, setTheme] = useState('light');
+  return { theme, setTheme };
+};
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
@@ -32,7 +31,6 @@ export default function SettingsPage() {
   );
 
   useEffect(() => {
-<<<<<<< HEAD
     if (blocker.state !== 'blocked') return;
     setShake(true);
     const timer = setTimeout(() => {
@@ -40,13 +38,6 @@ export default function SettingsPage() {
       blocker.reset();
     }, 500);
     return () => clearTimeout(timer);
-=======
-    if (blocker.state === 'blocked') {
-      setShake(true);
-      setTimeout(() => setShake(false), 1000);
-      blocker.reset();
-    }
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   }, [blocker]);
 
   const handleSave = () => {
