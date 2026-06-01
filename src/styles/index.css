@@ -1,61 +1,44 @@
 @import "tailwindcss";
 @import "./global.css";
 
-/* Thiết lập Dark Mode dạng class cho Tailwind v4 */
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* Thiết lập Dark Mode dạng class cho Tailwind v4 */
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* ============================================
-   CUSTOM THEME — Tailwind CSS v4 @theme block
-   Định nghĩa các biến thiết kế dùng chung
-   ============================================ */
 @theme {
-  /* Font families */
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    /* Font families */
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  /* Brand colors */
-  --color-primary: #137fec;
-  --color-primary-light: #e8f2fd;
-  --color-primary-dark: #0f6ad0;
+    /* Brand colors */
+    --color-primary: #137fec;
+    --color-primary-light: #e8f2fd;
 
-  /* Background */
-  --color-bg-light: #f6f7f8;
-  --color-bg-dark: #101922;
+    /* Background */
+    --color-bg-light: #f6f7f8;
 
-  /* Accent colors */
-  --color-accent-green: #10b981;
-  --color-accent-red: #ef4444;
-  --color-accent-orange: #f59e0b;
+    /* Accent colors */
+    --color-accent-green: #10b981;
+    --color-accent-red: #ef4444;
+    --color-accent-orange: #f59e0b;
 
-  /* Border radius */
-  --radius-DEFAULT: 0.25rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
-  --radius-full: 9999px;
+    /* Border radius */
+    --radius-DEFAULT: 0.25rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-full: 9999px;
 }
 
 /* ============================================
    BASE STYLES
    ============================================ */
 html {
-  font-size: 12.8px; /* Giảm root size thêm ~10% nữa để thu nhỏ giao diện toàn bộ UI (khoảng 80% so với 16px) */
+    font-size: 12.8px; /* Giảm root size thêm ~10% nữa để thu nhỏ giao diện toàn bộ UI (khoảng 80% so với 16px) */
 }
 
 body {
-  background-color: var(--color-bg-light);
-  color: #0f172a; /* slate-900 */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-family: var(--font-sans);
-}
-
-.dark body {
-  background-color: var(--color-bg-dark);
-  color: #e2e8f0; /* slate-200 */
+    background-color: var(--color-bg-light);
+    color: #0f172a; /* slate-900 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-sans);
 }
 
 /* ============================================
@@ -63,81 +46,87 @@ body {
    Thanh cuộn mỏng, đẹp cho sidebar & content
    ============================================ */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+    background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1; /* slate-300 */
-  border-radius: 9999px;
+    background-color: #cbd5e1; /* slate-300 */
+    border-radius: 9999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8; /* slate-400 */
+    background-color: #94a3b8; /* slate-400 */
 }
 
 /* ============================================
    ANIMATION HELPERS
    ============================================ */
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .animate-spin {
-  animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .animate-fadeInUp {
-  animation: fadeInUp 0.5s ease-out both;
+    animation: fadeInUp 0.5s ease-out both;
 }
 
-<<<<<<< HEAD
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.3s ease-out both;
+    animation: fadeIn 0.3s ease-out both;
 }
 
 @keyframes zoomIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .animate-zoomIn {
-  animation: zoomIn 0.3s ease-out both;
+    animation: zoomIn 0.3s ease-out both;
 }
 
 @keyframes slideInRight {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
 }
 
 .animate-slideInRight {
-  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-=======
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  50% { transform: translateX(4px); }
-  75% { transform: translateX(-4px); }
->>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

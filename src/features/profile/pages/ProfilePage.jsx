@@ -34,10 +34,10 @@ export default function ProfilePage() {
         <div>
           <nav className="flex text-sm text-slate-500 mb-2">
             <Link to="/" className="hover:text-primary transition-colors">
-              Trang chủ
+              Tổng quan
             </Link>
             <span className="mx-2 text-slate-300">/</span>
-            <span className="text-slate-900 dark:text-white font-medium">
+            <span className="text-slate-900 font-medium">
               Thông tin cá nhân
             </span>
           </nav>
@@ -70,3 +70,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

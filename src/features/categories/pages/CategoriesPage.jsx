@@ -28,12 +28,8 @@ export default function CategoriesPage() {
     handleAddCategory,
     handleUpdateCategory,
     handleDeleteCategory,
-    handleBulkSoftDelete,
     openEditModal,
     openDeleteModal,
-    selectedIds,
-    toggleSelect,
-    toggleSelectAll,
     isTrashOpen,
     setIsTrashOpen,
     allActiveCategories,
@@ -110,10 +106,6 @@ export default function CategoriesPage() {
         onDeleteCategory={handleDeleteCategory}
         selectedCategory={selectedCategory}
         modalLoading={isSubmitting}
-        selectedIds={selectedIds}
-        toggleSelect={toggleSelect}
-        toggleSelectAll={toggleSelectAll}
-        onBulkDelete={handleBulkSoftDelete}
       />
 
       <TrashBinDrawer 

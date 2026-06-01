@@ -68,14 +68,6 @@
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-.dark .imports-stat-card,
-.dark .imports-card,
-.dark .imports-summary-card,
-.dark .imports-tip-box {
-  background: #0f172a;
-  border-color: #1e293b;
-}
-
 .imports-stat-card {
   padding: 1.25rem;
 }
@@ -94,10 +86,6 @@
   line-height: 2rem;
   font-weight: 800;
   color: #0f172a;
-}
-
-.dark .imports-stat-value {
-  color: #f8fafc;
 }
 
 .imports-stat-icon {
@@ -128,11 +116,6 @@
   border-radius: 1rem;
   background-color: #ffffff;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-
-.dark .imports-filters-bar {
-  background-color: #0f172a;
-  border-color: #1e293b;
 }
 
 @media (min-width: 1200px) {
@@ -235,13 +218,6 @@
   outline: none;
 }
 
-.dark .imports-select,
-.dark .imports-input {
-  background-color: #0f172a;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
 .imports-select:focus,
 .imports-input:focus {
   border-color: var(--color-primary);
@@ -299,11 +275,6 @@
   overflow: hidden;
 }
 
-.dark .imports-search-results {
-  background: #0f172a;
-  border-color: #1e293b;
-}
-
 .imports-search-result {
   width: 100%;
   display: flex;
@@ -318,16 +289,8 @@
   background: #f8fafc;
 }
 
-.dark .imports-search-result:hover {
-  background: #111827;
-}
-
 .imports-search-result + .imports-search-result {
   border-top: 1px solid #f1f5f9;
-}
-
-.dark .imports-search-result + .imports-search-result {
-  border-color: #1e293b;
 }
 
 .imports-search-result-thumb {
@@ -350,10 +313,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.dark .imports-search-result-content p {
-  color: #f8fafc;
 }
 
 .imports-search-result-content span {
@@ -416,10 +375,6 @@
   margin-bottom: 1.25rem;
 }
 
-.dark .imports-card-header {
-  border-color: #1e293b;
-}
-
 .imports-card-heading {
   display: flex;
   align-items: center;
@@ -432,12 +387,6 @@
   font-weight: 700;
   color: #0f172a;
 }
-
-.dark .imports-card-heading h2,
-.dark .imports-summary-title {
-  color: #f8fafc;
-}
-
 .imports-meta-grid,
 .imports-entry-grid {
   display: grid;
@@ -478,10 +427,6 @@
   font-size: 0.875rem;
   font-weight: 600;
   color: #475569;
-}
-
-.dark .imports-field > span {
-  color: #94a3b8;
 }
 
 .imports-field-full {

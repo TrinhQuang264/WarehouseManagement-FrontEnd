@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AppRouter from './routes';
-import { ThemeProvider } from './contexts/ThemeContext';
 
 const router = createBrowserRouter([
   {
@@ -11,8 +10,6 @@ const router = createBrowserRouter([
 
 export default function App() {
   return (
-    <ThemeProvider>
       <RouterProvider router={router} />
-    </ThemeProvider>
   );
 }

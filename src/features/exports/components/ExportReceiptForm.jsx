@@ -270,7 +270,7 @@ export default function ExportReceiptForm({
             <div className="table-wrapper">
               <table className="table">
                 <thead>
-                  <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
+                  <tr className="bg-slate-50/80 border-b border-slate-200">
                     <th className="table-th px-6">STT</th>
                     <th className="table-th px-6">Sản phẩm</th>
                     <th className="table-th px-6">Mã SKU</th>
@@ -280,7 +280,7 @@ export default function ExportReceiptForm({
                     <th className="table-th px-6 text-center">Thao tác</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                <tbody className="divide-y divide-slate-100">
                   {receipt.items.map((item, index) => (
                     <tr
                       key={item.id || `${item.productId}-${index}`}
@@ -301,7 +301,7 @@ export default function ExportReceiptForm({
                             ) : null}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                            <p className="text-sm font-semibold text-slate-900">
                               {item.productName}
                             </p>
                             <p className="text-xs text-slate-500">
@@ -333,7 +333,7 @@ export default function ExportReceiptForm({
                       <td className="px-6 py-4 text-right text-sm">
                         {formatCurrency(item.unitPrice)}
                       </td>
-                      <td className="px-6 py-4 text-right text-sm font-bold text-slate-900 dark:text-white">
+                      <td className="px-6 py-4 text-right text-sm font-bold text-slate-900">
                         {formatCurrency(item.lineTotal)}
                       </td>
                       <td className="px-6 py-4 text-center">

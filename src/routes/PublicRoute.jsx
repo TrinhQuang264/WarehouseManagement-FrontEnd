@@ -3,9 +3,10 @@ import { useAuth } from '../features/auth/hooks/useAuth.jsx';
 import Loading from '../components/ui/Loading';
 
 export default function PublicRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isInitialized } = useAuth();
 
-  if (loading) {
+  // Chờ AuthProvider hydrate để tránh nháy điều hướng sai lúc reload.
+  if (!isInitialized) {
     return <Loading fullScreen text="Đang kiểm tra đăng nhập..." />;
   }
 

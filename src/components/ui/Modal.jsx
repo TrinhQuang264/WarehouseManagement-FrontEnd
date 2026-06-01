@@ -54,16 +54,16 @@ export default function Modal({
       
       {/* Modal Content */}
       <div 
-        className={`relative ${sizeClasses[size]} bg-white dark:bg-slate-900 ${isFullscreen ? 'rounded-none' : 'rounded-3xl'} ${isFullscreen ? 'shadow-none' : 'shadow-[0_20px_50px_rgba(0,0,0,0.15)]'} border ${isFullscreen ? 'border-0' : 'border-slate-100 dark:border-slate-800'} flex flex-col ${isFullscreen ? 'h-screen' : 'max-h-[90vh]'} overflow-hidden animate-zoomIn`}
+        className={`relative ${sizeClasses[size]} bg-white ${isFullscreen ? 'rounded-none' : 'rounded-3xl'} ${isFullscreen ? 'shadow-none' : 'shadow-[0_20px_50px_rgba(0,0,0,0.15)]'} border ${isFullscreen ? 'border-0' : 'border-slate-100 '} flex flex-col ${isFullscreen ? 'h-screen' : 'max-h-[90vh]'} overflow-hidden animate-zoomIn`}
       >
         {/* Header */}
-        <div className={`${isFullscreen ? 'px-6 sm:px-8 py-4' : 'px-8 py-6'} border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0`}>
-          <h3 className={`${isFullscreen ? 'text-2xl' : 'text-xl'} font-bold text-slate-900 dark:text-white leading-none`}>
+        <div className={`${isFullscreen ? 'px-6 sm:px-8 py-4' : 'px-8 py-6'} border-b border-slate-100  flex items-center justify-between shrink-0`}>
+          <h3 className={`${isFullscreen ? 'text-2xl' : 'text-xl'} font-bold text-slate-900  leading-none`}>
             {title}
           </h3>
           <button 
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
           >
             <X size={24} />
           </button>
@@ -76,7 +76,7 @@ export default function Modal({
 
         {/* Footer */}
         {footer && (
-          <div className={`${isFullscreen ? 'px-6 sm:px-8 py-4' : 'px-8 py-5'} border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3 shrink-0 bg-slate-50/50 dark:bg-slate-800/20`}>
+          <div className={`${isFullscreen ? 'px-6 sm:px-8 py-4' : 'px-8 py-5'} border-t border-slate-100  flex items-center justify-end gap-3 shrink-0 bg-slate-50/50 `}>
             {footer}
           </div>
         )}

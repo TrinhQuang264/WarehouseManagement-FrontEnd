@@ -16,6 +16,19 @@ const usersService = {
       throw error;
     }
   },
+  async getAll() {
+    return this.getAllUsers();
+  },
+
+  /**
+   * GET /Users/filter - Tìm kiếm user theo từ khóa
+   */
+  async search(params = {}) {
+    const response = await api.get('/Users/filter', {
+      params: { isDeleted: false, ...params },
+    });
+    return response.data;
+  },
 
   /**
    * GET /Users/{id} - Lấy thông tin user theo ID
@@ -39,6 +52,26 @@ const usersService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  async createUser(data) {
+    const response = await api.post('/Users', data);
+    return response.data;
+  },
+
+  async getAllRoles() {
+    const response = await api.get('/Roles/all');
+    return response.data;
+  },
+
+  async getUserRoles(id) {
+    const response = await api.get(`/Users/${id}/roles`);
+    return response.data;
+  },
+
+  async replaceUserRoles(id, roleNames) {
+    const response = await api.put(`/Users/${id}/roles`, { roleNames });
+    return response.data;
   },
 
   /**

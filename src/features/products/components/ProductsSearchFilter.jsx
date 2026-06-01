@@ -23,7 +23,7 @@ export default function ProductsSearchFilter({
               className="price-input"
             />
           </div>
-          <div className="w-2 h-[1px] bg-slate-300 dark:bg-slate-600"></div>
+          <div className="w-2 h-[1px] bg-slate-300"></div>
           <div className="price-input-wrapper">
             <span className="price-input-label">Max</span>
             <input

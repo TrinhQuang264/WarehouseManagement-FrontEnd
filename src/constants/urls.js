@@ -1,49 +1,50 @@
 export const PRODUCT_URLS = {
   list: '/products',
-  new: '/products/new',
-  edit: (id) => `/products/edit/${id}`,
+  new: '/products/create',
+  edit: (id) => `/products/update/${id}`,
   detail: (id) => `/products/${id}`,
 };
 
 export const IMPORT_URLS = {
   list: '/import',
-  new: '/import/new',
-  edit: (id) => `/import/edit/${id}`,
+  new: '/import/create',
+  edit: (id) => `/import/update/${id}`,
   detail: (id) => `/import/${id}`,
 };
 
 export const EXPORT_URLS = {
   list: '/export',
-  new: '/export/new',
-  edit: (id) => `/export/edit/${id}`,
+  new: '/export/create',
+  edit: (id) => `/export/update/${id}`,
   detail: (id) => `/export/${id}`,
 };
 
 export const CUSTOMER_URLS = {
   list: '/customers',
-  new: '/customers/new',
-  edit: (id) => `/customers/edit/${id}`,
+  new: '/customers/create',
+  edit: (id) => `/customers/update/${id}`,
   detail: (id) => `/customers/${id}`,
 };
 
 export const SUPPLIER_URLS = {
   list: '/suppliers',
-  new: '/suppliers/new',
-  edit: (id) => `/suppliers/edit/${id}`,
+  new: '/suppliers/create',
+  create: '/suppliers/create',
+  edit: (id) => `/suppliers/update/${id}`,
   detail: (id) => `/suppliers/${id}`,
 };
 
 export const CATEGORY_URLS = {
   list: '/categories',
-  new: '/categories/new',
-  edit: (id) => `/categories/edit/${id}`,
+  new: '/categories/create',
+  edit: (id) => `/categories/update/${id}`,
   detail: (id) => `/categories/${id}`,
 };
 
 export const USER_URLS = {
   list: '/users',
-  new: '/users/new',
-  edit: (id) => `/users/edit/${id}`,
+  new: '/users/create',
+  edit: (id) => `/users/update/${id}`,
   detail: (id) => `/users/${id}`,
 };
 
@@ -51,7 +52,6 @@ export const COMMON_URLS = {
   dashboard: '/',
   login: '/login',
   profile: '/profile',
-  settings: '/settings',
   inventory: '/inventory',
   import: '/import',
   export: '/export',

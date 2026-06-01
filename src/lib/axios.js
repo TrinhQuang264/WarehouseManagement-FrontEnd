@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "http://localhost:5066/api";
+const baseURL = "https://localhost:7161/api";
 
 const api = axios.create({
     baseURL,
@@ -20,9 +20,17 @@ api.interceptors.response.use(
         const originalConfig = err.config;
         const status = err?.response?.status;
         const data = err?.response?.data;
+        const requestUrl = String(originalConfig?.url || "");
+        const isChangePasswordRequest = requestUrl.includes(
+            "/Authentication/change-password",
+        );
 
         // Nếu lỗi 401 và chưa từng thử refresh token (tránh lặp vô hạn)
-        if (status === 401 && !originalConfig._retry) {
+        if (
+            status === 401 &&
+            !originalConfig?._retry &&
+            !isChangePasswordRequest
+        ) {
             originalConfig._retry = true;
 
             try {
@@ -69,7 +77,7 @@ api.interceptors.response.use(
 
         // Nếu lỗi không phải 401, hoặc đã retry mà vẫn lỗi thì log ra và trả về lỗi
         console.log("API ERROR:", status, data || err.message);
-        if (status === 401) {
+        if (status === 401 && !isChangePasswordRequest) {
             // Đảm bảo xóa session nếu bị 401 lần thứ 2
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");

@@ -46,11 +46,6 @@
   flex-direction: column;
 }
 
-.dark .chart-container {
-  background-color: #0f172a;
-  border-color: #1e293b;
-}
-
 .chart-header {
   display: flex;
   align-items: center;
@@ -112,11 +107,6 @@
   overflow: hidden;
 }
 
-.dark .top-products-section {
-  background-color: #0f172a;
-  border-color: #1e293b;
-}
-
 .top-products-header {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
@@ -126,10 +116,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.dark .top-products-header {
-  border-color: #1e293b;
 }
 
 .product-thumb {
@@ -142,8 +128,4 @@
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-}
-
-.dark .product-thumb {
-  background-color: #1e293b;
 }

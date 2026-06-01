@@ -36,7 +36,7 @@ export default function ReceiptTable({
       <div className="table-wrapper">
         <table className="table">
           <thead>
-            <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
+            <tr className="bg-slate-50/80  border-b border-slate-200">
               <th className="table-th px-6">Mã phiếu</th>
               <th className="table-th px-6">{partyColumnLabel}</th>
               <th className="table-th px-6">{dateColumnLabel}</th>
@@ -46,7 +46,7 @@ export default function ReceiptTable({
               <th className="table-th px-6 text-center">Thao tác</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+          <tbody className="divide-y divide-slate-100">
             {receipts.length > 0 ? (
               receipts.map((receipt) => (
                 <tr key={receipt.id} className="group table-row-hover cursor-pointer" onDoubleClick={() => onViewDetail?.(receipt)}>
@@ -58,13 +58,13 @@ export default function ReceiptTable({
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1">
-                      <span className="text-sm font-semibold text-slate-900 dark:text-white">{receipt[partyNameKey]}</span>
+                      <span className="text-sm font-semibold text-slate-900 ">{receipt[partyNameKey]}</span>
                       <span className="text-xs text-slate-500 line-clamp-1">{receipt.itemSummary}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">{formatDateTime(receipt.date)}</td>
-                  <td className="px-6 py-4 text-center text-sm font-semibold text-slate-700 dark:text-slate-200">{receipt.totalQuantity}</td>
-                  <td className="px-6 py-4 text-right text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(receipt.totalAmount)}</td>
+                  <td className="px-6 py-4 text-sm text-slate-600 ">{formatDateTime(receipt.date)}</td>
+                  <td className="px-6 py-4 text-center text-sm font-semibold text-slate-700 ">{receipt.totalQuantity}</td>
+                  <td className="px-6 py-4 text-right text-sm font-bold text-slate-900">{formatCurrency(receipt.totalAmount)}</td>
                   <td className="px-6 py-4"><Badge variant={STATUS_VARIANTS[receipt.status] || 'gray'}>{receipt.statusLabel}</Badge></td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">

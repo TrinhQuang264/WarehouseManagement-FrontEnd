@@ -13,14 +13,13 @@ const routeLabels = {
   customers: "Khách hàng",
   reports: "Báo cáo",
   users: "Người dùng",
-  settings: "Cài đặt",
   profile: "Thông tin cá nhân",
 };
 
 /**
  * Breadcrumbs component
  * @param {Array} items - Custom breadcrumb items: [{ label: string, path?: string }]
- * Example: [{ label: 'Trang chủ' }, { label: 'Sản phẩm', path: '/products' }, { label: 'Thêm mới' }]
+ * Example: [{ label: 'Tổng quan' }, { label: 'Sản phẩm', path: '/products' }, { label: 'Thêm mới' }]
  */
 export default function Breadcrumbs({ items = null }) {
   const location = useLocation();
@@ -29,7 +28,7 @@ export default function Breadcrumbs({ items = null }) {
   // If custom items provided, use them
   if (items && Array.isArray(items) && items.length > 0) {
     return (
-      <nav className="flex items-center text-sm font-medium text-slate-500 dark:text-slate-400">
+      <nav className="flex items-center text-sm font-medium text-slate-500 ">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           const isFirst = index === 0;
@@ -39,23 +38,23 @@ export default function Breadcrumbs({ items = null }) {
               {!isFirst && (
                 <ChevronRight
                   size={14}
-                  className="mx-2 text-slate-300 dark:text-slate-600"
+                  className="mx-2 text-slate-300 "
                 />
               )}
 
               {isLast ? (
-                <span className="text-slate-900 dark:text-white font-semibold">
+                <span className="text-slate-900  font-semibold">
                   {item.label}
                 </span>
               ) : item.path ? (
                 <button
                   onClick={() => navigate(item.path)}
-                  className="hover:text-primary transition-colors cursor-pointer text-slate-600 dark:text-slate-300"
+                  className="hover:text-primary transition-colors cursor-pointer text-slate-600 "
                 >
                   {item.label}
                 </button>
               ) : (
-                <span className="text-slate-600 dark:text-slate-300 hover:text-primary transition-colors cursor-pointer">
+                <span className="text-slate-600 hover:text-primary transition-colors cursor-pointer">
                   {item.label}
                 </span>
               )}
@@ -70,7 +69,7 @@ export default function Breadcrumbs({ items = null }) {
   const pathnames = location.pathname.split("/").filter((x) => x);
 
   return (
-    <nav className="flex items-center text-sm font-medium text-slate-500 dark:text-slate-400">
+    <nav className="flex items-center text-sm font-medium text-slate-500 ">
       <Link
         to="/"
         className="flex items-center hover:text-primary transition-colors gap-1.5"
@@ -78,7 +77,7 @@ export default function Breadcrumbs({ items = null }) {
         <span
           className={
             pathnames.length === 0
-              ? "text-slate-900 dark:text-white font-semibold"
+              ? "text-slate-900  font-semibold"
               : ""
           }
         >
@@ -95,10 +94,10 @@ export default function Breadcrumbs({ items = null }) {
           <React.Fragment key={name}>
             <ChevronRight
               size={14}
-              className="mx-2 text-slate-300 dark:text-slate-600"
+              className="mx-2 text-slate-300 "
             />
             {isLast ? (
-              <span className="text-slate-900 dark:text-white font-semibold">
+              <span className="text-slate-900  font-semibold">
                 {label}
               </span>
             ) : (
@@ -115,3 +114,4 @@ export default function Breadcrumbs({ items = null }) {
     </nav>
   );
 }
+

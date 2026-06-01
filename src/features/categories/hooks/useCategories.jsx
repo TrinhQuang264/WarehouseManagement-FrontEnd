@@ -35,8 +35,7 @@ export function useCategories() {
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const [totalCount, setTotalCount] = useState(0);
 
-  // UI state: chọn hàng, modal add/edit/delete, drawer thùng rác
-  const [selectedIds, setSelectedIds] = useState([]);
+  // UI state: modal add/edit/delete, drawer thùng rác
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -207,44 +206,6 @@ export function useCategories() {
     setIsDeleteModalOpen(true);
   };
 
-  // Logic Chọn Checkbox
-  const toggleSelect = (id) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.length === categories.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(categories.map((c) => c.id));
-    }
-  };
-
-  // Hành động hàng loạt
-  const handleBulkSoftDelete = async () => {
-    if (selectedIds.length === 0) return;
-    setIsSubmitting(true);
-    try {
-      await categoryService.bulkSoftDelete(selectedIds);
-      toast.success(`Đã xóa ${selectedIds.length} danh mục vào thùng rác`);
-      setSelectedIds([]);
-      // Auto lùi trang nếu xóa hết item trên trang hiện tại
-      if (selectedIds.length === categories.length && currentPage > 1) {
-        setCurrentPage((p) => p - 1);
-      } else {
-        fetchCategories();
-      }
-    } catch (error) {
-      console.error("useCategories - handleBulkSoftDelete error:", error);
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
-      toast.error(serverMsg || "Không thể xóa các danh mục đã chọn.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return {
     // Dữ liệu & Loading
     categories,
@@ -278,12 +239,8 @@ export function useCategories() {
     handleAddCategory,
     handleUpdateCategory,
     handleDeleteCategory,
-    handleBulkSoftDelete,
     openEditModal,
     openDeleteModal,
-    toggleSelect,
-    toggleSelectAll,
-    selectedIds,
     refreshList: fetchCategories,
   };
 }

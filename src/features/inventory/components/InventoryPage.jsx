@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import {
   Package,
@@ -7,6 +8,9 @@ import {
   Search,
   ChevronDown,
   Filter,
+=======
+import {
+>>>>>>> develop
   FileDown,
   Plus,
   ChevronLeft,
@@ -16,6 +20,7 @@ import {
   BatteryCharging,
   Camera,
   Cpu,
+<<<<<<< HEAD
   Layers
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
@@ -25,12 +30,29 @@ import Loading from '../../components/ui/Loading';
 import productService from '../../services/productService';
 import categoryService from '../../services/categoryService';
 import dashboardService from '../../services/dashboardService';
+=======
+  Layers,
+  Filter,
+} from "lucide-react";
+import { useEffect } from "react";
+import Button from "../../../components/ui/Button";
+import SearchBar from "../../../components/ui/SearchBar";
+import Badge from "../../../components/ui/Badge";
+import Loading from "../../../components/ui/Loading";
+import DataTableCard from "../../../components/ui/DataTableCard.jsx";
+import PaginationBar from "../../../components/ui/PaginationBar.jsx";
+import { useInventory } from "../hooks/useInventory.jsx";
+import { useHeader } from "../../../contexts/HeaderContext";
+import { formatNumber } from "../../../utils/util";
+import "../styles/Inventory.css";
+>>>>>>> develop
 
 /**
  * Trang kiểm kê tồn kho
  * Cho phép theo dõi số lượng tồn, cảnh báo tồn thấp và xem giá trị kho
  */
 export default function InventoryPage() {
+<<<<<<< HEAD
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState({
@@ -50,15 +72,45 @@ export default function InventoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+=======
+  const {
+    products,
+    categories,
+    stats,
+    loading,
+    isFirstFetch,
+    search,
+    setSearch,
+    selectedCategory,
+    setSelectedCategory,
+    lowStockOnly,
+    setLowStockOnly,
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    totalCount,
+  } = useInventory();
+>>>>>>> develop
 
   // Debounce search
   useEffect(() => {
+<<<<<<< HEAD
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
       setCurrentPage(1);
     }, 500);
     return () => clearTimeout(handler);
   }, [search]);
+=======
+    setActionButton({
+      label: "Nhập hàng mới",
+      icon: <Plus size={18} />,
+      onClick: () => alert("Chức năng nhập hàng mới"),
+      searchPlaceholder: "Tìm kiếm sản phẩm...",
+      className:
+        "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
+    });
+>>>>>>> develop
 
   // Lấy dữ liệu thống kê và danh mục khi load trang
   useEffect(() => {
@@ -122,15 +174,21 @@ export default function InventoryPage() {
     fetchInventory(isFirstFetch);
   }, [currentPage, pageSize, debouncedSearch, selectedCategory, lowStockOnly]);
 
-  if (isFirstFetch && loading) return <Loading text="Đang tải dữ liệu kiểm kê..." />;
+  if (isFirstFetch && loading)
+    return <Loading text="Đang tải dữ liệu kiểm kê..." />;
 
   const getCategoryIcon = (catId) => {
-    switch(catId) {
-      case 4: return <Smartphone size={18} className="text-slate-400" />;
-      case 5: return <BatteryCharging size={18} className="text-slate-400" />;
-      case 6: return <Camera size={18} className="text-slate-400" />;
-      case 7: return <Layers size={18} className="text-slate-400" />;
-      default: return <Cpu size={18} className="text-slate-400" />;
+    switch (catId) {
+      case 4:
+        return <Smartphone size={18} className="text-slate-400" />;
+      case 5:
+        return <BatteryCharging size={18} className="text-slate-400" />;
+      case 6:
+        return <Camera size={18} className="text-slate-400" />;
+      case 7:
+        return <Layers size={18} className="text-slate-400" />;
+      default:
+        return <Cpu size={18} className="text-slate-400" />;
     }
   };
 
@@ -157,6 +215,7 @@ export default function InventoryPage() {
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* ===== STATS OVERVIEW ===== */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
@@ -174,6 +233,41 @@ export default function InventoryPage() {
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
           <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Cập nhật lần cuối</p>
           <p className="text-2xl font-extrabold text-slate-900 dark:text-white mt-2">{stats.lastUpdate}</p>
+=======
+      {/* STATS OVERVIEW */}
+      <div className="inventory-stats-grid">
+        <div className="inventory-stat-card">
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">
+            Tổng mặt hàng
+          </p>
+          <p className="text-2xl font-extrabold text-slate-900 mt-2">
+            {formatNumber(stats.totalItems)}
+          </p>
+        </div>
+        <div className="inventory-stat-card border-l-4 border-l-red-500">
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">
+            Sắp hết hàng
+          </p>
+          <p className="text-2xl font-extrabold text-red-600 mt-2">
+            {stats.lowStock}
+          </p>
+        </div>
+        <div className="inventory-stat-card">
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">
+            Tổng giá trị kho
+          </p>
+          <p className="text-2xl font-extrabold text-primary mt-2">
+            {(stats.totalValue / 1000000).toFixed(1)}M
+          </p>
+        </div>
+        <div className="inventory-stat-card">
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">
+            Cập nhật lần cuối
+          </p>
+          <p className="text-2xl font-extrabold text-slate-900 mt-2">
+            {stats.lastUpdate}
+          </p>
+>>>>>>> develop
         </div>
       </div>
 
@@ -186,29 +280,49 @@ export default function InventoryPage() {
             placeholder="Tìm tên sản phẩm, mã SKU..."
           />
         </div>
+<<<<<<< HEAD
         
         <div className="flex items-center gap-3">
           <select 
             className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-xl py-2 pl-3 pr-10 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+=======
+
+        <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+          <select
+            className="bg-slate-50 border border-slate-200 text-slate-600 text-sm font-medium rounded-lg py-2 pl-3 pr-10 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+>>>>>>> develop
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             <option value="">Theo nhóm: Tất cả</option>
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
             ))}
           </select>
 
+<<<<<<< HEAD
           <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-100 dark:border-slate-800">
             <button 
               onClick={() => setLowStockOnly(false)}
               className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${!lowStockOnly ? 'bg-white dark:bg-slate-700 text-primary dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+=======
+          <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-100 shrink-0">
+            <button
+              onClick={() => setLowStockOnly(false)}
+              className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${!lowStockOnly ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+>>>>>>> develop
             >
               Tất cả
             </button>
-            <button 
+            <button
               onClick={() => setLowStockOnly(true)}
+<<<<<<< HEAD
               className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${lowStockOnly ? 'bg-white dark:bg-slate-700 text-accent-red shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+=======
+              className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${lowStockOnly ? "bg-white text-accent-red shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+>>>>>>> develop
             >
               Theo tồn thấp
             </button>
@@ -227,6 +341,7 @@ export default function InventoryPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
+<<<<<<< HEAD
               <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Sản phẩm</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nhóm</th>
@@ -237,6 +352,20 @@ export default function InventoryPage() {
               </tr>
             </thead>
             <tbody className={`divide-y divide-slate-100 transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
+=======
+              <tr className="bg-slate-50/80 border-b border-slate-200">
+                <th className="table-th px-6">Sản phẩm</th>
+                <th className="table-th px-6">Nhóm</th>
+                <th className="table-th px-6 text-center">Số lượng tồn</th>
+                <th className="table-th px-6">Đơn giá (VNĐ)</th>
+                <th className="table-th px-6 text-center">Cảnh báo</th>
+                <th className="table-th px-6 text-right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody
+              className={`divide-y divide-slate-100 transition-opacity duration-300 ${loading ? "opacity-50" : "opacity-100"}`}
+            >
+>>>>>>> develop
               {products.length > 0 ? (
                 products.map((product) => (
                   <tr key={product.id} className="group hover:bg-slate-50/80 transition-all duration-300">
@@ -246,33 +375,58 @@ export default function InventoryPage() {
                           {getCategoryIcon(product.categoryId)}
                         </div>
                         <div>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{product.name}</p>
-                        <p className="text-[10px] font-mono font-medium text-slate-500 uppercase tracking-wider">SKU: {product.code}</p>
+                          <p className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">
+                            {product.name}
+                          </p>
+                          <p className="text-[10px] font-mono font-medium text-slate-500 uppercase tracking-wider">
+                            SKU: {product.code}
+                          </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
+<<<<<<< HEAD
                       <Badge variant="blue" className="bg-slate-100 text-slate-600 border-none font-bold text-[10px] uppercase">
                         {categories.find(c => c.id === product.categoryId)?.name || 'Linh kiện'}
+=======
+                      <Badge
+                        variant="blue"
+                        className="bg-slate-100 text-slate-600 border-none font-bold text-[10px] uppercase"
+                      >
+                        {categories.find((c) => c.id === product.categoryId)
+                          ?.name || "Linh kiện"}
+>>>>>>> develop
                       </Badge>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`text-sm font-black ${product.quantity <= 10 ? 'text-accent-red' : 'text-slate-900 dark:text-white'}`}>
+                      <span
+                        className={`text-sm font-black ${product.quantity <= 10 ? "text-accent-red" : "text-slate-900"}`}
+                      >
                         {product.quantity}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm font-bold text-slate-600">
+<<<<<<< HEAD
                       {new Intl.NumberFormat('vi-VN').format(product.price)}
+=======
+                      {formatNumber(product.price)}
+>>>>>>> develop
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center">
                         {product.quantity <= 10 ? (
-                          <Badge variant="red" className="flex items-center gap-1 animate-pulse py-1 px-3 border-red-200">
+                          <Badge
+                            variant="red"
+                            className="flex items-center gap-1 animate-pulse py-1 px-3 border-red-200"
+                          >
                             <span className="w-1.5 h-1.5 bg-accent-red rounded-full" />
                             Tồn thấp
                           </Badge>
                         ) : (
-                          <Badge variant="success" className="py-1 px-3 border-emerald-200">
+                          <Badge
+                            variant="success"
+                            className="py-1 px-3 border-emerald-200"
+                          >
                             An toàn
                           </Badge>
                         )}
@@ -287,7 +441,10 @@ export default function InventoryPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-slate-400 italic">
+                  <td
+                    colSpan="6"
+                    className="px-6 py-12 text-center text-slate-400 italic"
+                  >
                     Không tìm thấy dữ liệu tồn kho...
                   </td>
                 </tr>
@@ -296,6 +453,7 @@ export default function InventoryPage() {
           </table>
         </div>
 
+<<<<<<< HEAD
         {/* ===== PAGINATION ===== */}
         <div className="px-8 py-5 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-xs text-slate-500">
@@ -332,6 +490,52 @@ export default function InventoryPage() {
               <ChevronRight size={18} />
             </button>
           </div>
+=======
+      {/* PAGINATION */}
+      <PaginationBar
+        info={
+          <p className="pagination-info">
+            Hiển thị{" "}
+            <span className="font-bold text-slate-900">
+              {(currentPage - 1) * pageSize + 1}
+            </span>{" "}
+            đến{" "}
+            <span className="font-bold text-slate-900">
+              {Math.min(currentPage * pageSize, totalCount)}
+            </span>{" "}
+            trong số{" "}
+            <span className="font-bold text-slate-900">{totalCount}</span> sản
+            phẩm
+          </p>
+        }
+      >
+        <div className="pagination-controls">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <div className="pagination-page-list">
+            {[1, 2, 3].map((page) => (
+              <button
+                key={page}
+                className={`pagination-page-btn ${currentPage === page ? "pagination-page-btn-active" : ""}`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setCurrentPage((p) => p + 1)}
+            disabled={currentPage * pageSize >= totalCount}
+            className="pagination-btn"
+          >
+            <ChevronRight size={18} />
+          </button>
+>>>>>>> develop
         </div>
       </div>
     </div>

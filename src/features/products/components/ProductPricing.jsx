@@ -14,6 +14,10 @@ export default function ProductPricing({
       setFormData(prev => ({ ...prev, originalPrice: value, importPrice: value }));
       return;
     }
+    if (name === "price") {
+      setFormData(prev => ({ ...prev, price: value, sellingPrice: value }));
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 

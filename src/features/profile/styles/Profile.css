@@ -15,53 +15,6 @@
   overflow: hidden;
 }
 
-.dark .profile-section {
-  background-color: #0f172a;
-  border-color: #1e293b;
-}
-
-.profile-avatar-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
-.profile-avatar-img {
-  width: 8rem;
-  height: 8rem;
-  border-radius: 1rem;
-  object-fit: cover;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  box-shadow: 0 0 0 1px #f1f5f9;
-}
-
-.dark .profile-avatar-img {
-  box-shadow: 0 0 0 1px #1e293b;
-}
-
-.profile-avatar-btn {
-  position: absolute;
-  bottom: -0.5rem;
-  right: -0.5rem;
-  background-color: #ffffff;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  border: 1px solid #e2e8f0;
-  color: var(--color-primary);
-  transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dark .profile-avatar-btn {
-  background-color: #1e293b;
-  border-color: #334155;
-}
-
-.profile-avatar-btn:hover {
-  background-color: #f8fafc;
-}
 
 .profile-input-grid {
   flex: 1 1 0%;
@@ -90,10 +43,6 @@
   color: #334155;
 }
 
-.dark .profile-label {
-  color: #cbd5e1;
-}
-
 .profile-input {
   width: 100%;
   padding-left: 1rem;
@@ -105,10 +54,6 @@
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dark .profile-input {
-  color: #ffffff;
-}
-
 .profile-input:focus {
   box-shadow: none;
 }
@@ -116,11 +61,6 @@
 .profile-input-editable {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
-}
-
-.dark .profile-input-editable {
-  background-color: rgba(30, 41, 59, 0.5);
-  border-color: #334155;
 }
 
 .profile-input-editable:focus {

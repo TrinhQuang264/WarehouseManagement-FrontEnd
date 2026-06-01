@@ -36,15 +36,33 @@ const suppliersService = {
         }
     },
     // POST /api/Suppliers
-    async create(data) {
-        try {
-            const response = await api.post('/Suppliers', data);
-            return response.data;
-        } catch (error) {
-            console.error('[suppliersService] Lỗi khi tạo nhà cung cấp:', error);
-            throw error;
-        }
-    },
+async create(data) {
+    try {
+        console.log("DATA SEND:");
+        console.log(data);
+
+        const response = await api.post('/Suppliers', data);
+
+        return response.data;
+    } catch (error) {
+
+        console.error("===== API VALIDATION ERROR =====");
+
+        // Full response
+        console.error(error.response?.data);
+
+        // Validation errors chi tiết
+        console.error(error.response?.data?.errors);
+
+        // Payload đã gửi
+        console.error("DATA SENT:");
+        console.error(data);
+
+        console.error('[suppliersService] Lỗi khi tạo nhà cung cấp:', error);
+
+        throw error;
+    }
+},
     // PUT /api/Suppliers/{id}
     async update(id, data) {
         try {

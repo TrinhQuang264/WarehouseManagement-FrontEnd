@@ -7,7 +7,7 @@ import PaginationBar from "../../../components/ui/PaginationBar";
 import TrashBinDrawer from "../../../components/ui/TrashBinDrawer";
 import SupplierTable from "../components/SupplierTable";
 import SupplierModal from "../components/SupplierModal";
-import SupplierDetailPage from "../components/SupplierDetailPage.jsx";
+import SupplierDetailPage from "./SupplierDetailPage.jsx";
 import { useSuppliers } from "../hooks/useSuppliers.jsx";
 import { useHeader } from "../../../contexts/HeaderContext";
 import suppliersService from "../api/suppliersService";
@@ -125,7 +125,8 @@ export default function SuppliersPage() {
   const openTrash = useCallback(() => setIsTrashOpen(true), [setIsTrashOpen]);
   const handleSaveSupplier = useCallback(
     (data) => {
-      if (selectedSupplier) return handleUpdateSupplier(selectedSupplier.id, data);
+      if (selectedSupplier)
+        return handleUpdateSupplier(selectedSupplier.id, data);
       return handleAddSupplier(data);
     },
     [handleAddSupplier, handleUpdateSupplier, selectedSupplier],
@@ -141,8 +142,23 @@ export default function SuppliersPage() {
 
   useEffect(() => {
     if (isDetailMode) {
-      setActionButton(null);
-      setExtraActions([]);
+      setActionButton({
+        label: "Chỉnh sửa",
+        onClick: () => openEditModal(currentSupplier),
+        className: "shadow-lg shadow-primary/20",
+      });
+      setExtraActions([
+        {
+          label: "Phiếu nhập mới",
+          icon: <Plus size={18} />,
+          onClick: () => {
+            navigate(IMPORT_URLS.new, {
+              state: { supplierId: currentSupplier?.id },
+            });
+          },
+          className: "shadow-lg shadow-primary/20 bg-primary text-white",
+        },
+      ]);
       setOnSearch(null);
       setTitle(
         currentSupplier
@@ -205,7 +221,7 @@ export default function SuppliersPage() {
                 to={COMMON_URLS.dashboard}
                 className="hover:text-primary transition-colors"
               >
-                Trang chủ
+                Tổng quan
               </Link>
               <span className="mx-2 text-slate-300">/</span>
               <Link
@@ -215,9 +231,7 @@ export default function SuppliersPage() {
                 Nhà cung cấp
               </Link>
               <span className="mx-2 text-slate-300">/</span>
-              <span className="text-slate-900 dark:text-white font-medium">
-                Không tìm thấy
-              </span>
+              <span className="text-slate-900 font-medium">Không tìm thấy</span>
             </nav>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500 shadow-sm">
@@ -280,7 +294,7 @@ export default function SuppliersPage() {
           onConfirm={handleDeleteSupplier}
           title="Xác nhận xóa nhà cung cấp"
           message={`Bạn có chắc chắn muốn xóa nhà cung cấp "${selectedSupplier?.supplierName}"? Dữ liệu sẽ được chuyển vào thùng rác.`}
-          confirmText="Xác nhận xóa"
+          confirmText="Xóa"
           variant="danger"
           loading={isSubmitting}
         />
@@ -289,7 +303,7 @@ export default function SuppliersPage() {
       <TrashBinDrawer
         isOpen={isTrashOpen}
         onClose={closeTrash}
-        title="Thùng rác nhà cung cấp"
+        title="Thùng rác dữ liệu nhà cung cấp"
         service={suppliersService}
         onDataChange={refreshList}
         columns={[{ key: "supplierName" }]}
