@@ -88,7 +88,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     setSearchParams(params, { replace: true });
   }, [currentPage, debouncedSearch, selectedCategoryId, pageSize, defaultPageSize, setSearchParams]);
 
-  // Debounce search
   useEffect(() => {
     if (isFirstMount.current) {
       isFirstMount.current = false;
@@ -126,8 +125,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
 
     setLoading(true);
     try {
-      // Use getAll to handle flexible client-side filtering as requested by the user's structure
-      // or alternate between getAll and getTrash based on isTrashOpen
       let response;
       if (isTrashOpen) {
         response = await productService.getTrash();
@@ -140,29 +137,21 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
       let allItems = Array.isArray(response) ? response : (response.data || []);
       allItems = allItems.map(normalizeProduct);
 
-      // Deduplicate: API trả về flat list tất cả variants.
-      // Chỉ giữ lại variant mặc định (isDefault: true) để hiển thị bảng danh sách.
-      // Nếu không có variant nào isDefault, fallback lấy cái đầu tiên của mỗi mã.
+      // Deduplicate
       const seen = new Map();
       for (const item of allItems) {
         const key = item.code || item.id;
         if (!seen.has(key)) {
           seen.set(key, item);
         } else if (item.isDefault === true) {
-          // Ưu tiên variant isDefault
           seen.set(key, item);
         }
       }
       allItems = Array.from(seen.values());
 
-      // Rule: isActive determines visibility in main list vs trash if not already split by API
-      // However, since we have a dedicated /trash endpoint, we'll trust the API response but 
-      // can still double-check isActive if needed.
-      // Client-side Filtering
       let filteredItems = [...allItems];
 
-
-      // 1. Search (Name/Code/Description)
+      // 1. Search
       if (debouncedSearch) {
         const lowerSearch = debouncedSearch.toLowerCase();
         filteredItems = filteredItems.filter(item => 
@@ -179,7 +168,7 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
         );
       }
 
-      // 3. Price Filter (Selling Price)
+      // 3. Price Filter
       if (minPrice !== "") {
         filteredItems = filteredItems.filter(item => item.price >= Number(minPrice));
       }
@@ -256,9 +245,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
   const handleUpdateProduct = async (id, data) => {
     setIsSubmitting(true);
     try {
-      // Assuming a generic update or specifically updateStatus if that's what's available
-      // If backend doesn't have a generic PUT /Products/{id}, we might need to adjust.
-      // For now, mapping to updateStatus or create if it handles both (generic pattern)
       const updated = await productService.update(id, data);
       toast.success("Cập nhật thông tin sản phẩm thành công!");
       setSelectedProduct(null);
@@ -299,8 +285,6 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     setSelectedProduct(null);
   };
 
-
-
   const resetFilters = () => {
     setSearch("");
     setMinPrice("");
@@ -320,7 +304,7 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
 
   return {
     products,
-    filteredProducts: products, // Alias for compatibility
+    filteredProducts: products,
     categories,
     loading,
     isSubmitting,

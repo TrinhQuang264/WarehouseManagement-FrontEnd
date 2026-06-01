@@ -1,13 +1,13 @@
 import { Package, AlertTriangle, LogIn, LogOut } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
+    BarChart,
+    Bar,
+    XAxis,
+    Tooltip,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
 } from "recharts";
 import StatCard from "../../../components/ui/StatCard";
 import Badge from "../../../components/ui/Badge";
@@ -51,56 +51,63 @@ import "../styles/Dashboard.css";
 // };
 
 export default function DashboardPage() {
-  const { stats, loading, chartData, allocation, topProducts } = useDashboard();
+    const { stats, loading, chartData, allocation, topProducts } =
+        useDashboard();
 
-  if (loading) return <Loading text="Đang tải dữ liệu dashboard..." />;
+    if (loading) return <Loading text="Đang tải dữ liệu dashboard..." />;
 
-  return (
-    <div className="dashboard-page">
-      {/* 1. SUMMARY CARDS */}
-      <section className="dashboard-grid">
-        <StatCard
-          title="Tổng tồn kho"
-          value={formatNumber(stats.totalInventory)}
-          icon={<Package size={24} className="text-primary" />}
-          iconBgClass="bg-primary/10"
-          trend={<Badge variant="green">+12%</Badge>}
-          subtitle="Linh kiện đang có sẵn"
-        />
-        <StatCard
-          title="Sản phẩm sắp hết"
-          value={stats.lowStockCount}
-          icon={<AlertTriangle size={24} className="text-accent-red" />}
-          iconBgClass="bg-red-50"
-          trend={<Badge variant="red">Cần nhập</Badge>}
-          subtitle="Dưới ngưỡng an toàn"
-        />
-        <StatCard
-          title="Nhập hôm nay"
-          value={formatNumber(stats.todayImport)}
-          icon={<LogIn size={24} className="text-accent-green" />}
-          iconBgClass="bg-emerald-50"
-          trend={
-            <span className="text-slate-400 text-xs font-medium">Hôm nay</span>
-          }
-          subtitle="Tăng 5% so với hôm qua"
-        />
-        <StatCard
-          title="Xuất hôm nay"
-          value={formatNumber(stats.todayExport)}
-          icon={<LogOut size={24} className="text-accent-orange" />}
-          iconBgClass="bg-amber-50"
-          trend={
-            <span className="text-slate-400 text-xs font-medium">Hôm nay</span>
-          }
-          subtitle="32 đơn hàng đã hoàn tất"
-        />
-      </section>
+    return (
+        <div className="dashboard-page">
+            {/* 1. SUMMARY CARDS */}
+            <section className="dashboard-grid">
+                <StatCard
+                    title="Tổng tồn kho"
+                    value={formatNumber(stats.totalInventory)}
+                    icon={<Package size={24} className="text-primary" />}
+                    iconBgClass="bg-primary/10"
+                    trend={<Badge variant="green">+12%</Badge>}
+                    subtitle="Linh kiện đang có sẵn"
+                />
+                <StatCard
+                    title="Sản phẩm sắp hết"
+                    value={stats.lowStockCount}
+                    icon={
+                        <AlertTriangle size={24} className="text-accent-red" />
+                    }
+                    iconBgClass="bg-red-50"
+                    trend={<Badge variant="red">Cần nhập</Badge>}
+                    subtitle="Dưới ngưỡng an toàn"
+                />
+                <StatCard
+                    title="Nhập hôm nay"
+                    value={formatNumber(stats.todayImport)}
+                    icon={<LogIn size={24} className="text-accent-green" />}
+                    iconBgClass="bg-emerald-50"
+                    trend={
+                        <span className="text-slate-400 text-xs font-medium">
+                            Hôm nay
+                        </span>
+                    }
+                    subtitle="Tăng 5% so với hôm qua"
+                />
+                <StatCard
+                    title="Xuất hôm nay"
+                    value={formatNumber(stats.todayExport)}
+                    icon={<LogOut size={24} className="text-accent-orange" />}
+                    iconBgClass="bg-amber-50"
+                    trend={
+                        <span className="text-slate-400 text-xs font-medium">
+                            Hôm nay
+                        </span>
+                    }
+                    subtitle="32 đơn hàng đã hoàn tất"
+                />
+            </section>
 
-      {/* 2. CHARTS
+            {/* 2. CHARTS
       <section className="dashboard-charts-grid">
         {/* Biểu đồ cột — Xu hướng Nhập/Xuất */}
-      {/* div className="lg:col-span-2 chart-container">
+            {/* div className="lg:col-span-2 chart-container">
           <div className="chart-header">
             <h3 className="font-bold text-lg text-slate-900">Xu hướng Nhập/Xuất</h3>
             <div className="chart-legend">
@@ -135,8 +142,8 @@ export default function DashboardPage() {
           </div>
         </div> */}
 
-      {/* Biểu đồ vòng — Phân bổ tồn kho */}
-      {/* <div className="chart-container">
+            {/* Biểu đồ vòng — Phân bổ tồn kho */}
+            {/* <div className="chart-container">
           <h3 className="font-bold text-lg mb-6 text-slate-900">Phân bổ Tồn kho</h3>
           <div className="flex-1 flex flex-col items-center justify-center">
             
@@ -161,14 +168,14 @@ export default function DashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
               {/* Inner Text Center */}
-      {/*   <div className="pie-chart-center">
+            {/*   <div className="pie-chart-center">
                 <span className="text-xs text-slate-400">Tổng</span>
                 <span className="text-xl font-bold text-slate-900">100%</span>
               </div>
             </div> */}
 
-      {/* Legend */}
-      {/* <div className="pie-legend">
+            {/* Legend */}
+            {/* <div className="pie-legend">
               {allocation.map((item) => (
                 <div key={item.name} className="pie-legend-item">
                   <div className="flex items-center gap-2">
@@ -183,81 +190,88 @@ export default function DashboardPage() {
         </div>
       </section> */}
 
-      {/* 3. TOP PRODUCTS TABLE */}
-      <section className="top-products-section">
-        <div className="top-products-header">
-          <h3 className="font-bold text-lg text-slate-900">
-            Top sản phẩm bán chạy
-          </h3>
-          <button className="text-primary text-sm font-medium hover:underline transition-colors">
-            Xem tất cả
-          </button>
+            {/* 3. TOP PRODUCTS TABLE */}
+            <section className="top-products-section">
+                <div className="top-products-header">
+                    <h3 className="font-bold text-lg text-slate-900">
+                        Top sản phẩm bán chạy
+                    </h3>
+                    <button className="text-primary text-sm font-medium hover:underline transition-colors">
+                        Xem tất cả
+                    </button>
+                </div>
+                <DataTableCard>
+                    <div className="table-wrapper">
+                        <table className="table">
+                            <thead>
+                                <tr className="bg-slate-50">
+                                    <th className="table-th px-6">Sản phẩm</th>
+                                    <th className="table-th px-6">Mã SKU</th>
+                                    <th className="table-th px-6">Đã bán</th>
+                                    <th className="table-th px-6">Tồn kho</th>
+                                    <th className="table-th px-6">Doanh thu</th>
+                                    <th className="table-th px-6">
+                                        Trạng thái
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {topProducts.map((product) => (
+                                    <tr
+                                        key={product.id}
+                                        className="table-row-hover"
+                                    >
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="product-thumb">
+                                                    <img
+                                                        src={product.image}
+                                                        alt={product.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-semibold text-slate-900 mb-0.5">
+                                                        {product.name}
+                                                    </p>
+                                                    <p className="text-xs text-slate-500">
+                                                        Loại: {product.type}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm font-mono text-slate-600">
+                                            {product.sku}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                                            {formatNumber(product.sold)}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-slate-600">
+                                            {formatNumber(product.stock)}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm font-semibold text-primary">
+                                            {formatCurrency(product.revenue)}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <Badge
+                                                variant={
+                                                    product.status === "selling"
+                                                        ? "green"
+                                                        : "orange"
+                                                }
+                                            >
+                                                {product.status === "selling"
+                                                    ? "Đang bán tốt"
+                                                    : "Sắp hết"}
+                                            </Badge>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </DataTableCard>
+            </section>
         </div>
-        <DataTableCard>
-          <div className="table-wrapper">
-            <table className="table">
-              <thead>
-                <tr className="bg-slate-50">
-                  <th className="table-th px-6">Sản phẩm</th>
-                  <th className="table-th px-6">Mã SKU</th>
-                  <th className="table-th px-6">Đã bán</th>
-                  <th className="table-th px-6">Tồn kho</th>
-                  <th className="table-th px-6">Doanh thu</th>
-                  <th className="table-th px-6">Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {topProducts.map((product) => (
-                  <tr key={product.id} className="table-row-hover">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="product-thumb">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-slate-900 mb-0.5">
-                            {product.name}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            Loại: {product.type}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-mono text-slate-600">
-                      {product.sku}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                      {formatNumber(product.sold)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      {formatNumber(product.stock)}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-primary">
-                      {formatCurrency(product.revenue)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <Badge
-                        variant={
-                          product.status === "selling" ? "green" : "orange"
-                        }
-                      >
-                        {product.status === "selling"
-                          ? "Đang bán tốt"
-                          : "Sắp hết"}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </DataTableCard>
-      </section>
-    </div>
-  );
+    );
 }

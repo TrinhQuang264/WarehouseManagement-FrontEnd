@@ -14,7 +14,7 @@ export default function CustomerTable({
       <div className="table-wrapper">
         <table className="table">
           <thead>
-            <tr className="bg-slate-50/80  border-b border-slate-200 ">
+            <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
               <th className="table-th px-6">Khách hàng</th>
               <th className="table-th px-6">Số Điện Thoại</th>
               <th className="table-th px-6">Địa Chỉ</th>
@@ -22,29 +22,34 @@ export default function CustomerTable({
             </tr>
           </thead>
           <tbody
-            className={`divide-y divide-slate-100 transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+            className={`divide-y divide-slate-100 dark:divide-slate-800/50 transition-opacity duration-300 ${
+              loading ? "opacity-50 pointer-events-none" : "opacity-100"
+            }`}
           >
             {customers.length > 0 ? (
               customers.map((customer) => (
-                <tr key={customer.id} className="group table-row-hover h-20 ">
+                <tr key={customer.id} className="group table-row-hover h-20">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-white dark:group-hover:bg-slate-700 transition-all duration-300">
+                        <User size={16} />
+                      </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">
+                        <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
                           {customer.fullName}
                         </p>
-                        <p className="text-xs text-slate-500 mt-0.5">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                           {customer.email || "customer@example.com"}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium text-slate-600 ">
+                  <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">
                     {customer.phoneNumber}
                   </td>
                   <td className="px-6 py-4">
                     <p
-                      className="text-sm text-slate-600 line-clamp-1 max-w-xs xl:max-w-md"
+                      className="text-sm text-slate-600 dark:text-slate-400 line-clamp-1 max-w-xs xl:max-w-md"
                       title={customer.address}
                     >
                       {customer.address}

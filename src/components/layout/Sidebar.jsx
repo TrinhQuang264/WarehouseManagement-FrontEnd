@@ -22,22 +22,22 @@ import {
 import "../../styles/slidebar.css";
 
 const mainMenu = [
-  { to: "/", icon: LayoutDashboard, label: "Tổng quan" },
-  { to: "/import", icon: Download, label: "Nhập kho" },
-  { to: "/export", icon: Upload, label: "Xuất kho" },
-  { to: "/inventory", icon: Package, label: "Tồn kho" },
+    { to: "/", icon: LayoutDashboard, label: "Tổng quan" },
+    { to: "/import", icon: Download, label: "Nhập kho" },
+    { to: "/export", icon: Upload, label: "Xuất kho" },
+    { to: "/inventory", icon: Package, label: "Tồn kho" },
 ];
 
 const managerMenu = [
-  { to: "/products", icon: Smartphone, label: "Sản phẩm" },
-  { to: "/categories", icon: FolderTree, label: "Danh mục" },
-  { to: "/customers", icon: Users2, label: "Khách hàng" },
-  { to: "/suppliers", icon: Store, label: "Nhà cung cấp" },
+    { to: "/products", icon: Smartphone, label: "Sản phẩm" },
+    { to: "/categories", icon: FolderTree, label: "Danh mục" },
+    { to: "/customers", icon: Users2, label: "Khách hàng" },
+    { to: "/suppliers", icon: Store, label: "Nhà cung cấp" },
 ];
 
 const systemMenu = [
-  { to: "/users", icon: Users, label: "Người dùng" },
-  { to: "/reports", icon: BarChart3, label: "Báo cáo" },
+    { to: "/users", icon: Users, label: "Người dùng" },
+    { to: "/reports", icon: BarChart3, label: "Báo cáo" },
 ];
 
 // ─── Tooltip — render qua Portal vào document.body ───────────────────────────

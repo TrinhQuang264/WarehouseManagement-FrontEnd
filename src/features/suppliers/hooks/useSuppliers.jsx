@@ -199,6 +199,10 @@ export function useSuppliers() {
     setIsDeleteModalOpen(true);
   };
 
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
+
+  const nextCode = `NCC${String(allActiveSuppliers.length + 1).padStart(3, "0")}`;
+
   return {
     suppliers,
     allActiveSuppliers,
@@ -214,6 +218,7 @@ export function useSuppliers() {
     pageSize,
     setPageSize,
     totalCount,
+    totalPages,
     isModalOpen,
     setIsModalOpen,
     isDeleteModalOpen,
@@ -227,6 +232,7 @@ export function useSuppliers() {
     handleDeleteSupplier,
     openEditModal,
     openDeleteModal,
+    nextCode,
     refreshList: fetchSuppliers,
   };
 }

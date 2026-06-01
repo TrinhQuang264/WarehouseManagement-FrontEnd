@@ -193,7 +193,6 @@ export function useUsers() {
           toast.error("Không thể tải danh sách người dùng");
           return;
         }
-        // Fallback local filter to keep search usable when filter API shape differs.
         setUsers((prev) =>
           prev.filter((u) =>
             [u.fullName, u.username, u.email, u.phoneNumber, u.roleLabel]
