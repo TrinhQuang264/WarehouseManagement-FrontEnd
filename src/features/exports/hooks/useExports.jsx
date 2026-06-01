@@ -1,83 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { customers, products, users } from "../../../utils/mockData.js";
-
-const RECEIPT_SEED = [
-  {
-    id: 1,
-    code: "XK-20260323-001",
-    customerId: 2,
-    createdById: users[0]?.id,
-    date: "2026-03-23T10:20:00",
-    note: "Giao màn hình và SSD cho khách doanh nghiệp.",
-    warehouse: "Kho Linh kiện A",
-    referenceCode: "SO-202603-2201",
-    status: "completed",
-    items: [
-      { productId: 1, quantity: 4, unitPrice: products[0]?.price || 0 },
-      { productId: 5, quantity: 6, unitPrice: products[4]?.price || 0 },
-    ],
-  },
-  {
-    id: 2,
-    code: "XK-20260323-002",
-    customerId: 3,
-    createdById: users[1]?.id,
-    date: "2026-03-23T14:10:00",
-    note: "Đơn giao nhanh, chờ xác nhận từ bộ phận vận chuyển.",
-    warehouse: "Kho Phụ kiện B",
-    referenceCode: "SO-202603-2205",
-    status: "pending",
-    items: [
-      { productId: 4, quantity: 10, unitPrice: products[3]?.price || 0 },
-      { productId: 6, quantity: 8, unitPrice: products[5]?.price || 0 },
-    ],
-  },
-  {
-    id: 3,
-    code: "XK-20260322-009",
-    customerId: 4,
-    createdById: users[2]?.id,
-    date: "2026-03-22T16:45:00",
-    note: "Xuất pin thay thế cho đơn bảo hành.",
-    warehouse: "Kho Linh kiện A",
-    referenceCode: "SO-202603-2178",
-    status: "completed",
-    items: [
-      { productId: 2, quantity: 5, unitPrice: products[1]?.price || 0 },
-      { productId: 3, quantity: 12, unitPrice: products[2]?.price || 0 },
-    ],
-  },
-  {
-    id: 4,
-    code: "XK-20260322-007",
-    customerId: 5,
-    createdById: users[1]?.id,
-    date: "2026-03-22T09:00:00",
-    note: "Hủy do khách đổi sang cấu hình khác.",
-    warehouse: "Kho Phụ kiện B",
-    referenceCode: "SO-202603-2169",
-    status: "cancelled",
-    items: [
-      { productId: 1, quantity: 2, unitPrice: products[0]?.price || 0 },
-      { productId: 4, quantity: 6, unitPrice: products[3]?.price || 0 },
-    ],
-  },
-  {
-    id: 5,
-    code: "XK-20260321-011",
-    customerId: 1,
-    createdById: users[3]?.id,
-    date: "2026-03-21T15:30:00",
-    note: "Xuất thử nghiệm cho dự án demo showroom.",
-    warehouse: "Kho Linh kiện A",
-    referenceCode: "SO-202603-2134",
-    status: "completed",
-    items: [
-      { productId: 5, quantity: 3, unitPrice: products[4]?.price || 0 },
-      { productId: 6, quantity: 4, unitPrice: products[5]?.price || 0 },
-    ],
-  },
-];
+import purchasesService from "../../imports/api/purchasesService";
+import productsService from "../../products/api/productsService";
+import customersService from "../../customers/api/customersService";
+import { toast } from "../../../utils/toast.js";
 
 const STATUS_LABELS = {
   completed: "Đã xuất kho",
@@ -85,95 +10,50 @@ const STATUS_LABELS = {
   cancelled: "Đã hủy",
   draft: "Bản nháp",
 };
-const DATE_RANGE_FILTERS = {
-  all: () => true,
-  last7: (date) => new Date(date) >= new Date("2026-03-17T00:00:00"),
-  last14: (date) => new Date(date) >= new Date("2026-03-10T00:00:00"),
-  month: (date) => new Date(date).getMonth() === 2,
+
+const STATUS_KEY_MAP = {
+  0: "draft",
+  1: "pending",
+  2: "completed",
+  3: "cancelled",
 };
 
-function formatUserName(user) {
-  if (!user) return "Chưa gán";
-  return (
-    `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-    user.userName ||
-    "Chưa gán"
-  );
-}
+const DATE_RANGE_FILTERS = {
+  all: () => true,
+  last7: (date) =>
+    new Date(date) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+  last14: (date) =>
+    new Date(date) >= new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+  month: (date) => new Date(date).getMonth() === new Date().getMonth(),
+};
 
-function enrichReceipt(receipt) {
-  const customer = customers.find((item) => item.id === receipt.customerId);
-  const user = users.find((item) => item.id === receipt.createdById);
-  const items = (receipt.items || []).map((item, index) => {
-    const product = products.find(
-      (productItem) => productItem.id === item.productId,
-    );
-    const lineTotal = item.quantity * item.unitPrice;
-    return {
-      ...item,
-      id: `${receipt.id}-${item.productId}-${index}`,
-      productName: product?.name || "Sản phẩm chưa xác định",
-      imageUrl: product?.imageUrl || "",
-      sku: product?.code || "N/A",
-      unit: "Cái",
-      lineTotal,
-      categoryId: product?.categoryId,
-      description: product?.description || "",
-    };
-  });
-  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subTotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
-  const discountAmount = 0;
-  const totalAmount = Math.max(0, subTotal - discountAmount);
-  return {
-    ...receipt,
-    customerName: customer?.fullName || "Khách hàng chưa xác định",
-    customerAddress: customer?.address || "Chưa cập nhật",
-    customerPhone: customer?.phoneNumber || "Chưa cập nhật",
-    operatorName: formatUserName(user),
-    totalQuantity,
-    itemCount: items.length,
-    subTotal,
-    discountAmount,
-    totalAmount,
-    statusLabel: STATUS_LABELS[receipt.status] || "Không xác định",
-    itemSummary: items
-      .map((item) => `${item.quantity} x ${item.productName}`)
-      .join(", "),
-    items,
-  };
-}
-
-function buildReceipts() {
-  return RECEIPT_SEED.map(enrichReceipt).sort(
-    (a, b) => new Date(b.date) - new Date(a.date),
-  );
-}
-
-function buildEmptyReceipt() {
+function buildEmptyReceipt(products) {
+  const defaultProduct = products && products.length > 0 ? products[0] : null;
   return {
     id: null,
-    code: "XK-DRAFT-001",
+    code: "XK-DRAFT",
     customerId: "",
-    createdById: users[0]?.id,
-    date: "2026-03-23",
+    createdById: null,
+    date: new Date().toISOString().slice(0, 10),
     note: "",
-    warehouse: "Kho Linh kiện A",
+    warehouse: "1",
     referenceCode: "",
     status: "draft",
-    items: [
-      {
-        id: "draft-1",
-        productId: products[0]?.id || "",
-        productName: products[0]?.name || "",
-        imageUrl: products[0]?.imageUrl || "",
-        sku: products[0]?.code || "",
-        quantity: 1,
-        unitPrice: products[0]?.price || 0,
-        lineTotal: products[0]?.price || 0,
-        unit: "Cái",
-      },
-    ],
+    items: defaultProduct
+      ? [
+          {
+            id: "draft-1",
+            productId: defaultProduct.id,
+            productName: defaultProduct.name || "",
+            imageUrl: defaultProduct.imageUrl || "",
+            sku: defaultProduct.code || "",
+            quantity: 1,
+            unitPrice: defaultProduct.sellingPrice || defaultProduct.price || 0,
+            lineTotal: defaultProduct.sellingPrice || defaultProduct.price || 0,
+            unit: "Cái",
+          },
+        ]
+      : [],
   };
 }
 
@@ -183,13 +63,122 @@ export function useExports() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedDateRange, setSelectedDateRange] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [receipts, setReceipts] = useState(() => buildReceipts());
   const pageSize = 5;
+
+  const [products, setProducts] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [receipts, setReceipts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const [productsData, customersData, purchasesData] = await Promise.all([
+        productsService.getAll(),
+        customersService.getAll(),
+        purchasesService.getAll(),
+      ]);
+
+      const fetchedProducts = productsData?.data || productsData || [];
+      const fetchedCustomers = Array.isArray(customersData)
+        ? customersData
+        : customersData?.data || [];
+      const fetchedPurchases = purchasesData?.data || purchasesData || [];
+
+      setProducts(Array.isArray(fetchedProducts) ? fetchedProducts : []);
+      setCustomers(Array.isArray(fetchedCustomers) ? fetchedCustomers : []);
+
+      // Only keep type === 2 (export) purchases
+      const exportPurchases = (
+        Array.isArray(fetchedPurchases) ? fetchedPurchases : []
+      ).filter((p) => Number(p.type) === 2);
+
+      const mappedReceipts = exportPurchases
+        .map((p) => {
+          const customer = (
+            Array.isArray(fetchedCustomers) ? fetchedCustomers : []
+          ).find((c) => c.id === p.customerId);
+
+          const items = (p.items || []).map((item, index) => {
+            const product = (
+              Array.isArray(fetchedProducts) ? fetchedProducts : []
+            ).find((prod) => prod.id === item.productId);
+            const qty = item.quantity || 1;
+            const price = item.unitCost || item.unitPrice || 0;
+            return {
+              ...item,
+              id: item.id || `${p.id}-${item.productId}-${index}`,
+              productName:
+                product?.name || item.productName || "Sản phẩm chưa xác định",
+              imageUrl: product?.imageUrl || "",
+              sku: product?.code || "N/A",
+              unit: "Cái",
+              quantity: qty,
+              unitPrice: price,
+              lineTotal: qty * price,
+              categoryId: product?.categoryId,
+              description: product?.description || "",
+            };
+          });
+
+          const totalQuantity = items.reduce(
+            (sum, item) => sum + item.quantity,
+            0,
+          );
+          const subTotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
+
+          return {
+            ...p,
+            id: p.id,
+            code: p.referenceCode || `XK-${p.id}`,
+            customerId: p.customerId,
+            date: p.receiptDate || p.createdAt || new Date().toISOString(),
+            note: p.note || "",
+            referenceCode: p.referenceCode || "",
+            status: STATUS_KEY_MAP[p.status ?? p.Status] || "draft",
+            customerName:
+              p.customerName ||
+              customer?.fullName ||
+              customer?.name ||
+              "Khách hàng chưa xác định",
+            customerAddress: customer?.address || "Chưa cập nhật",
+            customerPhone: customer?.phoneNumber || "Chưa cập nhật",
+            operatorName: "Hệ thống",
+            items,
+            itemCount: items.length,
+            totalQuantity,
+            subTotal,
+            discountAmount: 0,
+            totalAmount: subTotal,
+            statusLabel:
+              STATUS_LABELS[STATUS_KEY_MAP[p.status] || "draft"] ||
+              "Không xác định",
+            itemSummary: items
+              .map((item) => `${item.quantity} x ${item.productName}`)
+              .join(", "),
+          };
+        })
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      console.log("DEBUG - final Export mappedReceipts:", mappedReceipts);
+      setReceipts(mappedReceipts);
+    } catch (error) {
+      console.error("Error fetching data for exports:", error);
+      toast.error("Không thể tải dữ liệu xuất kho.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const filteredReceipts = useMemo(() => {
     const keyword = String(search ?? "")
       .trim()
       .toLowerCase();
+
     return receipts.filter((receipt) => {
       const matchesSearch =
         !keyword ||
@@ -203,6 +192,7 @@ export function useExports() {
             .toLowerCase()
             .includes(keyword),
         );
+
       const matchesCustomer =
         selectedCustomer === "all" ||
         String(receipt.customerId) === selectedCustomer;
@@ -211,17 +201,18 @@ export function useExports() {
       const matchesDate = (
         DATE_RANGE_FILTERS[selectedDateRange] || DATE_RANGE_FILTERS.all
       )(receipt.date);
+
       return matchesSearch && matchesCustomer && matchesStatus && matchesDate;
     });
   }, [receipts, search, selectedCustomer, selectedStatus, selectedDateRange]);
 
   const totalCount = filteredReceipts.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+
   useEffect(() => {
     setCurrentPage(1);
   }, [search, selectedCustomer, selectedStatus, selectedDateRange]);
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+
   useEffect(() => {
     setCurrentPage((prev) => Math.min(prev, totalPages));
   }, [totalPages]);
@@ -242,6 +233,7 @@ export function useExports() {
     const completedCount = receipts.filter(
       (receipt) => receipt.status === "completed",
     ).length;
+
     return {
       totalReceipts: receipts.length,
       totalValue,
@@ -255,22 +247,156 @@ export function useExports() {
       receipts.find((receipt) => String(receipt.id) === String(id)) || null,
     [receipts],
   );
-  const createEmptyReceipt = useCallback(() => buildEmptyReceipt(), []);
+
+  const createEmptyReceipt = useCallback(
+    () => buildEmptyReceipt(products),
+    [products],
+  );
+
   const deleteReceipt = useCallback((id) => {
     setReceipts((prev) =>
       prev.filter((receipt) => String(receipt.id) !== String(id)),
     );
   }, []);
 
+  const createReceipt = async (receiptData, { submit = false } = {}) => {
+    const customer = customers.find(
+      (c) => String(c.id) === String(receiptData.customerId),
+    );
+    const payload = {
+      type: 2,
+      Type: 2,
+      customerId: receiptData.customerId ? Number(receiptData.customerId) : 0,
+      warehouseId: 1,
+      customerName: customer
+        ? customer.fullName || customer.name || ""
+        : "Khách hàng chưa xác định",
+      receiptDate: receiptData.date
+        ? new Date(receiptData.date).toISOString()
+        : new Date().toISOString(),
+      referenceCode: receiptData.referenceCode || "",
+      note: receiptData.note || "",
+      items: (receiptData.items || []).map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitCost: item.unitPrice || 0,
+      })),
+      ...(submit ? { status: 1, Status: 1 } : {}),
+    };
+
+    console.log(
+      "[useExports.createReceipt] Payload:",
+      payload,
+      "submit:",
+      submit,
+    );
+    try {
+      const response = await purchasesService.create(payload);
+      console.log("[useExports.createReceipt] Response:", response);
+      return response;
+    } catch (error) {
+      console.error("Error creating export receipt:", error);
+      throw error;
+    }
+  };
+
+  const updateReceipt = async (id, receiptData, { submit = false } = {}) => {
+    const customer = customers.find(
+      (c) => String(c.id) === String(receiptData.customerId),
+    );
+    const payload = {
+      id: id,
+      type: 2,
+      Type: 2,
+      customerId: receiptData.customerId ? Number(receiptData.customerId) : 0,
+      warehouseId: 1,
+      customerName: customer
+        ? customer.fullName || customer.name || ""
+        : "Khách hàng chưa xác định",
+      receiptDate: receiptData.date
+        ? new Date(receiptData.date).toISOString()
+        : new Date().toISOString(),
+      referenceCode: receiptData.referenceCode || "",
+      note: receiptData.note || "",
+      items: (receiptData.items || []).map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitCost: item.unitPrice || 0,
+      })),
+      ...(submit ? { status: 1, Status: 1 } : {}),
+    };
+
+    console.log(
+      "[useExports.updateReceipt] Payload:",
+      payload,
+      "submit:",
+      submit,
+    );
+    try {
+      const response = await purchasesService.update(id, payload);
+      console.log("[useExports.updateReceipt] Response:", response);
+      return response;
+    } catch (error) {
+      console.error("Error updating export receipt:", error);
+      throw error;
+    }
+  };
+  const submitReceipt = async (id) => {
+    const receipt = getReceiptById(id);
+    console.log("[useExports.submitReceipt] Receipt to submit:", receipt);
+    if (!receipt) return;
+    if (
+      !(
+        receipt.status === "draft" ||
+        receipt.status === 0 ||
+        receipt.status === "0"
+      )
+    ) {
+      throw new Error("Chỉ phiếu ở trạng thái bản nháp mới được gửi duyệt.");
+    }
+
+    try {
+      // Build payload keeping all original data, only update status to 1
+      const payload = {
+        id: id,
+        type: 2,
+        Type: 2,
+        customerId: receipt.customerId,
+        warehouseId: 1,
+        customerName: receipt.customerName,
+        receiptDate: receipt.date,
+        referenceCode: receipt.referenceCode || "",
+        note: receipt.note || "",
+        status: 1,
+        Status: 1,
+        items: (receipt.items || []).map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          unitCost: item.unitPrice || 0,
+        })),
+      };
+      console.log("[useExports.submitReceipt] Submitting payload:", payload);
+      const response = await purchasesService.update(id, payload);
+      console.log("[useExports.submitReceipt] Response from update:", response);
+      await fetchData();
+      return response;
+    } catch (error) {
+      console.error("Error submitting export receipt:", error);
+      throw error;
+    }
+  };
+
   return {
+    submitReceipt,
     products,
     customers,
-    users,
     receipts,
     paginatedReceipts,
     getReceiptById,
     buildEmptyReceipt: createEmptyReceipt,
     deleteReceipt,
+    createReceipt,
+    updateReceipt,
     stats,
     search,
     setSearch,
@@ -285,5 +411,7 @@ export function useExports() {
     totalCount,
     pageSize,
     totalPages,
+    isLoading,
+    refreshList: fetchData,
   };
 }

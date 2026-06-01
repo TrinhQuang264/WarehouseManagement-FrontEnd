@@ -21,6 +21,7 @@ const InventoryPage = lazy(
 );
 const ImportsPage = lazy(() => import("../features/imports/pages/ImportsPage"));
 const ExportsPage = lazy(() => import("../features/exports/pages/ExportsPage"));
+const ApprovePage = lazy(() => import("../features/approve/pages/ApprovePage"));
 const SuppliersPage = lazy(
     () => import("../features/suppliers/pages/SuppliersPage"),
 );
@@ -77,6 +78,7 @@ export default function AppRouter() {
                     <Route path="export/create" element={<ExportsPage />} />
                     <Route path="export/update/:id" element={<ExportsPage />} />
                     <Route path="export/:id" element={<ExportsPage />} />
+                    <Route path="approve" element={<ApprovePage />} />
                     <Route path="inventory" element={<InventoryPage />} />
                     <Route path="suppliers" element={<SuppliersPage />} />
                     <Route path="suppliers/:id" element={<SuppliersPage />} />

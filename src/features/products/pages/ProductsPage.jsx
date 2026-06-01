@@ -29,6 +29,7 @@ const DEFAULT_PRODUCT_FORM = {
   price: "",
   imageUrl: "",
   specs: [],
+  warehouseLocation: "",
 };
 
 const getEntityFromResponse = (response) => response?.data ?? response ?? null;
@@ -171,40 +172,22 @@ export default function ProductsPage() {
         const productToEdit = response?.data ?? response;
         if (!isMounted || !productToEdit) return;
 
-        const originalPriceVal =
-          productToEdit.originalPrice ||
-          productToEdit.OriginalPrice ||
-          productToEdit.importPrice ||
-          productToEdit.ImportPrice ||
-          1;
-        const priceVal =
-          productToEdit.price ??
-          productToEdit.Price ??
-          productToEdit.sellingPrice ??
-          productToEdit.SellingPrice ??
-          "";
+        const originalPriceVal = productToEdit.originalPrice || 1;
+        const priceVal = productToEdit.sellingPrice ?? "";
         const quantityVal =
-          productToEdit.quantity ??
-          productToEdit.Quantity ??
-          productToEdit.initialStock ??
-          productToEdit.InitialStock ??
-          1;
+          productToEdit.quantity ?? productToEdit.initialStock ?? 0;
 
         setFormData({
-          code: productToEdit.code ?? productToEdit.Code ?? "",
-          name: productToEdit.name ?? productToEdit.Name ?? "",
-          description:
-            productToEdit.description ?? productToEdit.Description ?? "",
-          categoryId:
-            productToEdit.categoryId ?? productToEdit.CategoryId ?? "",
+          code: productToEdit.code ?? "",
+          name: productToEdit.name ?? "",
+          description: productToEdit.description ?? "",
+          categoryId: productToEdit.categoryId ?? "",
           originalPrice: originalPriceVal,
-          importPrice: originalPriceVal,
-          price: priceVal,
           sellingPrice: priceVal,
-          imageUrl: productToEdit.imageUrl ?? productToEdit.ImageUrl ?? "",
-          specs: productToEdit.specs ?? productToEdit.Specs ?? [],
+          imageUrl: productToEdit.imageUrl ?? "",
           initialStock: quantityVal,
           quantity: quantityVal,
+          warehouseLocation: productToEdit.warehouseLocation ?? "",
         });
         setImagePreview(productToEdit.imageUrl || null);
         setSelectedImageFile(null);
@@ -382,9 +365,7 @@ export default function ProductsPage() {
                 Tổng quan
               </Link>
               <span className="mx-2 text-slate-300">/</span>
-              <span className="text-slate-900 font-medium">
-                Sản phẩm
-              </span>
+              <span className="text-slate-900 font-medium">Sản phẩm</span>
             </nav>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, SendHorizonal, Trash2 } from "lucide-react";
 import Badge from "../../../components/ui/Badge.jsx";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
 import { formatCurrency } from "../../../utils/util.js";
@@ -25,6 +25,7 @@ export default function ReceiptTable({
   onEdit,
   onViewDetail,
   onDelete,
+  onSubmit,
   codeSubLabelKey = "referenceCode",
   partyColumnLabel,
   partyNameKey,
@@ -112,6 +113,23 @@ export default function ReceiptTable({
                       >
                         <Edit size={18} />
                       </button>
+                      {(receipt.status === "draft" ||
+                        receipt.status === 0 ||
+                        receipt.status === "0") &&
+                        onSubmit && (
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              onSubmit?.(receipt);
+                            }}
+                            className="flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs font-semibold shadow-sm hover:shadow transition-all"
+                            title="Gửi duyệt"
+                          >
+                            <SendHorizonal size={14} />
+                            Gửi duyệt
+                          </button>
+                        )}
                       <button
                         type="button"
                         onClick={(event) => {

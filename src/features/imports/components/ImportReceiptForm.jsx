@@ -69,6 +69,14 @@ export default function ImportReceiptForm({
     [products, draftItem.productId],
   );
 
+  const selectedProductPrice =
+    selectedProduct?.importPrice ?? selectedProduct?.price ?? 0;
+  const selectedProductCategory =
+    selectedProduct?.categoryName ||
+    (selectedProduct?.categoryId
+      ? `#${selectedProduct.categoryId}`
+      : "Chưa xác định");
+
   const [productSearch, setProductSearch] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -96,8 +104,14 @@ export default function ImportReceiptForm({
 
   const handleSelectProduct = (product) => {
     onDraftItemChange("productId", String(product.id));
+    onDraftItemChange("unitPrice", product.importPrice || product.price || 0);
     setProductSearch(product.name);
     setIsSearchOpen(false);
+  };
+
+  const handleClearSearch = () => {
+    setProductSearch("");
+    setIsSearchOpen(true);
   };
 
   return (
@@ -205,7 +219,25 @@ export default function ImportReceiptForm({
                       onFocus={() => setIsSearchOpen(true)}
                       placeholder="Tìm tên sản phẩm hoặc mã SKU..."
                     />
+                    {productSearch ? (
+                      <button
+                        type="button"
+                        className="imports-search-clear"
+                        onClick={handleClearSearch}
+                        aria-label="Xóa tìm kiếm"
+                      >
+                        <X size={16} />
+                      </button>
+                    ) : null}
                   </div>
+                  {selectedProduct ? (
+                    <div className="imports-selected-product-meta">
+                      <p className="text-xs text-slate-500">
+                        Đơn giá gợi ý: {formatCurrency(selectedProductPrice)} •
+                        Danh mục: {selectedProductCategory}
+                      </p>
+                    </div>
+                  ) : null}
 
                   {isSearchOpen && searchResults.length > 0 && (
                     <div className="imports-search-results imports-product-search-results">
@@ -231,6 +263,9 @@ export default function ImportReceiptForm({
                             <span>
                               {product.code} •{" "}
                               {product.description || "Sản phẩm kho"}
+                              {product.categoryId
+                                ? ` • Danh mục ${product.categoryId}`
+                                : ""}
                             </span>
                           </div>
                         </button>

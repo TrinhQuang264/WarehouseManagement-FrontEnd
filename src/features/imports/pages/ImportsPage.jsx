@@ -10,6 +10,7 @@ import { toast } from "../../../utils/toast.js";
 import ImportFilters from "../components/ImportFilters.jsx";
 import PaginationBar from "../../../components/ui/PaginationBar.jsx";
 import ImportReceiptDetail from "../components/ImportReceiptDetail.jsx";
+import ExportReceiptDetail from "../../exports/components/ExportReceiptDetail.jsx";
 import ImportReceiptForm from "../components/ImportReceiptForm.jsx";
 // import ImportStats from '../components/ImportStats.jsx';
 import ImportTable from "../components/ImportTable.jsx";
@@ -78,6 +79,7 @@ export default function ImportsPage() {
     deleteReceipt,
     createReceipt,
     updateReceipt,
+    submitReceipt,
     refreshList,
     setSearch,
     selectedSupplier,
@@ -264,6 +266,19 @@ export default function ImportsPage() {
     setDeleteConfirm({ isOpen: true, receipt });
   }, []);
 
+  const handleSubmitReceipt = useCallback(
+    async (receipt) => {
+      try {
+        await submitReceipt(receipt.id);
+        toast.success(`Phiếu "${receipt.receiptCode}" đã được gửi duyệt.`);
+      } catch (error) {
+        console.error("[ImportsPage] Error submitting receipt:", error);
+        toast.error("Gửi duyệt phiếu thất bại.");
+      }
+    },
+    [submitReceipt],
+  );
+
   const handleDeleteConfirm = useCallback(() => {
     if (!deleteConfirm.receipt) return;
 
@@ -416,17 +431,27 @@ export default function ImportsPage() {
 
   const handleSubmit = useCallback(async () => {
     try {
+      console.log(
+        "[ImportsPage] handleSubmit called, formReceipt:",
+        formReceipt,
+      );
       if (isEditMode) {
-        await updateReceipt(sourceReceipt.id, formReceipt);
+        console.log(
+          "[ImportsPage] Updating receipt (draft), id:",
+          sourceReceipt.id,
+        );
+        await updateReceipt(sourceReceipt.id, formReceipt, { submit: false });
         toast.success("Cập nhật phiếu nhập thành công.");
       } else {
-        await createReceipt(formReceipt);
+        console.log("[ImportsPage] Creating receipt (draft)");
+        await createReceipt(formReceipt, { submit: false });
         toast.success("Tạo phiếu nhập mới thành công.");
       }
+      console.log("[ImportsPage] Receipt saved, navigating to list");
       navigate(IMPORT_URLS.list);
       refreshList();
     } catch (error) {
-      toast.error("Lỗi khi lưu phiếu nhập. Vui lòng thử lại.");
+      toast.error("Lỗi khi gửi duyệt phiếu nhập. Vui lòng thử lại.");
     }
   }, [
     isEditMode,
@@ -481,11 +506,21 @@ export default function ImportsPage() {
             </button>
           </label>
         </div>
-        <ImportReceiptDetail
-          receipt={sourceReceipt}
-          viewMode={isPaperView ? "paper" : "document"}
-          paperRef={receiptPrintRef}
-        />
+        {(() => {
+          const codeToCheck =
+            sourceReceipt.receiptCode || sourceReceipt.code || "";
+          const isExport = codeToCheck.slice(0, 2).toUpperCase() === "SO";
+          const DetailComponent = isExport
+            ? ExportReceiptDetail
+            : ImportReceiptDetail;
+          return (
+            <DetailComponent
+              receipt={sourceReceipt}
+              viewMode={isPaperView ? "paper" : "document"}
+              paperRef={receiptPrintRef}
+            />
+          );
+        })()}
       </div>
     );
   }
@@ -551,6 +586,7 @@ export default function ImportsPage() {
           onEdit={openEdit}
           onViewDetail={openDetail}
           onDelete={handleDeleteClick}
+          onSubmit={handleSubmitReceipt}
         />
       </section>
 

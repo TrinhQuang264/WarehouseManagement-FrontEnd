@@ -76,6 +76,28 @@ const purchasesService = {
       console.error('Error adding items to purchase:', error);
       throw error;
     }
+  },
+
+  // POST /api/Purchases/{id}/approve
+  async approve(id) {
+    try {
+      const response = await api.post(`/Purchases/${id}/approve`);
+      return response.data;
+    } catch (error) {
+      console.error('Error approving purchase:', error);
+      throw error;
+    }
+  },
+
+  // POST /api/Purchases/{id}/cancel
+  async cancel(id, reasonObj) {
+    try {
+      const response = await api.post(`/Purchases/${id}/cancel`, reasonObj || { reason: "Hủy bỏ bởi thủ kho" });
+      return response.data;
+    } catch (error) {
+      console.error('Error canceling purchase:', error);
+      throw error;
+    }
   }
 };
 

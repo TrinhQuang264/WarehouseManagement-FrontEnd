@@ -68,6 +68,20 @@ export default function ExportReceiptForm({
       ) || null,
     [products, draftItem.productId],
   );
+  const selectedProductStock = Number(
+    selectedProduct?.quantity ?? selectedProduct?.stock ?? 0,
+  );
+  const selectedProductPrice =
+    selectedProduct?.sellingPrice ?? selectedProduct?.price ?? 0;
+  const selectedProductCategory =
+    selectedProduct?.categoryName ||
+    (selectedProduct?.categoryId
+      ? `#${selectedProduct.categoryId}`
+      : "Chưa xác định");
+  const isSelectedProductOutOfStock = selectedProductStock <= 0;
+  const isDraftQuantityTooLarge =
+    selectedProduct && Number(draftItem.quantity || 0) > selectedProductStock;
+
   const [productSearch, setProductSearch] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -94,8 +108,14 @@ export default function ExportReceiptForm({
 
   const handleSelectProduct = (product) => {
     onDraftItemChange("productId", String(product.id));
+    onDraftItemChange("unitPrice", product.sellingPrice || product.price || 0);
     setProductSearch(product.name);
     setIsSearchOpen(false);
+  };
+
+  const handleClearSearch = () => {
+    setProductSearch("");
+    setIsSearchOpen(true);
   };
 
   return (
@@ -198,36 +218,80 @@ export default function ExportReceiptForm({
                       onFocus={() => setIsSearchOpen(true)}
                       placeholder="Tìm tên sản phẩm hoặc mã SKU..."
                     />
+                    {productSearch ? (
+                      <button
+                        type="button"
+                        className="imports-search-clear"
+                        onClick={handleClearSearch}
+                        aria-label="Xóa tìm kiếm"
+                      >
+                        <X size={16} />
+                      </button>
+                    ) : null}
                   </div>
+                  {selectedProduct ? (
+                    <div className="imports-selected-product-meta">
+                      <p className="text-xs text-slate-500">
+                        Đơn giá gợi ý: {formatCurrency(selectedProductPrice)} •
+                        Danh mục: {selectedProductCategory}
+                      </p>
+                    </div>
+                  ) : null}
                   {isSearchOpen && searchResults.length > 0 && (
                     <div className="imports-search-results imports-product-search-results">
-                      {searchResults.map((product) => (
-                        <button
-                          key={product.id}
-                          type="button"
-                          className="imports-search-result"
-                          onMouseDown={(event) => event.preventDefault()}
-                          onClick={() => handleSelectProduct(product)}
-                        >
-                          <div className="imports-search-result-thumb">
-                            {product.imageUrl ? (
-                              <img
-                                src={product.imageUrl}
-                                alt={product.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : null}
-                          </div>
-                          <div className="imports-search-result-content">
-                            <p>{product.name}</p>
-                            <span>
-                              {product.code} • Tồn kho: {product.quantity ?? 0}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
+                      {searchResults.map((product) => {
+                        const availableStock = Number(
+                          product.quantity ?? product.stock ?? 0,
+                        );
+                        const isOutOfStock = availableStock <= 0;
+                        return (
+                          <button
+                            key={product.id}
+                            type="button"
+                            className={`imports-search-result ${isOutOfStock ? "opacity-40 cursor-not-allowed" : ""}`}
+                            disabled={isOutOfStock}
+                            onMouseDown={(event) => event.preventDefault()}
+                            onClick={() =>
+                              !isOutOfStock && handleSelectProduct(product)
+                            }
+                          >
+                            <div className="imports-search-result-thumb">
+                              {product.imageUrl ? (
+                                <img
+                                  src={product.imageUrl}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : null}
+                            </div>
+                            <div className="imports-search-result-content">
+                              <p>{product.name}</p>
+                              <span>
+                                {product.code} • Tồn kho: {availableStock}
+                                {isOutOfStock ? " • Hết hàng" : ""}
+                                {product.categoryId
+                                  ? ` • Danh mục ${product.categoryId}`
+                                  : ""}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
+                  {selectedProduct && isSelectedProductOutOfStock && (
+                    <p className="text-xs text-red-500 mt-2">
+                      Sản phẩm đã hết hàng.
+                    </p>
+                  )}
+                  {selectedProduct &&
+                    !isSelectedProductOutOfStock &&
+                    isDraftQuantityTooLarge && (
+                      <p className="text-xs text-red-500 mt-2">
+                        Số lượng xuất không được vượt quá tồn kho (
+                        {selectedProductStock}).
+                      </p>
+                    )}
                 </div>
               </label>
               <label className="imports-field">
@@ -257,7 +321,8 @@ export default function ExportReceiptForm({
               <div className="imports-entry-action">
                 <Button
                   variant="secondary"
-                  className="w-full justify-center border-primary/20 text-primary hover:bg-primary hover:text-white"
+                  disabled={isSelectedProductOutOfStock}
+                  className={`w-full justify-center border-primary/20 text-primary hover:bg-primary hover:text-white ${isSelectedProductOutOfStock ? "opacity-40 pointer-events-none" : ""}`}
                   onClick={onAddItem}
                 >
                   Thêm
@@ -317,6 +382,7 @@ export default function ExportReceiptForm({
                         <div className="imports-qty-stepper">
                           <button
                             type="button"
+                            className={item.quantity <= 1 ? "opacity-40" : ""}
                             onClick={() => onDecreaseQty(item.id)}
                           >
                             -
@@ -324,6 +390,24 @@ export default function ExportReceiptForm({
                           <span>{item.quantity}</span>
                           <button
                             type="button"
+                            className={
+                              Number(item.quantity) >=
+                              Number(
+                                products.find(
+                                  (product) =>
+                                    String(product.id) ===
+                                    String(item.productId),
+                                )?.quantity ??
+                                  products.find(
+                                    (product) =>
+                                      String(product.id) ===
+                                      String(item.productId),
+                                  )?.stock ??
+                                  0,
+                              )
+                                ? "opacity-40"
+                                : ""
+                            }
                             onClick={() => onIncreaseQty(item.id)}
                           >
                             +

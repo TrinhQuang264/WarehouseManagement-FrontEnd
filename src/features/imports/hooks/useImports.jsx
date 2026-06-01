@@ -11,6 +11,13 @@ const STATUS_LABELS = {
   draft: "Bản nháp",
 };
 
+const STATUS_KEY_MAP = {
+  0: "draft",
+  1: "pending",
+  2: "completed",
+  3: "cancelled",
+};
+
 const DATE_RANGE_FILTERS = {
   all: () => true,
   last7: (date) =>
@@ -89,10 +96,12 @@ export function useImports() {
       setProducts(Array.isArray(fetchedProducts) ? fetchedProducts : []);
       setSuppliers(Array.isArray(fetchedSuppliers) ? fetchedSuppliers : []);
 
+      console.log("DEBUG - fetchedPurchases:", fetchedPurchases);
       // Map purchases to receipts format
       const mappedReceipts = (
         Array.isArray(fetchedPurchases) ? fetchedPurchases : []
       )
+        .filter((p) => Number(p.type) === 1)
         .map((p) => {
           const supplier = (
             Array.isArray(fetchedSuppliers) ? fetchedSuppliers : []
@@ -143,7 +152,7 @@ export function useImports() {
             date: p.receiptDate || p.createdAt || new Date().toISOString(),
             note: p.note || "",
             referenceCode: p.referenceCode || "",
-            status: p.status || "completed", // Mock status
+            status: STATUS_KEY_MAP[p.status ?? p.Status] || "draft",
             supplierName:
               p.supplierName ||
               supplier?.supplierName ||
@@ -157,7 +166,8 @@ export function useImports() {
             vatAmount: 0,
             totalAmount: subTotal,
             statusLabel:
-              STATUS_LABELS[p.status || "completed"] || "Không xác định",
+              STATUS_LABELS[STATUS_KEY_MAP[p.status] || "draft"] ||
+              "Không xác định",
             itemSummary: mappedItems
               .map((item) => `${item.quantity} x ${item.productName}`)
               .join(", "),
@@ -165,6 +175,7 @@ export function useImports() {
         })
         .sort((a, b) => new Date(b.date) - new Date(a.date));
 
+      console.log("DEBUG - final mappedReceipts:", mappedReceipts);
       setReceipts(mappedReceipts);
     } catch (error) {
       console.error("Error fetching data for imports:", error);
@@ -265,13 +276,15 @@ export function useImports() {
     );
   }, []);
 
-  const createReceipt = async (receiptData) => {
+  const createReceipt = async (receiptData, { submit = false } = {}) => {
     const supplier = suppliers.find(
       (s) => String(s.id) === String(receiptData.supplierId),
     );
     const payload = {
       supplierId: receiptData.supplierId,
       warehouseId: 1,
+      type: 1,
+      Type: 1,
       supplierName: supplier
         ? supplier.supplierName
         : "Nhà cung cấp chưa xác định",
@@ -285,10 +298,18 @@ export function useImports() {
         quantity: item.quantity,
         unitCost: item.unitPrice || 0,
       })),
+      ...(submit ? { status: 1, Status: 1 } : {}),
     };
 
+    console.log(
+      "[useImports.createReceipt] Payload:",
+      payload,
+      "submit:",
+      submit,
+    );
     try {
       const response = await purchasesService.create(payload);
+      console.log("[useImports.createReceipt] Response:", response);
 
       // Update local state by re-fetching or optimistic UI update
       // For simplicity, we just trigger a page reload or let the component do it
@@ -300,7 +321,7 @@ export function useImports() {
     }
   };
 
-  const updateReceipt = async (id, receiptData) => {
+  const updateReceipt = async (id, receiptData, { submit = false } = {}) => {
     const supplier = suppliers.find(
       (s) => String(s.id) === String(receiptData.supplierId),
     );
@@ -308,6 +329,8 @@ export function useImports() {
       id: id,
       supplierId: receiptData.supplierId,
       warehouseId: 1,
+      type: 1,
+      Type: 1,
       supplierName: supplier
         ? supplier.supplierName
         : "Nhà cung cấp chưa xác định",
@@ -321,18 +344,71 @@ export function useImports() {
         quantity: item.quantity,
         unitCost: item.unitPrice || 0,
       })),
+      ...(submit ? { status: 1, Status: 1 } : {}),
     };
 
+    console.log(
+      "[useImports.updateReceipt] Payload:",
+      payload,
+      "submit:",
+      submit,
+    );
     try {
       const response = await purchasesService.update(id, payload);
+      console.log("[useImports.updateReceipt] Response:", response);
       return response;
     } catch (error) {
       console.error("Error updating receipt:", error);
       throw error;
     }
   };
+  const submitReceipt = async (id) => {
+    const receipt = getReceiptById(id);
+    console.log("[useImports.submitReceipt] Receipt to submit:", receipt);
+    if (!receipt) return;
+    if (
+      !(
+        receipt.status === "draft" ||
+        receipt.status === 0 ||
+        receipt.status === "0"
+      )
+    ) {
+      throw new Error("Chỉ phiếu ở trạng thái bản nháp mới được gửi duyệt.");
+    }
+
+    try {
+      // Build payload keeping all original data, only update status to 1
+      const payload = {
+        id: id,
+        supplierId: receipt.supplierId,
+        warehouseId: 1,
+        type: 1,
+        Type: 1,
+        supplierName: receipt.supplierName,
+        receiptDate: receipt.date,
+        referenceCode: receipt.referenceCode || "",
+        note: receipt.note || "",
+        status: 1,
+        Status: 1,
+        items: (receipt.items || []).map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          unitCost: item.unitPrice || 0,
+        })),
+      };
+      console.log("[useImports.submitReceipt] Submitting payload:", payload);
+      const response = await purchasesService.update(id, payload);
+      console.log("[useImports.submitReceipt] Response from update:", response);
+      await fetchData();
+      return response;
+    } catch (error) {
+      console.error("Error submitting receipt:", error);
+      throw error;
+    }
+  };
 
   return {
+    submitReceipt,
     products,
     suppliers,
     receipts,

@@ -1,15 +1,15 @@
 import api from '../../../lib/axios';
 
 const normalizeProductPayload = (data = {}) => {
-  const name = String(data.name ?? data.Name ?? '').trim();
-  const code = String(data.code ?? data.Code ?? '').trim();
-  const description = String(data.description ?? data.Description ?? '').trim();
-  const categoryId = Number(data.categoryId ?? data.CategoryId ?? 0);
-  const sellingPrice = Number(data.price ?? data.Price ?? data.sellingPrice ?? data.SellingPrice ?? 0);
-  const originalPrice = Number(data.originalPrice ?? data.OriginalPrice ?? data.importPrice ?? data.ImportPrice ?? 0);
-  const initialStock = Number(data.initialStock ?? data.InitialStock ?? data.quantity ?? data.Quantity ?? 1);
-  const imageUrl = String(data.imageUrl ?? data.ImageUrl ?? '').trim();
-
+  const name = String(data.name ?? '').trim();
+  const code = String(data.code ?? '').trim();
+  const description = String(data.description ?? '').trim();
+  const categoryId = Number(data.categoryId ?? 0);
+  const sellingPrice = Number(data.sellingPrice ?? 0);
+  const originalPrice = Number(data.originalPrice ?? 1);
+  const initialStock = Number(0);
+  const imageUrl = String(data.imageUrl ?? '').trim();
+  const warehouseLocation = String(data.warehouseLocation ?? '').trim();
   return {
     ...data,
     // camelCase (frontend internal + backend thường chấp nhận)
@@ -34,6 +34,7 @@ const normalizeProductPayload = (data = {}) => {
     ImportPrice: originalPrice,
     SellingPrice: sellingPrice,
     InitialStock: initialStock,
+    WarehourseLocation: warehouseLocation,
     ImageUrl: imageUrl,
   };
 };

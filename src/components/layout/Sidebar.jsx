@@ -18,6 +18,7 @@ import {
   PanelLeftClose,
   PanelRightClose,
   UserCircle2,
+  PackageOpen,
 } from "lucide-react";
 import "../../styles/slidebar.css";
 
@@ -25,6 +26,7 @@ const mainMenu = [
     { to: "/", icon: LayoutDashboard, label: "Tổng quan" },
     { to: "/import", icon: Download, label: "Nhập kho" },
     { to: "/export", icon: Upload, label: "Xuất kho" },
+    { to: "/approve", icon: PackageOpen, label: "Duyệt phiếu" },
     { to: "/inventory", icon: Package, label: "Tồn kho" },
 ];
 
