@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { useState, useCallback, useMemo } from "react";
 import { customers as mockCustomers } from "../../../utils/mockData";
 import { toast } from "../../../utils/toast";
+=======
+import { useState } from 'react';
+import { customers as mockCustomers } from '../../../utils/mockData';
+import { toast } from '../../../utils/toast';
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
 export function useCustomers() {
   // 1. Quản lý danh sách khách hàng
@@ -20,6 +26,7 @@ export function useCustomers() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingCustomer, setDeletingCustomer] = useState(null);
 
+<<<<<<< HEAD
   // 4. State cho tìm kiếm
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -67,17 +74,20 @@ export function useCustomers() {
     === END API CALL ===*/
   }, []);
 
+=======
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   // --- XỬ LÝ SỰ KIỆN ---
-  const handleOpenAdd = useCallback(() => {
+  const handleOpenAdd = () => {
     setEditingCustomer(null);
     setIsFormOpen(true);
-  }, []);
+  };
 
-  const handleOpenEdit = useCallback((customer) => {
+  const handleOpenEdit = (customer) => {
     setEditingCustomer(customer);
     setIsFormOpen(true);
-  }, []);
+  };
 
+<<<<<<< HEAD
   const handleSave = useCallback(
     (formData) => {
       setCustomers((prev) => {
@@ -97,23 +107,43 @@ export function useCustomers() {
     },
     [editingCustomer],
   );
+=======
+  const handleSave = (formData) => {
+    if (editingCustomer) {
+      setCustomers(prev => prev.map(c => c.id === editingCustomer.id ? { ...c, ...formData } : c));
+      toast.success('Cập nhật khách hàng thành công');
+    } else {
+      const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
+      setCustomers(prev => [{ id: newId, ...formData }, ...prev]);
+      toast.success('Thêm khách hàng mới thành công');
+    }
+    setIsFormOpen(false);
+  };
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
-  const handleOpenDelete = useCallback((customer) => {
+  const handleOpenDelete = (customer) => {
     setDeletingCustomer(customer);
     setIsDeleteOpen(true);
-  }, []);
+  };
 
+<<<<<<< HEAD
   const confirmDelete = useCallback(() => {
     setCustomers((prev) => prev.filter((c) => c.id !== deletingCustomer.id));
     setIsDeleteOpen(false);
     toast.success("Xóa khách hàng thành công");
   }, [deletingCustomer]);
+=======
+  const confirmDelete = () => {
+    setCustomers(prev => prev.filter(c => c.id !== deletingCustomer.id));
+    setIsDeleteOpen(false);
+    toast.success('Xóa khách hàng thành công');
+  };
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
   const nextCode = `KH${String(customers.length + 1).padStart(3, "0")}`;
 
   return {
     customers,
-    filteredCustomers,
     isFormOpen,
     setIsFormOpen,
     editingCustomer,
@@ -125,7 +155,11 @@ export function useCustomers() {
     handleSave,
     handleOpenDelete,
     confirmDelete,
+<<<<<<< HEAD
     searchCustomers,
     nextCode,
+=======
+    nextCode
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   };
 }

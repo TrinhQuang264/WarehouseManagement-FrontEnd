@@ -1,26 +1,38 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { useBlocker } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
 import '../styles/Settings.css';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs';
+=======
+import { Link, useBlocker } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
-  const [localTheme, setLocalTheme] = useState('system');
+  
+  // Local state for settings preview
+  const [localTheme, setLocalTheme] = useState(theme);
   const [localLang, setLocalLang] = useState('vi');
+  
+  // To highlight save button
   const [shake, setShake] = useState(false);
 
+  // Check if there are unsaved changes
   const hasChanges = localTheme !== theme || localLang !== 'vi';
   useEffect(() => {
     setLocalTheme(theme);
   }, [theme]);
 
+  // Navigation Blocker
   let blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       hasChanges && currentLocation.pathname !== nextLocation.pathname
   );
 
   useEffect(() => {
+<<<<<<< HEAD
     if (blocker.state !== 'blocked') return;
     setShake(true);
     const timer = setTimeout(() => {
@@ -28,10 +40,18 @@ export default function SettingsPage() {
       blocker.reset();
     }, 500);
     return () => clearTimeout(timer);
+=======
+    if (blocker.state === 'blocked') {
+      setShake(true);
+      setTimeout(() => setShake(false), 1000);
+      blocker.reset();
+    }
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   }, [blocker]);
 
   const handleSave = () => {
     setTheme(localTheme);
+    // if there was a global lang context, set it here
   };
 
   const handleCancel = () => {
@@ -40,12 +60,25 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="settings-page">
+    <div className="p-5 pt-0 space-y-5">
+      {/* Breadcrumb */}
+      <nav className="flex text-sm text-slate-500 dark:text-slate-400 mb-2">
+        <ol className="flex items-center space-x-2">
+          <li><Link to="/" className="cursor-pointer hover:text-primary transition-colors">Trang chủ</Link></li>
+          <li><span className="material-icons text-xs">chevron_right</span></li>
+          <li className="font-medium text-slate-900 dark:text-white">Cài đặt</li>
+        </ol>
+      </nav>
+
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Cài đặt hệ thống</h2>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Quản lý các tùy chỉnh giao diện và ngôn ngữ của bạn.</p>
+      </div>
+
       <div className="space-y-6">
-        <Breadcrumbs />
-        <div className="settings-section">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="text-lg font-semibold flex items-center gap-2 text-slate-900 dark:text-white">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
               <span className="material-icons text-primary">palette</span>
               Giao diện
             </h3>
@@ -55,11 +88,11 @@ export default function SettingsPage() {
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button 
-                className={`settings-card ${localTheme === 'light' ? 'settings-card-active' : 'settings-card-inactive'}`} 
+                className={`group relative border-2 bg-white dark:bg-slate-800 rounded-xl p-4 flex flex-col items-center gap-3 transition-all outline-none focus:outline-none ring-offset-2 ring-primary ${localTheme === 'light' ? 'border-primary' : 'border-transparent'}`} 
                 onClick={() => setLocalTheme('light')}
               >
-                <div className="theme-preview theme-preview-light">
-                  <div className="theme-icon-circle bg-white">
+                <div className="w-full h-24 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-200">
+                  <div className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center">
                     <span className="material-icons text-orange-400 text-3xl">light_mode</span>
                   </div>
                 </div>
@@ -72,11 +105,11 @@ export default function SettingsPage() {
               </button>
 
               <button 
-                className={`settings-card ${localTheme === 'dark' ? 'settings-card-active' : 'settings-card-inactive'}`} 
+                className={`group relative border-2 bg-white dark:bg-slate-800 rounded-xl p-4 flex flex-col items-center gap-3 transition-all outline-none focus:outline-none ring-offset-2 ring-primary ${localTheme === 'dark' ? 'border-primary' : 'border-transparent'}`} 
                 onClick={() => setLocalTheme('dark')}
               >
-                <div className="theme-preview theme-preview-dark">
-                  <div className="theme-icon-circle bg-slate-800">
+                <div className="w-full h-24 bg-slate-900 rounded-lg flex items-center justify-center border border-slate-700">
+                  <div className="w-12 h-12 bg-slate-800 rounded-full shadow-lg flex items-center justify-center">
                     <span className="material-icons text-indigo-400 text-3xl">dark_mode</span>
                   </div>
                 </div>
@@ -89,11 +122,11 @@ export default function SettingsPage() {
               </button>
 
               <button 
-                className={`settings-card ${localTheme === 'system' ? 'settings-card-active' : 'settings-card-inactive'}`}
+                className={`group relative border-2 bg-white dark:bg-slate-800 rounded-xl p-4 flex flex-col items-center gap-3 transition-all outline-none focus:outline-none ring-offset-2 ring-primary ${localTheme === 'system' ? 'border-primary' : 'border-transparent'}`}
                 onClick={() => setLocalTheme('system')}
               >
-                <div className="theme-preview theme-preview-system">
-                  <div className="theme-icon-circle bg-white dark:bg-slate-800">
+                <div className="w-full h-24 bg-gradient-to-r from-slate-50 to-slate-900 rounded-lg flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                  <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg flex items-center justify-center">
                     <span className="material-icons text-slate-500 text-3xl">settings_brightness</span>
                   </div>
                 </div>
@@ -108,9 +141,9 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="settings-section">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="text-lg font-semibold flex items-center gap-2 text-slate-900 dark:text-white">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
               <span className="material-icons text-primary">translate</span>
               Ngôn ngữ
             </h3>
@@ -141,16 +174,15 @@ export default function SettingsPage() {
           <div className="flex items-center justify-end gap-3 pt-4">
             <button 
               onClick={handleCancel}
-              className="px-6 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all font-bold"
+              className="px-6 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
             >
                 Hủy bỏ
             </button>
             <button 
               onClick={handleSave}
-              className={`px-6 py-2.5 rounded-lg text-white text-sm font-semibold shadow-lg transition-all font-bold ${ shake 
-                          ? 'bg-red-500 shadow-indigo-500/50 animate-shake' 
-                          : 'bg-primary shadow-blue-500/20 hover:bg-blue-600'
-                        }`}
+              className={`px-6 py-2.5 rounded-lg text-white text-sm font-semibold shadow-lg transition-all ${
+                shake ? 'bg-indigo-500 shadow-indigo-500/50 animate-[shake_0.4s_ease-in-out_2]' : 'bg-primary shadow-blue-500/20 hover:bg-blue-600'
+              }`}
             >
                 Lưu thay đổi
             </button>

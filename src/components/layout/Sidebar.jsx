@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
+=======
+import { NavLink, Link } from 'react-router-dom';
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 import {
   LayoutDashboard,
   Smartphone,
@@ -12,11 +16,17 @@ import {
   Settings,
   LogOut,
   FolderTree,
+<<<<<<< HEAD
   Users2,
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
 import Avatar from "../ui/Avatar";
+=======
+  Users2
+} from 'lucide-react';
+import Avatar from '../ui/Avatar';
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
 // Danh sách menu chính
 const mainMenu = [
@@ -62,11 +72,14 @@ export default function Sidebar({ user, onLogout }) {
         <span className="sidebar-logo-text">WareSmart</span>
       </div>
 
+      {/* Navigation */}
       <nav className="sidebar-nav">
+        {/* Menu chính */}
         {mainMenu.map((item) => (
           <SidebarLink key={item.to} item={item} />
         ))}
 
+<<<<<<< HEAD
         <div
           className="sidebar-section-title flex justify-between items-center"
           onClick={() => toggleSection("manager")}
@@ -80,10 +93,16 @@ export default function Sidebar({ user, onLogout }) {
               <ChevronRight size={16} />
             )}
           </span>
+=======
+        {/* Phân cách hệ thống */}
+        <div className="sidebar-section-title">
+          Hệ thống
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
         </div>
         {expandedSections.manager &&
           managerMenu.map((item) => <SidebarLink key={item.to} item={item} />)}
 
+<<<<<<< HEAD
         <div
           className="sidebar-section-title flex justify-between items-center"
           onClick={() => toggleSection("system")}
@@ -100,6 +119,12 @@ export default function Sidebar({ user, onLogout }) {
         </div>
         {expandedSections.system &&
           systemMenu.map((item) => <SidebarLink key={item.to} item={item} />)}
+=======
+        {/* Menu hệ thống */}
+        {systemMenu.map((item) => (
+          <SidebarLink key={item.to} item={item} />
+        ))}
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
       </nav>
 
       {/* User Info */}

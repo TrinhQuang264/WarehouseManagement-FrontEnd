@@ -1,3 +1,4 @@
+
 /* Shared Layout Classes */
 .layout-wrapper {
   display: flex;
@@ -374,6 +375,7 @@
 
 .table {
   width: 100%;
+  text-align: left;
   text-align: left;
   border-collapse: collapse;
 }

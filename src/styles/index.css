@@ -4,6 +4,9 @@
 /* Thiết lập Dark Mode dạng class cho Tailwind v4 */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Thiết lập Dark Mode dạng class cho Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================
    CUSTOM THEME — Tailwind CSS v4 @theme block
    Định nghĩa các biến thiết kế dùng chung
@@ -104,6 +107,7 @@ body {
   animation: fadeInUp 0.5s ease-out both;
 }
 
+<<<<<<< HEAD
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -129,4 +133,11 @@ body {
 
 .animate-slideInRight {
   animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+=======
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 }

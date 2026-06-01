@@ -52,6 +52,7 @@ export default function Header() {
 
   return (
     <header className="header">
+<<<<<<< HEAD
       <div className="header-content">
         <div className="header-left">
           {title && (
@@ -104,6 +105,24 @@ export default function Header() {
             </div>
           )}
         </div>
+=======
+      {/* Breadcrumbs thay cho Ô tìm kiếm */}
+      <Breadcrumbs />
+
+      {/* Các nút hành động bên phải */}
+      <div className="header-actions">
+        {/* Nút trợ giúp */}
+        <button className="header-icon-btn" title="Trợ giúp">
+          <HelpCircle size={20} />
+        </button>
+
+        {/* Nút thông báo - Chuyển ra ngoài cùng bên phải */}
+        <button className="header-icon-btn relative" title="Thông báo">
+          <Bell size={20} />
+          {/* Chấm đỏ báo có thông báo mới */}
+          <span className="notification-badge" />
+        </button>
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
       </div>
     </header>
   );

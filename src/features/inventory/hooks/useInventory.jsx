@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect } from "react";
 
 const MOCK_CATEGORIES = [
@@ -89,6 +90,12 @@ const MOCK_PRODUCTS = [
     price: 1200000,
   },
 ];
+=======
+import { useState, useEffect } from 'react';
+import productService from '../../products/api/productsService';
+import categoryService from '../../categories/api/categoriesService';
+import dashboardService from '../../dashboard/api/dashboardService';
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
 export function useInventory() {
   const [products, setProducts] = useState([]);
@@ -123,8 +130,9 @@ export function useInventory() {
     return () => clearTimeout(handler);
   }, [search]);
 
-  // Load Categories & Statistics from Mock Data
+  // Lấy dữ liệu thống kê và danh mục
   useEffect(() => {
+<<<<<<< HEAD
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCategories(MOCK_CATEGORIES);
 
@@ -144,16 +152,44 @@ export function useInventory() {
         minute: "2-digit",
       }),
     });
+=======
+    const initPage = async () => {
+      try {
+        const [catData, statsData] = await Promise.all([
+          categoryService.getAll(),
+          dashboardService.getStats()
+        ]);
+        setCategories(catData || []);
+        if (statsData) {
+          setStats({
+            totalItems: statsData.totalProducts || 0,
+            lowStock: statsData.lowStockCount || 0,
+            totalValue: statsData.totalInventoryValue || 0,
+            lastUpdate: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+          });
+        }
+      } catch (error) {
+        console.error('[useInventory] Lỗi khởi tạo:', error);
+      }
+    };
+    initPage();
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   }, []);
 
-  // Fetch Inventory (Mock processing)
-  const fetchInventory = (isInitial = false) => {
+  // Fetch sản phẩm
+  const fetchInventory = async (isInitial = false) => {
     setLoading(true);
     if (isInitial) setIsFirstFetch(true);
 
-    setTimeout(() => {
-      let filtered = [...MOCK_PRODUCTS];
+    try {
+      const response = await productService.filter({
+        filter: debouncedSearch,
+        pageIndex: currentPage,
+        pageSize: pageSize,
+        categoryId: selectedCategory || undefined
+      });
 
+<<<<<<< HEAD
       if (debouncedSearch) {
         filtered = filtered.filter(
           (p) =>
@@ -167,22 +203,28 @@ export function useInventory() {
           (p) => p.categoryId.toString() === selectedCategory.toString(),
         );
       }
+=======
+      const items = response.items || response.data || [];
+      const total = response.totalCount || items.length;
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
+      let finalItems = items;
       if (lowStockOnly) {
+<<<<<<< HEAD
         filtered = filtered.filter((p) => p.quantity <= 10);
+=======
+        finalItems = items.filter(p => p.quantity <= 10);
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
       }
 
-      const total = filtered.length;
+      setProducts(finalItems);
       setTotalCount(total);
-
-      // Pagination
-      const startIndex = (currentPage - 1) * pageSize;
-      const paginated = filtered.slice(startIndex, startIndex + pageSize);
-
-      setProducts(paginated);
+    } catch (error) {
+      console.error('[useInventory] Lỗi fetch dữ liệu:', error);
+    } finally {
       setLoading(false);
       setIsFirstFetch(false);
-    }, 500); // simulate network delay
+    }
   };
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -205,6 +247,10 @@ export function useInventory() {
     currentPage,
     setCurrentPage,
     pageSize,
+<<<<<<< HEAD
     totalCount,
+=======
+    totalCount
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   };
 }

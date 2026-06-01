@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import productService from "../api/productsService";
@@ -8,6 +9,11 @@ const PAGE_SIZE = 10;
 const extractApiErrorMessage = (error, fallback) => {
   const data = error?.response?.data;
   if (!data) return fallback;
+=======
+import { useState, useEffect, useMemo } from 'react';
+import productService from '../api/productsService';
+import categoryService from '../../categories/api/categoriesService';
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
   const directMessage = data.message || data.error || data.title || data.detail;
   if (directMessage) return directMessage;
@@ -64,6 +70,7 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [totalCount, setTotalCount] = useState(0);
 
+<<<<<<< HEAD
   // Filter state
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialCategoryId);
   const [minPrice, setMinPrice] = useState("");
@@ -88,9 +95,72 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     if (pageSize !== defaultPageSize) params.set("pageSize", pageSize);
     setSearchParams(params, { replace: true });
   }, [currentPage, debouncedSearch, selectedCategoryId, pageSize, defaultPageSize, setSearchParams]);
+=======
+  // Lấy danh mục
+  const fetchCategories = async () => {
+    try {
+      const data = await categoryService.getAll();
+      setCategories(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('[useProducts] Lỗi lấy danh mục:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   // Debounce search
   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Reset về trang 1 khi tìm kiếm thay đổi
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  // Fetch sản phẩm
+  const fetchProducts = async (isInitial = false) => {
+    setLoading(true);
+    if (isInitial) setIsFirstFetch(true);
+    
+    try {
+      const response = await productService.filter({
+        filter: debouncedSearch,
+        pageIndex: currentPage,
+        pageSize: pageSize
+      });
+      
+      let items = [];
+      let total = 0;
+
+      if (response) {
+        if (Array.isArray(response)) {
+          items = response;
+          total = response.length;
+        } else {
+          items = response.items || response.data || response.results || response.products || [];
+          total = response.totalCount || response.totalItems || response.count || response.total || items.length;
+        }
+      }
+      
+      setProducts(Array.isArray(items) ? items : []);
+      setTotalCount(total);
+    } catch (error) {
+      console.error('[useProducts] Lỗi API:', error);
+    } finally {
+      setLoading(false);
+      setIsFirstFetch(false);
+    }
+  };
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+
+  useEffect(() => {
+<<<<<<< HEAD
     if (isFirstMount.current) {
       isFirstMount.current = false;
       return;
@@ -216,6 +286,10 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     fetchProducts();
     return () => abortControllerRef.current?.abort();
   }, [fetchProducts]);
+=======
+    fetchProducts(isFirstFetch);
+  }, [currentPage, pageSize, debouncedSearch]);
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
   // --- Handlers ---
 
@@ -339,6 +413,7 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     setCurrentPage(1);
   };
 
+<<<<<<< HEAD
   const searchProducts = useCallback((value) => {
     setSearch(value);
   }, []);
@@ -351,12 +426,17 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
   return {
     products,
     filteredProducts: products, // Alias for compatibility
+=======
+  return {
+    products: filteredProducts,
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
     categories,
     loading,
     isSubmitting,
 
     search,
     setSearch,
+<<<<<<< HEAD
     debouncedSearch,
     currentPage,
     setCurrentPage,
@@ -366,10 +446,13 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     // Filters
     selectedCategoryId,
     setSelectedCategoryId,
+=======
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
     minPrice,
     setMinPrice,
     maxPrice,
     setMaxPrice,
+<<<<<<< HEAD
     resetFilters,
 
     // Modals & Selection
@@ -392,5 +475,13 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
     clearSelection,
     searchProducts,
     refreshList: fetchProducts,
+=======
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    totalCount,
+    resetFilters
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   };
 }
