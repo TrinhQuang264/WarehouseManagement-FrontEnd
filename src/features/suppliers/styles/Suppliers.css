@@ -1,28 +1,26 @@
 /* Supplier Page Styles */
 .suppliers-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  animation: fadeInUp 0.5s ease-out both;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    animation: fadeInUp 0.5s ease-out both;
 }
-
 
 /* Pagination Styles */
 
 /* Supplier Table Specific */
 
 .supplier-code-badge {
-  padding-left: 0.625rem;
-  padding-right: 0.625rem;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-  border-radius: 0.375rem;
-  background-color: #f1f5f9;
-  color: #475569;
-  font-size: 0.75rem;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  border: 1px solid #e2e8f0;
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    border-radius: 0.375rem;
+    background-color: #f1f5f9;
+    color: #475569;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border: 1px solid #e2e8f0;
 }
-

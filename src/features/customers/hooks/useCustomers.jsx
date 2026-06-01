@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+import { useState, useCallback, useMemo } from "react";
+import { customers as mockCustomers } from "../../../utils/mockData";
+import { toast } from "../../../utils/toast";
+=======
+import { useState } from 'react';
+import { customers as mockCustomers } from '../../../utils/mockData';
+import { toast } from '../../../utils/toast';
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+=======
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import customersService from "../api/customersService";
@@ -12,6 +23,7 @@ const normalizeCustomerPayload = (data = {}) => ({
   address: String(data.address || "").trim(),
   email: String(data.email || "").trim(),
 });
+>>>>>>> develop
 
 export function useCustomers() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -26,9 +38,15 @@ export function useCustomers() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFirstFetch, setIsFirstFetch] = useState(true);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+  // 4. State cho tìm kiếm
+  const [searchQuery, setSearchQuery] = useState("");
+=======
   // Đồng bộ hóa việc đọc dữ liệu ban đầu từ URL params
   const initialSearch = searchParams.get("search") || "";
   const initialPage = Number(searchParams.get("page")) || 1;
+>>>>>>> develop
 
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
@@ -76,6 +94,73 @@ export function useCustomers() {
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
 
+<<<<<<< HEAD
+=======
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+  // --- XỬ LÝ SỰ KIỆN ---
+  const handleOpenAdd = () => {
+    setEditingCustomer(null);
+    setIsFormOpen(true);
+  };
+
+  const handleOpenEdit = (customer) => {
+    setEditingCustomer(customer);
+    setIsFormOpen(true);
+  };
+
+<<<<<<< HEAD
+  const handleSave = useCallback(
+    (formData) => {
+      setCustomers((prev) => {
+        if (editingCustomer) {
+          toast.success("Cập nhật khách hàng thành công");
+          return prev.map((c) =>
+            c.id === editingCustomer.id ? { ...c, ...formData } : c,
+          );
+        } else {
+          const newId =
+            prev.length > 0 ? Math.max(...prev.map((c) => c.id)) + 1 : 1;
+          toast.success("Thêm khách hàng mới thành công");
+          return [{ id: newId, ...formData }, ...prev];
+        }
+      });
+      setIsFormOpen(false);
+    },
+    [editingCustomer],
+  );
+=======
+  const handleSave = (formData) => {
+    if (editingCustomer) {
+      setCustomers(prev => prev.map(c => c.id === editingCustomer.id ? { ...c, ...formData } : c));
+      toast.success('Cập nhật khách hàng thành công');
+    } else {
+      const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
+      setCustomers(prev => [{ id: newId, ...formData }, ...prev]);
+      toast.success('Thêm khách hàng mới thành công');
+    }
+    setIsFormOpen(false);
+  };
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+
+  const handleOpenDelete = (customer) => {
+    setDeletingCustomer(customer);
+    setIsDeleteOpen(true);
+  };
+
+<<<<<<< HEAD
+  const confirmDelete = useCallback(() => {
+    setCustomers((prev) => prev.filter((c) => c.id !== deletingCustomer.id));
+    setIsDeleteOpen(false);
+    toast.success("Xóa khách hàng thành công");
+  }, [deletingCustomer]);
+=======
+  const confirmDelete = () => {
+    setCustomers(prev => prev.filter(c => c.id !== deletingCustomer.id));
+    setIsDeleteOpen(false);
+    toast.success('Xóa khách hàng thành công');
+  };
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+=======
     setIsFetching(true);
     setLoading(true);
     try {
@@ -107,6 +192,7 @@ export function useCustomers() {
       const total = filteredItems.length;
       const start = (currentPage - 1) * pageSize;
       const paginatedItems = filteredItems.slice(start, start + pageSize);
+>>>>>>> develop
 
       setCustomers(paginatedItems);
       setTotalCount(total);
@@ -226,6 +312,26 @@ export function useCustomers() {
   const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
   return {
+<<<<<<< HEAD
+    customers,
+    isFormOpen,
+    setIsFormOpen,
+    editingCustomer,
+    isDeleteOpen,
+    setIsDeleteOpen,
+    deletingCustomer,
+    handleOpenAdd,
+    handleOpenEdit,
+    handleSave,
+    handleOpenDelete,
+    confirmDelete,
+<<<<<<< HEAD
+    searchCustomers,
+    nextCode,
+=======
+    nextCode
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
+=======
     customers, // Danh sách khách hàng đã được phân trang (tương đương paginatedCustomers cũ)
     allActiveCustomers, // Toàn bộ danh sách khách hàng đang hoạt động (chưa xóa)
     loading,
@@ -256,5 +362,6 @@ export function useCustomers() {
     openDeleteModal,
     nextCode,
     refreshList: fetchCustomers,
+>>>>>>> develop
   };
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import suppliersService from "../api/suppliersService";
@@ -11,6 +12,15 @@ const normalizeSupplierPayload = (data = {}) => ({
   address: String(data.address || "").trim(),
   email: String(data.email || "").trim(),
 });
+=======
+<<<<<<< HEAD
+import { useState } from 'react';
+=======
+import { useState, useCallback, useMemo } from 'react';
+>>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
+import { suppliers as mockSuppliers } from '../../../utils/mockData';
+import { toast } from '../../../utils/toast';
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
 export function useSuppliers() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,8 +33,48 @@ export function useSuppliers() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFirstFetch, setIsFirstFetch] = useState(true);
 
+<<<<<<< HEAD
   const initialSearch = searchParams.get("search") || "";
   const initialPage = Number(searchParams.get("page")) || 1;
+=======
+<<<<<<< HEAD
+  // --- XỬ LÝ SỰ KIỆN ---
+  const handleOpenAdd = () => {
+    setEditingSupplier(null);
+    setIsFormOpen(true);
+  };
+
+  const handleOpenEdit = (supplier) => {
+    setEditingSupplier(supplier);
+    setIsFormOpen(true);
+  };
+
+  const handleSave = (formData) => {
+    if (editingSupplier) {
+      setSuppliers(prev => prev.map(s => s.id === editingSupplier.id ? { ...s, ...formData } : s));
+      toast.success('Cập nhật nhà cung cấp thành công');
+    } else {
+      const newId = suppliers.length > 0 ? Math.max(...suppliers.map(s => s.id)) + 1 : 1;
+      setSuppliers(prev => [{ id: newId, ...formData }, ...prev]);
+      toast.success('Thêm nhà cung cấp mới thành công');
+    }
+    setIsFormOpen(false);
+  };
+
+  const handleOpenDelete = (supplier) => {
+    setDeletingSupplier(supplier);
+    setIsDeleteOpen(true);
+  };
+
+  const confirmDelete = () => {
+    setSuppliers(prev => prev.filter(s => s.id !== deletingSupplier.id));
+    setIsDeleteOpen(false);
+    toast.success('Xóa nhà cung cấp thành công');
+  };
+=======
+  // 4. State cho tìm kiếm
+  const [searchQuery, setSearchQuery] = useState('');
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
@@ -97,6 +147,7 @@ export function useSuppliers() {
       const start = (currentPage - 1) * pageSize;
       const paginatedItems = filteredItems.slice(start, start + pageSize);
 
+<<<<<<< HEAD
       setSuppliers(paginatedItems);
       setTotalCount(total);
     } catch (error) {
@@ -112,6 +163,14 @@ export function useSuppliers() {
       }
     }
   }, [debouncedSearch, currentPage, pageSize]);
+=======
+  const confirmDelete = useCallback(() => {
+    setSuppliers(prev => prev.filter(s => s.id !== deletingSupplier.id));
+    setIsDeleteOpen(false);
+    toast.success('Xóa nhà cung cấp thành công');
+  }, [deletingSupplier]);
+>>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
 
   useEffect(() => {
     fetchSuppliers();
@@ -201,6 +260,7 @@ export function useSuppliers() {
 
   return {
     suppliers,
+<<<<<<< HEAD
     allActiveSuppliers,
     loading,
     isFetching,
@@ -228,5 +288,27 @@ export function useSuppliers() {
     openEditModal,
     openDeleteModal,
     refreshList: fetchSuppliers,
+=======
+<<<<<<< HEAD
+=======
+    filteredSuppliers,
+>>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
+    isFormOpen,
+    setIsFormOpen,
+    editingSupplier,
+    isDeleteOpen,
+    setIsDeleteOpen,
+    deletingSupplier,
+    handleOpenAdd,
+    handleOpenEdit,
+    handleSave,
+    handleOpenDelete,
+    confirmDelete,
+<<<<<<< HEAD
+=======
+    searchSuppliers,
+>>>>>>> c9d4396b0eea2861fbc38a435f7cd5d40ab73b2a
+    nextCode
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   };
 }

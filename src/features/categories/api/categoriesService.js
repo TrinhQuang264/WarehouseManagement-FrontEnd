@@ -3,6 +3,7 @@ import api from '../../../lib/axios';
 const categoryService = {
   // GET /api/Categories/all
   async getAll() {
+<<<<<<< HEAD
     try {
       const response = await api.get('/Categories/all');
       return response.data || [];
@@ -10,6 +11,10 @@ const categoryService = {
       console.warn('[categoryService] Lỗi getAll:', error);
       return [];
     }
+=======
+    const response = await api.get('/Categories/all');
+    return response.data;
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   },
 
   // GET /api/Categories/filter
@@ -32,6 +37,7 @@ const categoryService = {
 
   // GET /api/Categories/{id}
   async getById(id) {
+<<<<<<< HEAD
     try {
       const response = await api.get(`/Categories/${id}`);
       return response.data;
@@ -49,6 +55,21 @@ const categoryService = {
       console.error('[categoryService] Lỗi khi tạo danh mục:', error);
       throw error;
     }
+=======
+    const response = await api.get(`/Categories/${id}`);
+    return response.data;
+  },
+
+  /**
+   * Lọc và tìm kiếm danh mục
+   * GET /api/Categories/filter
+   * @param {Object} params - Các tham số lọc { search, page, pageSize }
+   * @returns {Promise<Object>}
+   */
+  async filter(params = {}) {
+    const response = await api.get('/Categories/filter', { params });
+    return response.data;
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   },
 
   // PUT /api/Categories/{id}
@@ -112,6 +133,7 @@ const categoryService = {
 
   // GET /api/Categories/{id}/products
   async getProductsByCategory(id) {
+<<<<<<< HEAD
     try {
       const response = await api.get(`/Categories/${id}/products`);
       return response.data;
@@ -130,6 +152,10 @@ const categoryService = {
       console.error('[categoryService] Lỗi khi lấy dữ liệu thùng rác:', error);
       throw error;
     }
+=======
+    const response = await api.get(`/Categories/${id}/products`);
+    return response.data;
+>>>>>>> 3a5566f739b6b8c84db6d85232bb921ac357dbbf
   }
 };
 
