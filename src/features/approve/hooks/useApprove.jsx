@@ -108,7 +108,7 @@ export function useApprove() {
   const handleCancel = async (id, reason) => {
     try {
       await purchasesService.cancel(id, {
-        reason: reason || "Hủy bỏ bởi quản trị viên",
+        noteCancel: reason || "Hủy bỏ bởi quản trị viên",
       });
       toast.success("Đã hủy phiếu thành công!");
       fetchReceipts();

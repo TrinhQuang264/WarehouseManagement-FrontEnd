@@ -89,10 +89,21 @@ const purchasesService = {
     }
   },
 
+  // POST /api/Purchases/{id}/confirm
+  async confirm(id) {
+    try {
+      const response = await api.post(`/Purchases/${id}/confirm`);
+      return response.data;
+    } catch (error) {
+      console.error('Error confirming purchase:', error);
+      throw error;
+    }
+  },
+
   // POST /api/Purchases/{id}/cancel
   async cancel(id, reasonObj) {
     try {
-      const response = await api.post(`/Purchases/${id}/cancel`, reasonObj || { reason: "Hủy bỏ bởi thủ kho" });
+      const response = await api.post(`/Purchases/${id}/cancel`, reasonObj || { noteCancel: "Hủy bỏ bởi thủ kho" });
       return response.data;
     } catch (error) {
       console.error('Error canceling purchase:', error);

@@ -265,13 +265,12 @@ export default function ExportReceiptForm({
                               ) : null}
                             </div>
                             <div className="imports-search-result-content">
-                              <p>{product.name}</p>
+                              <p>
+                                {product.name} - SL: {availableStock}
+                              </p>
                               <span>
-                                {product.code} • Tồn kho: {availableStock}
+                                {product.code} - {product.categoryName || (product.categoryId ? `Danh mục ${product.categoryId}` : "")}
                                 {isOutOfStock ? " • Hết hàng" : ""}
-                                {product.categoryId
-                                  ? ` • Danh mục ${product.categoryId}`
-                                  : ""}
                               </span>
                             </div>
                           </button>

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import purchasesService from "../api/purchasesService";
 import productsService from "../../products/api/productsService";
 import suppliersService from "../../suppliers/api/suppliersService";
+import categoryService from "../../categories/api/categoriesService";
 import { toast } from "../../../utils/toast";
 
 const STATUS_LABELS = {
@@ -82,18 +83,29 @@ export function useImports() {
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [productsData, suppliersData, purchasesData] = await Promise.all([
+      const [productsData, suppliersData, purchasesData, categoriesData] = await Promise.all([
         productsService.getAll(),
         suppliersService.getAll(),
         purchasesService.getAll(),
+        categoryService.getAll(),
       ]);
 
       // Handle potentially wrapped responses
       const fetchedProducts = productsData.data || productsData || [];
       const fetchedSuppliers = suppliersData.data || suppliersData || [];
       const fetchedPurchases = purchasesData.data || purchasesData || [];
+      const fetchedCategories = categoriesData?.data || categoriesData || [];
 
-      setProducts(Array.isArray(fetchedProducts) ? fetchedProducts : []);
+      const categoryMap = new Map(
+        (Array.isArray(fetchedCategories) ? fetchedCategories : []).map((c) => [Number(c.id), c.name])
+      );
+
+      const productsWithCategory = (Array.isArray(fetchedProducts) ? fetchedProducts : []).map(p => ({
+        ...p,
+        categoryName: categoryMap.get(Number(p.categoryId)) || null
+      }));
+
+      setProducts(productsWithCategory);
       setSuppliers(Array.isArray(fetchedSuppliers) ? fetchedSuppliers : []);
 
       console.log("DEBUG - fetchedPurchases:", fetchedPurchases);
@@ -362,43 +374,23 @@ export function useImports() {
       throw error;
     }
   };
-  const submitReceipt = async (id) => {
-    const receipt = getReceiptById(id);
+  const submitReceipt = async (receiptOrId) => {
+    const id = typeof receiptOrId === 'object' ? receiptOrId.id : receiptOrId;
+    const receipt = typeof receiptOrId === 'object' ? receiptOrId : getReceiptById(id);
+    
     console.log("[useImports.submitReceipt] Receipt to submit:", receipt);
-    if (!receipt) return;
-    if (
-      !(
+    if (receipt && !(
         receipt.status === "draft" ||
         receipt.status === 0 ||
         receipt.status === "0"
-      )
-    ) {
+      )) {
       throw new Error("Chỉ phiếu ở trạng thái bản nháp mới được gửi duyệt.");
     }
 
     try {
-      // Build payload keeping all original data, only update status to 1
-      const payload = {
-        id: id,
-        supplierId: receipt.supplierId,
-        warehouseId: 1,
-        type: 1,
-        Type: 1,
-        supplierName: receipt.supplierName,
-        receiptDate: receipt.date,
-        referenceCode: receipt.referenceCode || "",
-        note: receipt.note || "",
-        status: 1,
-        Status: 1,
-        items: (receipt.items || []).map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          unitCost: item.unitPrice || 0,
-        })),
-      };
-      console.log("[useImports.submitReceipt] Submitting payload:", payload);
-      const response = await purchasesService.update(id, payload);
-      console.log("[useImports.submitReceipt] Response from update:", response);
+      console.log("[useImports.submitReceipt] Confirming receipt:", id);
+      const response = await purchasesService.confirm(id);
+      console.log("[useImports.submitReceipt] Response from confirm:", response);
       await fetchData();
       return response;
     } catch (error) {

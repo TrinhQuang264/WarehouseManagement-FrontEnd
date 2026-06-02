@@ -230,15 +230,6 @@ export default function ImportReceiptForm({
                       </button>
                     ) : null}
                   </div>
-                  {selectedProduct ? (
-                    <div className="imports-selected-product-meta">
-                      <p className="text-xs text-slate-500">
-                        Đơn giá gợi ý: {formatCurrency(selectedProductPrice)} •
-                        Danh mục: {selectedProductCategory}
-                      </p>
-                    </div>
-                  ) : null}
-
                   {isSearchOpen && searchResults.length > 0 && (
                     <div className="imports-search-results imports-product-search-results">
                       {searchResults.map((product) => (
@@ -259,13 +250,11 @@ export default function ImportReceiptForm({
                             ) : null}
                           </div>
                           <div className="imports-search-result-content">
-                            <p>{product.name}</p>
+                            <p>
+                              {product.name} - SL: {product.quantity}
+                            </p>
                             <span>
-                              {product.code} •{" "}
-                              {product.description || "Sản phẩm kho"}
-                              {product.categoryId
-                                ? ` • Danh mục ${product.categoryId}`
-                                : ""}
+                              {product.code} - {product.categoryName}
                             </span>
                           </div>
                         </button>
