@@ -85,6 +85,17 @@ const usersService = {
       throw error;
     }
   },
+  /**
+   * PUT /Users/{id}/toggle-active - Khóa/mở khóa tài khoản
+   */
+  async toggleActive(id) {
+    try {
+      const response = await api.put(`/Users/${id}/toggle-active`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default usersService;

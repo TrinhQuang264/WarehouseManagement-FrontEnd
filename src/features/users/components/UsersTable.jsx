@@ -1,7 +1,7 @@
 import { Edit, Ban, CheckCircle } from "lucide-react";
 import Badge from "../../../components/ui/Badge";
 
-function UserRow({ user, onEditRoles }) {
+function UserRow({ user, onEditRoles, onToggleActive }) {
   return (
     <tr className="table-row-hover">
       <td className="px-6 py-4">
@@ -19,9 +19,9 @@ function UserRow({ user, onEditRoles }) {
       </td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${user.isActive ? "bg-emerald-500" : "bg-slate-300"}`} />
-          <span className={`text-sm font-medium ${user.isActive ? "text-emerald-600" : "text-slate-500"}`}>
-            {user.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
+          <span className={`w-2 h-2 rounded-full ${!user.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
+          <span className={`text-sm font-medium ${!user.isActive ? "text-emerald-600" : "text-red-500"}`}>
+            {!user.isActive ? "Đang hoạt động" : "Đã khóa"}
           </span>
         </div>
       </td>
@@ -31,12 +31,12 @@ function UserRow({ user, onEditRoles }) {
             <Edit size={18} />
             <span className="text-xs">Chỉnh sửa</span>
           </button>
-          {user.isActive ? (
-            <button className="action-btn text-slate-400 hover:text-accent-red hover:bg-red-50" title="Vô hiệu hóa">
+          {!user.isActive ? (
+            <button className="action-btn text-slate-400 hover:text-accent-red hover:bg-red-50" title="Khóa tài khoản" onClick={() => onToggleActive(user)}>
               <Ban size={18} />
             </button>
           ) : (
-            <button className="action-btn text-primary hover:bg-primary/10" title="Kích hoạt">
+            <button className="action-btn text-primary hover:bg-primary/10" title="Mở khóa tài khoản" onClick={() => onToggleActive(user)}>
               <CheckCircle size={18} />
             </button>
           )}
@@ -46,7 +46,7 @@ function UserRow({ user, onEditRoles }) {
   );
 }
 
-export default function UsersTable({ users, onEditRoles }) {
+export default function UsersTable({ users, onEditRoles, onToggleActive }) {
   return (
     <div className="table-wrapper">
       <table className="table">
@@ -61,7 +61,7 @@ export default function UsersTable({ users, onEditRoles }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100 ">
-          {users.map((user) => <UserRow key={user.id} user={user} onEditRoles={onEditRoles} />)}
+          {users.map((user) => <UserRow key={user.id} user={user} onEditRoles={onEditRoles} onToggleActive={onToggleActive} />)}
         </tbody>
       </table>
     </div>

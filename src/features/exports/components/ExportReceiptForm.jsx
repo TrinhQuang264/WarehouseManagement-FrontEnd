@@ -61,12 +61,15 @@ export default function ExportReceiptForm({
   onSubmit,
   onCancel,
 }) {
+  const activeProducts = useMemo(() => products.filter(p => p.isDeleted !== true), [products]);
+  const activeCustomers = useMemo(() => customers.filter(c => c.isDeleted !== true), [customers]);
+
   const selectedProduct = useMemo(
     () =>
-      products.find(
+      activeProducts.find(
         (product) => String(product.id) === String(draftItem.productId),
       ) || null,
-    [products, draftItem.productId],
+    [activeProducts, draftItem.productId],
   );
   const selectedProductStock = Number(
     selectedProduct?.quantity ?? selectedProduct?.stock ?? 0,
@@ -94,8 +97,8 @@ export default function ExportReceiptForm({
     const keyword = String(productSearch ?? "")
       .trim()
       .toLowerCase();
-    if (!keyword) return products.slice(0, 6);
-    return products
+    if (!keyword) return activeProducts.slice(0, 6);
+    return activeProducts
       .filter((product) =>
         [product.name, product.code, product.description].some((value) =>
           String(value ?? "")
@@ -104,7 +107,7 @@ export default function ExportReceiptForm({
         ),
       )
       .slice(0, 6);
-  }, [products, productSearch]);
+  }, [activeProducts, productSearch]);
 
   const handleSelectProduct = (product) => {
     onDraftItemChange("productId", String(product.id));
@@ -142,7 +145,7 @@ export default function ExportReceiptForm({
                     }
                   >
                     <option value="">Chọn khách hàng...</option>
-                    {customers.map((customer) => (
+                    {activeCustomers.map((customer) => (
                       <option key={customer.id} value={customer.id}>
                         {customer.fullName}
                       </option>

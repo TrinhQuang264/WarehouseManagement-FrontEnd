@@ -19,7 +19,7 @@ const EMPTY_FORM = {
 };
 
 export default function UsersPage() {
-  const { users, loading, setSearch, currentPage, setCurrentPage, totalUsers, pageSize, roles, createUserWithRoles, updateUserAccount, updateUserRoles, deleteUser, userRolesMap } = useUsers();
+  const { users, loading, setSearch, currentPage, setCurrentPage, totalUsers, pageSize, roles, createUserWithRoles, updateUserAccount, updateUserActive, updateUserRoles, deleteUser, userRolesMap } = useUsers();
   const { setActionButton, setOnSearch, resetHeader } = useHeader();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -104,6 +104,26 @@ export default function UsersPage() {
     }
   };
 
+  const handleToggleActive = async (user) => {
+    if (!user?.id) return;
+    const message = user.isActive
+      ? `Bạn có muốn mở khoá tài khoản "${user.fullName}" không?`
+      : `Bạn có muốn khoá tài khoản "${user.fullName}" không?`;
+
+    if (!window.confirm(message)) {
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await updateUserActive(user.id);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Không thể cập nhật trạng thái tài khoản.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!selectedUser?.id) return;
     if (!window.confirm(`Xóa tài khoản "${selectedUser.fullName}"?`)) return;
@@ -122,7 +142,15 @@ export default function UsersPage() {
 
   return (
     <>
-      <UsersPageLayout users={users} currentPage={currentPage} setCurrentPage={setCurrentPage} totalUsers={totalUsers} pageSize={pageSize} onEditRoles={openEditModal} />
+      <UsersPageLayout
+        users={users}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalUsers={totalUsers}
+        pageSize={pageSize}
+        onEditRoles={openEditModal}
+        onToggleActive={handleToggleActive}
+      />
 
       <UserAccountModal
         isOpen={isCreateOpen}

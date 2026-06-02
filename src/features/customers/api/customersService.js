@@ -57,47 +57,40 @@ const customersService = {
       throw error;
     }
   },
-  // Soft delete: Lấy dữ liệu và set isDeleted = true
-  async delete(id) {
+  // DELETE /api/Customers/{id}/soft-delete
+  async softDelete(id) {
     try {
-      const customer = await this.getById(id);
-      if (!customer) throw new Error("Customer not found");
-      const updatedData = { ...customer, isDeleted: true };
-      const response = await api.put(`/Customers/${id}`, updatedData);
+      const response = await api.delete(`/Customers/${id}/soft-delete`);
       return response.data;
     } catch (error) {
-      console.error('[customersService] delete (soft) error:', error);
+      console.error('[customersService] softDelete error:', error);
       throw error;
     }
   },
-  // Khôi phục: Lấy dữ liệu và set isDeleted = false
+  // PUT /api/Customers/{id}/restore
   async restore(id) {
     try {
-      const customer = await this.getById(id);
-      if (!customer) throw new Error("Customer not found");
-      const updatedData = { ...customer, isDeleted: false };
-      const response = await api.put(`/Customers/${id}`, updatedData);
+      const response = await api.put(`/Customers/${id}/restore`);
       return response.data;
     } catch (error) {
       console.error('[customersService] restore error:', error);
       throw error;
     }
   },
-  // Lấy danh sách thùng rác: Lấy toàn bộ và lọc theo isDeleted === true
+  // GET /api/Customers/trash
   async getTrash() {
     try {
-      const response = await api.get('/Customers/all');
-      const allData = response.data || [];
-      return allData.filter(item => item.isDeleted === true);
+      const response = await api.get('/Customers/trash');
+      return response.data;
     } catch (error) {
       console.error('[customersService] getTrash error:', error);
       throw error;
     }
   },
-  // Xóa vĩnh viễn: Sử dụng API DELETE /api/Customers/{id}
+  // DELETE /api/Customers/{id}/permanent-delete
   async permanentDelete(id) {
     try {
-      const response = await api.delete(`/Customers/${id}`);
+      const response = await api.delete(`/Customers/${id}/permanent-delete`);
       return response.data;
     } catch (error) {
       console.error('[customersService] permanentDelete error:', error);

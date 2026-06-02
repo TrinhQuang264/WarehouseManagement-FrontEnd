@@ -62,7 +62,7 @@ const categoryService = {
     }
   },
 
-  // PUT /api/Categories/{id}/soft-delete
+  // DELETE /api/Categories/{id}/soft-delete
   async softDelete(id) {
     try {
       const response = await api.delete(`/Categories/${id}/soft-delete`);

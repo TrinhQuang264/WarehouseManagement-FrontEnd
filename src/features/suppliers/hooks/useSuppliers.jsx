@@ -130,7 +130,7 @@ export function useSuppliers() {
     } catch (error) {
       console.error("useSuppliers - handleAddSupplier error:", error);
       const serverMsg =
-        error?.response?.data?.message || error?.response?.data?.error;
+        error?.response?.data?.Message || error?.response?.data?.message || error?.response?.data?.error;
       toast.error(
         serverMsg || "Không thể thêm nhà cung cấp. Vui lòng thử lại.",
       );
@@ -153,7 +153,7 @@ export function useSuppliers() {
     } catch (error) {
       console.error("useSuppliers - handleUpdateSupplier error:", error);
       const serverMsg =
-        error?.response?.data?.message || error?.response?.data?.error;
+        error?.response?.data?.Message || error?.response?.data?.message || error?.response?.data?.error;
       toast.error(
         serverMsg || "Lỗi khi cập nhật nhà cung cấp. Hãy kiểm tra lại dữ liệu.",
       );
@@ -181,7 +181,7 @@ export function useSuppliers() {
     } catch (error) {
       console.error("useSuppliers - handleDeleteSupplier error:", error);
       const serverMsg =
-        error?.response?.data?.message || error?.response?.data?.error;
+        error?.response?.data?.Message || error?.response?.data?.message || error?.response?.data?.error;
       toast.error(serverMsg || "Không thể xóa nhà cung cấp này.");
       return false;
     } finally {

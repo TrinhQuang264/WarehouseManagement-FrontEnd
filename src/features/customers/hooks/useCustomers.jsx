@@ -152,7 +152,7 @@ export function useCustomers() {
     } catch (error) {
       console.error("useCustomers - handleAddCustomer error:", error);
       const serverMsg =
-        error?.response?.data?.message || error?.response?.data?.error;
+        error?.response?.data?.Message || error?.response?.data?.message || error?.response?.data?.error;
       toast.error(serverMsg || "Không thể thêm khách hàng. Vui lòng thử lại.");
       return false;
     } finally {
@@ -173,7 +173,7 @@ export function useCustomers() {
     } catch (error) {
       console.error("useCustomers - handleUpdateCustomer error:", error);
       const serverMsg =
-        error?.response?.data?.message || error?.response?.data?.error;
+        error?.response?.data?.Message || error?.response?.data?.message || error?.response?.data?.error;
       toast.error(
         serverMsg || "Lỗi khi cập nhật khách hàng. Hãy kiểm tra lại dữ liệu.",
       );
@@ -188,7 +188,7 @@ export function useCustomers() {
     setIsSubmitting(true);
     try {
       // Gọi tới hàm delete từ service của bạn
-      await customersService.delete(selectedCustomer.id);
+      await customersService.softDelete(selectedCustomer.id);
       toast.success(`Đã xóa khách hàng "${selectedCustomer.fullName}"`);
       setIsDeleteModalOpen(false);
       setSelectedCustomer(null);
@@ -203,7 +203,7 @@ export function useCustomers() {
     } catch (error) {
       console.error("useCustomers - handleDeleteCustomer error:", error);
       const serverMsg =
-        error?.response?.data?.message || error?.response?.data?.error;
+        error?.response?.data?.Message || error?.response?.data?.message || error?.response?.data?.error;
       toast.error(serverMsg || "Không thể xóa khách hàng này.");
       return false;
     } finally {

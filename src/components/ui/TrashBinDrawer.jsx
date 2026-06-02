@@ -79,7 +79,8 @@ export default function TrashBinDrawer({
       fetchTrash();
       onDataChange?.();
     } catch (error) {
-      toast.error("Lỗi khi xóa vĩnh viễn");
+      const serverMsg = error?.response?.data?.message || error?.response?.data?.Message || error?.response?.data?.error;
+      toast.error(serverMsg || "Không thể xóa do dữ liệu đang được sử dụng (ràng buộc)");
     }
   };
 

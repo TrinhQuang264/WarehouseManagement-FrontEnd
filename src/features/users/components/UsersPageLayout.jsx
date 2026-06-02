@@ -12,6 +12,7 @@ export default function UsersPageLayout({
   totalUsers,
   pageSize,
   onEditRoles,
+  onToggleActive,
 }) {
   return (
     <div className="users-page">
@@ -33,7 +34,7 @@ export default function UsersPageLayout({
         </div>
       </div> */}
       <DataTableCard>
-        <UsersTable users={users} onEditRoles={onEditRoles} />
+        <UsersTable users={users} onEditRoles={onEditRoles} onToggleActive={onToggleActive} />
       </DataTableCard>
       <PaginationBar
         currentPage={currentPage}

@@ -31,6 +31,10 @@ const authService = {
           const foundUser = userResponse.data;
 
           if (foundUser) {
+            if (foundUser.isActive === false) {
+              authService.clearSession();
+              throw new Error('Tài khoản đang bị khoá. Vui lòng liên hệ quản trị viên.');
+            }
             const firstName = foundUser.firstName || '';
             const lastName = foundUser.lastName || '';
 

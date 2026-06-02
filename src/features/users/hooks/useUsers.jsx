@@ -37,7 +37,7 @@ export function useUsers() {
       role: u.role || "staff",
       roleLabel:
         u.roleLabel || (u.role === "admin" ? "Quản trị viên" : "Nhân viên"),
-      isActive: u.isActive !== undefined ? u.isActive : true,
+      isActive: u.isActive !== undefined ? u.isActive : false,
     }));
   }, []);
 
@@ -101,7 +101,11 @@ export function useUsers() {
 
   const createUserWithRoles = useCallback(
     async (payload, roleNames = ["User"]) => {
-      await userService.createUser(payload);
+      const payloadWithDefaults = {
+        isActive: false,
+        ...payload,
+      };
+      await userService.createUser(payloadWithDefaults);
       const usersData = await userService.getAll();
       const userList = Array.isArray(usersData)
         ? usersData
@@ -109,7 +113,7 @@ export function useUsers() {
       const createdUser = userList.find(
         (u) =>
           String(u.email || "").toLowerCase() ===
-          String(payload.email || "").toLowerCase(),
+          String(payloadWithDefaults.email || "").toLowerCase(),
       );
       if (!createdUser?.id) {
         throw new Error("Không tìm thấy user vừa tạo để gán role.");
@@ -160,6 +164,15 @@ export function useUsers() {
       await userService.deleteUser(id);
       await fetchUsers();
       toast.success("Xóa tài khoản thành công");
+    },
+    [fetchUsers],
+  );
+
+  const updateUserActive = useCallback(
+    async (id) => {
+      const response = await userService.toggleActive(id);
+      await fetchUsers();
+      toast.success(response.isActive ? "Khoá tài khoản thành công" : "Mở khoá tài khoản thành công");
     },
     [fetchUsers],
   );
@@ -239,6 +252,7 @@ export function useUsers() {
     updateUserAccount,
     updateUserRoles,
     deleteUser,
+    updateUserActive,
     userRolesMap,
   };
 }

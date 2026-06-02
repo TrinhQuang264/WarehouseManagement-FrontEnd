@@ -61,12 +61,15 @@ export default function ImportReceiptForm({
   onSubmit,
   onCancel,
 }) {
+  const activeProducts = useMemo(() => products.filter(p => p.isDeleted !== true), [products]);
+  const activeSuppliers = useMemo(() => suppliers.filter(s => s.isDeleted !== true), [suppliers]);
+
   const selectedProduct = useMemo(
     () =>
-      products.find(
+      activeProducts.find(
         (product) => String(product.id) === String(draftItem.productId),
       ) || null,
-    [products, draftItem.productId],
+    [activeProducts, draftItem.productId],
   );
 
   const selectedProductPrice =
@@ -89,9 +92,9 @@ export default function ImportReceiptForm({
     const keyword = String(productSearch ?? "")
       .trim()
       .toLowerCase();
-    if (!keyword) return products.slice(0, 6);
+    if (!keyword) return activeProducts.slice(0, 6);
 
-    return products
+    return activeProducts
       .filter((product) =>
         [product.name, product.code, product.description].some((value) =>
           String(value ?? "")
@@ -100,7 +103,7 @@ export default function ImportReceiptForm({
         ),
       )
       .slice(0, 6);
-  }, [products, productSearch]);
+  }, [activeProducts, productSearch]);
 
   const handleSelectProduct = (product) => {
     onDraftItemChange("productId", String(product.id));
@@ -139,7 +142,7 @@ export default function ImportReceiptForm({
                     }
                   >
                     <option value="">Chọn nhà cung cấp...</option>
-                    {suppliers.map((supplier) => (
+                    {activeSuppliers.map((supplier) => (
                       <option key={supplier.id} value={supplier.id}>
                         {supplier.supplierName}
                       </option>

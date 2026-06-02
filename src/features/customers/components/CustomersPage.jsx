@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo } from "react";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import ConfirmModal from "../../../components/ui/ConfirmModal";
 import CustomerTable from "./CustomerTable";
 import CustomerModal from "./CustomerModal";
 import CustomerDetailPage from "./CustomerDetailPage.jsx";
+import TrashBinDrawer from "../../../components/ui/TrashBinDrawer";
 import { useCustomers } from "../hooks/useCustomers.jsx";
 import { useHeader } from "../../../contexts/HeaderContext";
+import customersService from "../api/customersService";
 import {
   COMMON_URLS,
   CUSTOMER_URLS,
@@ -90,9 +92,12 @@ export default function CustomersPage() {
     handleUpdateCustomer,
     handleDeleteCustomer,
     nextCode,
+    isTrashOpen,
+    setIsTrashOpen,
+    refreshList,
   } = useCustomers();
 
-  const { setActionButton, setOnSearch, setTitle, resetHeader } = useHeader();
+  const { setActionButton, setExtraActions, setOnSearch, setTitle, resetHeader } = useHeader();
 
   const isDetailMode =
     location.pathname !== CUSTOMER_URLS.list && Boolean(params.id);
@@ -127,7 +132,15 @@ export default function CustomersPage() {
         className:
           "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
       });
-      setOnSearch(setSearch);
+      setExtraActions([
+        {
+          label: "Thùng rác",
+          icon: <Trash2 size={18} />,
+          onClick: () => setIsTrashOpen(true),
+          className: "bg-red-500 text-red-600 hover:bg-red-300",
+        }
+      ]);
+      setOnSearch(() => setSearch);
       setTitle("");
     }
     return () => resetHeader();
@@ -135,11 +148,13 @@ export default function CustomersPage() {
     isDetailMode,
     currentCustomer,
     setActionButton,
+    setExtraActions,
     setOnSearch,
     setTitle,
     resetHeader,
     setSearch,
     openEditModal,
+    setIsTrashOpen,
   ]);
 
   if (isDetailMode) {
@@ -262,6 +277,18 @@ export default function CustomersPage() {
         title="Xác nhận xóa"
         message={`Bạn có chắc chắn muốn xóa khách hàng "${selectedCustomer?.fullName}"? Toàn bộ dữ liệu liên quan sẽ không thể phục hồi.`}
         confirmLabel="Vâng, Xóa ngay"
+      />
+
+      <TrashBinDrawer 
+        isOpen={isTrashOpen}
+        onClose={() => setIsTrashOpen(false)}
+        title="Thùng rác khách hàng"
+        service={customersService}
+        onDataChange={refreshList}
+        columns={[
+          { label: 'Số điện thoại', key: 'phoneNumber' },
+          { label: 'Email', key: 'email' }
+        ]}
       />
     </div>
   );
