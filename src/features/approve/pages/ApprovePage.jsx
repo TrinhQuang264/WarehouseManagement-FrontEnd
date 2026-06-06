@@ -5,6 +5,7 @@ import ConfirmModal from "../../../components/ui/ConfirmModal.jsx";
 import PaginationBar from "../../../components/ui/PaginationBar.jsx";
 import ApproveTable from "../components/ApproveTable.jsx";
 import { useApprove } from "../hooks/useApprove.jsx";
+import Breadcrumbs from "../../../components/ui/Breadcrumbs";
 import "../styles/Approve.css";
 
 export default function ApprovePage() {
@@ -41,22 +42,11 @@ export default function ApprovePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    setTitle("Duyệt phiếu kho");
-    setSubtitle(
-      "Xem danh sách phiếu nhập/xuất kho đang chờ phê duyệt và xử lý trực tiếp.",
-    );
     setActionButton(null);
     setOnSearch(() => setSearch);
 
     return () => resetHeader();
-  }, [
-    setTitle,
-    setSubtitle,
-    setActionButton,
-    setOnSearch,
-    setSearch,
-    resetHeader,
-  ]);
+  }, [setActionButton, setOnSearch, setSearch, resetHeader]);
 
   const handleOpenApproveModal = useCallback((receipt) => {
     setApproveConfirm({ isOpen: true, receipt });
@@ -102,7 +92,9 @@ export default function ApprovePage() {
     <div className="approve-page">
       <section className="imports-table-section">
         <div className="mb-4 flex flex-wrap items-center gap-3 justify-between">
-          <div className="text-sm text-slate-600">Lọc loại phiếu:</div>
+          <div className="page-header">
+            <Breadcrumbs />
+          </div>
           <select
             className="border border-slate-200 rounded px-3 py-2 text-sm text-slate-900 focus:border-primary focus:outline-none"
             value={selectedType}

@@ -14,18 +14,12 @@ const routeLabels = {
   reports: "Báo cáo",
   users: "Người dùng",
   profile: "Thông tin cá nhân",
+  approve: "Duyệt phiếu kho",
 };
 
-/**
- * Breadcrumbs component
- * @param {Array} items - Custom breadcrumb items: [{ label: string, path?: string }]
- * Example: [{ label: 'Tổng quan' }, { label: 'Sản phẩm', path: '/products' }, { label: 'Thêm mới' }]
- */
 export default function Breadcrumbs({ items = null }) {
   const location = useLocation();
   const navigate = useNavigate();
-
-  // If custom items provided, use them
   if (items && Array.isArray(items) && items.length > 0) {
     return (
       <nav className="flex items-center text-sm font-medium text-slate-500 ">
@@ -36,10 +30,7 @@ export default function Breadcrumbs({ items = null }) {
           return (
             <React.Fragment key={`${item.label}-${index}`}>
               {!isFirst && (
-                <ChevronRight
-                  size={14}
-                  className="mx-2 text-slate-300 "
-                />
+                <ChevronRight size={14} className="mx-2 text-slate-300 " />
               )}
 
               {isLast ? (
@@ -65,7 +56,6 @@ export default function Breadcrumbs({ items = null }) {
     );
   }
 
-  // Default: Auto-generate from URL
   const pathnames = location.pathname.split("/").filter((x) => x);
 
   return (
@@ -76,9 +66,7 @@ export default function Breadcrumbs({ items = null }) {
       >
         <span
           className={
-            pathnames.length === 0
-              ? "text-slate-900  font-semibold"
-              : ""
+            pathnames.length === 0 ? "text-slate-900  font-semibold" : ""
           }
         >
           Tổng quan
@@ -92,14 +80,9 @@ export default function Breadcrumbs({ items = null }) {
 
         return (
           <React.Fragment key={name}>
-            <ChevronRight
-              size={14}
-              className="mx-2 text-slate-300 "
-            />
+            <ChevronRight size={14} className="mx-2 text-slate-300 " />
             {isLast ? (
-              <span className="text-slate-900  font-semibold">
-                {label}
-              </span>
+              <span className="text-slate-900  font-semibold">{label}</span>
             ) : (
               <Link
                 to={routeTo}
@@ -114,4 +97,3 @@ export default function Breadcrumbs({ items = null }) {
     </nav>
   );
 }
-

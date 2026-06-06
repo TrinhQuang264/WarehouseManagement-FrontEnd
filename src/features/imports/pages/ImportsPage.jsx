@@ -12,7 +12,7 @@ import PaginationBar from "../../../components/ui/PaginationBar.jsx";
 import ImportReceiptDetail from "../components/ImportReceiptDetail.jsx";
 import ExportReceiptDetail from "../../exports/components/ExportReceiptDetail.jsx";
 import ImportReceiptForm from "../components/ImportReceiptForm.jsx";
-// import ImportStats from '../components/ImportStats.jsx';
+import ImportStats from "../components/ImportStats.jsx";
 import ImportTable from "../components/ImportTable.jsx";
 import { useImports } from "../hooks/useImports.jsx";
 import "../styles/Imports.css";
@@ -569,7 +569,7 @@ export default function ImportsPage() {
         />
       </div>
 
-      {/* <ImportStats stats={stats} /> */}
+      <ImportStats stats={stats} />
 
       <section className="imports-table-section">
         <ImportFilters

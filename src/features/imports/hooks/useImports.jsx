@@ -21,11 +21,25 @@ const STATUS_KEY_MAP = {
 
 const DATE_RANGE_FILTERS = {
   all: () => true,
-  last7: (date) =>
-    new Date(date) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-  last14: (date) =>
-    new Date(date) >= new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-  month: (date) => new Date(date).getMonth() === new Date().getMonth(),
+  last7: (date) => {
+    const d = new Date(date);
+    const limit = new Date();
+    limit.setDate(limit.getDate() - 7);
+    limit.setHours(0, 0, 0, 0);
+    return d >= limit;
+  },
+  last14: (date) => {
+    const d = new Date(date);
+    const limit = new Date();
+    limit.setDate(limit.getDate() - 14);
+    limit.setHours(0, 0, 0, 0);
+    return d >= limit;
+  },
+  month: (date) => {
+    const d = new Date(date);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  },
 };
 
 function formatUserName(user) {
@@ -161,7 +175,7 @@ export function useImports() {
             id: p.id,
             code: p.referenceCode || `NK-${p.id}`,
             supplierId: p.supplierId,
-            date: p.receiptDate || p.createdAt || new Date().toISOString(),
+            date: p.createDate || p.purchaseDate || p.receiptDate || p.createdAt || new Date().toISOString(),
             note: p.note || "",
             referenceCode: p.referenceCode || "",
             status: STATUS_KEY_MAP[p.status ?? p.Status] || "draft",
@@ -225,9 +239,20 @@ export function useImports() {
         String(receipt.supplierId) === selectedSupplier;
       const matchesStatus =
         selectedStatus === "all" || receipt.status === selectedStatus;
-      const matchesDate = (
-        DATE_RANGE_FILTERS[selectedDateRange] || DATE_RANGE_FILTERS.all
-      )(receipt.date);
+      const matchesDate = (() => {
+        if (selectedDateRange && selectedDateRange.startsWith("date:")) {
+          const selectedDateStr = selectedDateRange.replace("date:", "");
+          const d = new Date(receipt.date);
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          const receiptDateStr = `${year}-${month}-${day}`;
+          return receiptDateStr === selectedDateStr;
+        }
+        return (
+          DATE_RANGE_FILTERS[selectedDateRange] || DATE_RANGE_FILTERS.all
+        )(receipt.date);
+      })();
 
       return matchesSearch && matchesSupplier && matchesStatus && matchesDate;
     });
@@ -250,10 +275,9 @@ export function useImports() {
   }, [filteredReceipts, currentPage]);
 
   const stats = useMemo(() => {
-    const totalValue = receipts.reduce(
-      (sum, receipt) => sum + receipt.totalAmount,
-      0,
-    );
+    const totalValue = receipts
+      .filter((receipt) => receipt.status === "completed")
+      .reduce((sum, receipt) => sum + receipt.totalAmount, 0);
     const pendingCount = receipts.filter(
       (receipt) => receipt.status === "pending",
     ).length;

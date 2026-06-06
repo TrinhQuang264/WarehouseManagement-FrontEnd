@@ -1,4 +1,5 @@
-import { CalendarDays, SlidersHorizontal } from "lucide-react";
+import { useRef } from "react";
+import { CalendarDays } from "lucide-react";
 
 const DATE_RANGE_OPTIONS = [
   { value: "all", label: "Toàn bộ" },
@@ -19,6 +20,8 @@ export default function ReceiptFilters({
   selectedDateRange,
   setSelectedDateRange,
 }) {
+  const dateInputRef = useRef(null);
+
   return (
     <div className="imports-filters-bar">
       <div className="imports-range-group">
@@ -33,6 +36,77 @@ export default function ReceiptFilters({
               {option.label}
             </button>
           ))}
+
+          <div className="imports-custom-date-picker">
+            <input
+              ref={dateInputRef}
+              type="date"
+              id="import-date"
+              name="importDate"
+              aria-label="Chọn ngày nhập"
+              value={
+                selectedDateRange.startsWith("date:")
+                  ? selectedDateRange.replace("date:", "")
+                  : ""
+              }
+              onChange={(e) => {
+                if (e.target.value) {
+                  setSelectedDateRange(`date:${e.target.value}`);
+                } else {
+                  setSelectedDateRange("all");
+                }
+              }}
+              style={{
+                position: "absolute",
+                opacity: 0,
+                width: 0,
+                height: 0,
+                pointerEvents: "none",
+              }}
+            />
+
+            {selectedDateRange.startsWith("date:") ? (
+              <div
+                className="imports-range-pill imports-range-pill-active"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  cursor: "pointer",
+                }}
+                onClick={() => dateInputRef.current?.showPicker()}
+              >
+                <CalendarDays size={14} />
+                <span>{selectedDateRange.replace("date:", "")}</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedDateRange("all");
+                  }}
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    lineHeight: 1,
+                    padding: 0,
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="imports-range-pill imports-datepicker-button"
+                onClick={() => dateInputRef.current?.showPicker()}
+              >
+                <CalendarDays size={14} />
+                <span>Chọn ngày</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
