@@ -19,7 +19,7 @@ export function formatNumber(num) {
  */
 export function formatCurrency(amount) {
   if (amount === null || amount === undefined) return '0đ';
-  return Number(amount).toLocaleString('vi-VN') + 'đ';
+  return Number(amount).toLocaleString('vi-VN', { maximumFractionDigits: 0 }) + 'đ';
 }
 
 /**

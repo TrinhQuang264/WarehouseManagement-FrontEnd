@@ -1,15 +1,15 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import productService from '../../products/api/productsService';
 import categoryService from '../../categories/api/categoriesService';
-import stockTransactionsService from '../api/stockTransactionsService';
 import purchasesService from '../../imports/api/purchasesService';
+
 
 export function useReports() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [transactions, setTransactions] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(false);
+
 
   // Filters
   const [selectedDateRange, setSelectedDateRange] = useState('month'); // 'month', 'lastMonth', 'quarter', 'custom'
@@ -24,16 +24,14 @@ export function useReports() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [prodRes, catRes, txRes, purchaseRes] = await Promise.all([
+      const [prodRes, catRes, purchaseRes] = await Promise.all([
         productService.getAll(),
         categoryService.getAll(),
-        stockTransactionsService.getAll(),
         purchasesService.getAll()
       ]);
 
       setProducts(Array.isArray(prodRes) ? prodRes : prodRes?.data || []);
       setCategories(Array.isArray(catRes) ? catRes : catRes?.data || []);
-      setTransactions(Array.isArray(txRes) ? txRes : txRes?.data || []);
       setPurchases(Array.isArray(purchaseRes) ? purchaseRes : purchaseRes?.data || []);
     } catch (error) {
       console.error('Error fetching reports data:', error);
@@ -77,42 +75,56 @@ export function useReports() {
   const reportData = useMemo(() => {
     const { start, end } = dateRange;
 
-    // Filter completed (status = 2) purchases within the range
-    const periodPurchases = purchases.filter((p) => {
+    // Only completed (status = 2) purchases
+    const completedPurchases = purchases.filter((p) => {
       const statusValue = p.status ?? p.Status;
-      const dateStr = p.createDate || p.purchaseDate || p.receiptDate || p.createdAt;
-      if (!dateStr || Number(statusValue) !== 2) return false;
-      const d = new Date(dateStr);
-      return d >= start && d <= end;
+      return Number(statusValue) === 2;
     });
 
     return products.map((product) => {
-      // Get all active (not canceled) transactions for this product
-      const prodTx = transactions.filter(
-        (t) => Number(t.productId) === Number(product.id) && !t.isCanceled
-      );
+      // --- Purchases before the period (for opening stock) ---
+      let qImportBefore = 0;
+      let qExportBefore = 0;
 
-      // 1. Transactions after the end date (for quantity backtrack)
-      const txAfter = prodTx.filter((t) => new Date(t.createDate) > end);
-      const qAfterChange = txAfter.reduce((sum, t) => sum + (t.quantityChange || 0), 0);
-
-      // 2. Calculate actual imports/exports values and quantities from the period purchases
+      // --- Purchases within the period ---
       let qImport = 0;
       let importVal = 0;
       let qExport = 0;
       let exportVal = 0;
 
-      periodPurchases.forEach((p) => {
-        const typeValue = p.type ?? p.Type;
+      // --- All-time import for weighted average cost ---
+      let totalImportQtyAllTime = 0;
+      let totalImportCostAllTime = 0;
+
+      completedPurchases.forEach((p) => {
+        const typeValue = Number(p.type ?? p.Type);
+        const dateStr = p.createDate || p.purchaseDate || p.receiptDate || p.createdAt;
+        if (!dateStr) return;
+        const d = new Date(dateStr);
         const items = p.items || [];
+
         items.forEach((item) => {
-          if (Number(item.productId) === Number(product.id)) {
-            const qty = item.quantity || 0;
-            const price = item.unitCost || item.unitPrice || 0;
-            if (Number(typeValue) === 1) {
+          if (Number(item.productId) !== Number(product.id)) return;
+          const qty = item.quantity || 0;
+          const price = item.unitCost || item.unitPrice || 0;
+
+          // Accumulate for weighted average cost (all-time imports)
+          if (typeValue === 1) {
+            totalImportQtyAllTime += qty;
+            totalImportCostAllTime += qty * price;
+          }
+
+          // Before period start → contributes to opening stock
+          if (d < start) {
+            if (typeValue === 1) qImportBefore += qty;
+            else if (typeValue === 2) qExportBefore += qty;
+          }
+          // Within period → contributes to period import/export
+          else if (d >= start && d <= end) {
+            if (typeValue === 1) {
               qImport += qty;
               importVal += qty * price;
-            } else if (Number(typeValue) === 2) {
+            } else if (typeValue === 2) {
               qExport += qty;
               exportVal += qty * price;
             }
@@ -120,28 +132,7 @@ export function useReports() {
         });
       });
 
-      // 3. Compute Weighted Average Cost from all-time imports
-      const allTimeImports = purchases.filter((p) => {
-        const statusValue = p.status ?? p.Status;
-        const typeValue = p.type ?? p.Type;
-        return Number(statusValue) === 2 && Number(typeValue) === 1;
-      });
-
-      let totalImportQtyAllTime = 0;
-      let totalImportCostAllTime = 0;
-
-      allTimeImports.forEach((p) => {
-        const items = p.items || [];
-        items.forEach((item) => {
-          if (Number(item.productId) === Number(product.id)) {
-            const qty = item.quantity || 0;
-            const price = item.unitCost || item.unitPrice || 0;
-            totalImportQtyAllTime += qty;
-            totalImportCostAllTime += qty * price;
-          }
-        });
-      });
-
+      // Weighted average cost (from all-time completed imports)
       let averageCost = product.originalPrice || product.price || product.sellingPrice || 0;
       if (totalImportQtyAllTime > 0) {
         averageCost = totalImportCostAllTime / totalImportQtyAllTime;
@@ -151,20 +142,17 @@ export function useReports() {
         averageCost = product.originalPrice || product.sellingPrice || 0;
       }
 
-      // Current product quantity (from DB)
-      const qCurrent = product.quantity || 0;
+      // Opening Qty = total completed imports before start - total completed exports before start
+      const openingQty = Math.max(0, qImportBefore - qExportBefore);
 
-      // 4. Closing Stock Qty
-      const closingQty = qCurrent - qAfterChange;
-
-      // 5. Opening Stock Qty
-      const openingQty = closingQty - qImport + qExport;
-      
-      // 6. Opening Value (Opening Qty * Average Cost)
+      // Opening Value = openingQty * averageCost
       const openingVal = openingQty * averageCost;
 
-      // 7. Closing Value (Opening Val + Import Val - Export Val)
-      const closingVal = openingVal + importVal - exportVal;
+      // Closing Qty = openingQty + qImport - qExport (must not go negative)
+      const closingQty = Math.max(0, openingQty + qImport - qExport);
+
+      // Closing Value = closingQty * averageCost (never negative when qty = 0)
+      const closingVal = closingQty > 0 ? closingQty * averageCost : 0;
 
       return {
         id: product.id,
@@ -181,7 +169,7 @@ export function useReports() {
         closingVal,
       };
     });
-  }, [products, transactions, purchases, dateRange]);
+  }, [products, purchases, dateRange]);
 
   // Filters & Search
   const filteredReportData = useMemo(() => {
@@ -251,11 +239,20 @@ export function useReports() {
     // 2. Count low stock products (<= 10)
     const lowStockCount = products.filter((p) => (p.quantity || 0) <= 10).length;
 
-    // 3. Count imports in selected period
+    // Only completed purchases
+    const completedImportPurchases = purchases.filter((p) => {
+      const statusValue = Number(p.status ?? p.Status);
+      const typeValue = Number(p.type ?? p.Type);
+      return statusValue === 2 && typeValue === 1;
+    });
+
+    // 3. Count completed import purchases in selected period
     const { start, end } = dateRange;
-    const periodImports = transactions.filter((t) => {
-      const d = new Date(t.createDate);
-      return !t.isCanceled && (t.quantityChange || 0) > 0 && d >= start && d <= end;
+    const periodImports = completedImportPurchases.filter((p) => {
+      const dateStr = p.createDate || p.purchaseDate || p.receiptDate || p.createdAt;
+      if (!dateStr) return false;
+      const d = new Date(dateStr);
+      return d >= start && d <= end;
     });
     const importCount = periodImports.length;
 
@@ -265,17 +262,28 @@ export function useReports() {
     const averageImportsPerDay = (importCount / diffDays).toFixed(1);
 
     // Dynamic month-over-month comparisons (premium detail)
-    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
 
-    // Stock level at the end of last month
+    // Stock at end of last month = sum of all completed imports up to end of last month - exports
     const lastMonthClosingStock = products.reduce((sum, p) => {
-      const prodTx = transactions.filter(
-        (t) => Number(t.productId) === Number(p.id) && !t.isCanceled
-      );
-      const txAfterLastMonth = prodTx.filter((t) => new Date(t.createDate) > endOfLastMonth);
-      const qAfterLastMonth = txAfterLastMonth.reduce((s, t) => s + (t.quantityChange || 0), 0);
-      return sum + ((p.quantity || 0) - qAfterLastMonth);
+      let qIn = 0;
+      let qOut = 0;
+      purchases.forEach((pur) => {
+        const statusValue = Number(pur.status ?? pur.Status);
+        const typeValue = Number(pur.type ?? pur.Type);
+        if (statusValue !== 2) return;
+        const dateStr = pur.createDate || pur.purchaseDate || pur.receiptDate || pur.createdAt;
+        if (!dateStr) return;
+        const d = new Date(dateStr);
+        if (d > endOfLastMonth) return;
+        (pur.items || []).forEach((item) => {
+          if (Number(item.productId) !== Number(p.id)) return;
+          const qty = item.quantity || 0;
+          if (typeValue === 1) qIn += qty;
+          else if (typeValue === 2) qOut += qty;
+        });
+      });
+      return sum + Math.max(0, qIn - qOut);
     }, 0);
 
     const stockPercentChange = lastMonthClosingStock > 0
@@ -290,7 +298,7 @@ export function useReports() {
       averageImportsPerDay,
       stockPercentChange,
     };
-  }, [products, transactions, dateRange]);
+  }, [products, purchases, dateRange]);
 
   // Export to Excel / CSV function
   const handleExport = useCallback(() => {
