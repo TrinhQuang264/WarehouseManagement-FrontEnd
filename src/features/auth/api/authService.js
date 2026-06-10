@@ -29,7 +29,7 @@ const authService = {
         if (userId) {
           const userResponse = await api.get(`/Users/${userId}`);
           const foundUser = userResponse.data;
-
+          
           if (foundUser) {
             if (foundUser.isActive === false) {
               authService.clearSession();

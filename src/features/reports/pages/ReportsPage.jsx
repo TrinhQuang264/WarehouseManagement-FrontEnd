@@ -460,9 +460,6 @@ export default function ReportsPage() {
               {dashboardStats.stockPercentChange}% tháng trước
             </p>
           </div>
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-sm flex-shrink-0">
-            📦
-          </div>
         </div>
 
         {/* Card 2: Tổng giá trị tồn */}
@@ -481,9 +478,6 @@ export default function ReportsPage() {
               Giá nhập ban đầu
             </p>
           </div>
-          <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-sm flex-shrink-0">
-            💰
-          </div>
         </div>
 
         {/* Card 3: Số lượt nhập kho */}
@@ -498,9 +492,6 @@ export default function ReportsPage() {
             <p className="text-[9px] text-slate-400 font-medium mt-0.5 truncate">
               ~{dashboardStats.averageImportsPerDay} phiếu/ngày
             </p>
-          </div>
-          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-sm flex-shrink-0">
-            📥
           </div>
         </div>
 
@@ -526,13 +517,6 @@ export default function ReportsPage() {
                 ? "Cần nhập ngưay"
                 : "Tồn kho an toàn"}
             </p>
-          </div>
-          <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${
-              dashboardStats.lowStockCount > 0 ? "bg-red-50" : "bg-slate-50"
-            }`}
-          >
-            ⚠️
           </div>
         </div>
       </div>
