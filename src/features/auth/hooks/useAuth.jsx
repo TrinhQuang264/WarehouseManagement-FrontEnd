@@ -1,4 +1,10 @@
-import { useState, useEffect, useCallback, createContext, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  createContext,
+  useContext,
+} from "react";
 import authService from "../api/authService";
 
 const AuthContext = createContext(null);
@@ -25,12 +31,19 @@ export function AuthProvider({ children }) {
     setError(null);
 
     try {
-      const { user: loggedInUser } = await authService.login(username, password);
+      const { user: loggedInUser } = await authService.login(
+        username,
+        password,
+      );
       setUser(loggedInUser);
       return { success: true };
     } catch (err) {
-      const isAuthError = err.response?.status === 400 || err.response?.status === 401;
-      const message = isAuthError ? "Tài khoản hoặc mật khẩu không chính xác" : err.response?.data?.message || "Tài khoản hoặc mật khẩu không chính xác";
+      const isAuthError =
+        err.response?.status === 400 || err.response?.status === 401;
+      const message = isAuthError
+        ? "Tài khoản hoặc mật khẩu không chính xác"
+        : err.response?.data?.message ||
+          "Tài khoản hoặc mật khẩu không chính xác";
       setError(message);
       return { success: false, message };
     } finally {
@@ -71,7 +84,10 @@ export function AuthProvider({ children }) {
       await authService.changePassword(currentPassword, newPassword);
       return { success: true, message: "Đổi mật khẩu thành công." };
     } catch (err) {
-      const message = err.response?.data?.message || err.message || "Đổi mật khẩu thất bại. Vui lòng thử lại.";
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Đổi mật khẩu thất bại. Vui lòng thử lại.";
       setError(message);
       return { success: false, message };
     } finally {
