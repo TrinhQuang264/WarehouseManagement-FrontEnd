@@ -2,7 +2,6 @@ import {
   CalendarDays,
   FileText,
   PackagePlus,
-  Save,
   Search,
   Store,
   Trash2,
@@ -11,6 +10,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import Button from "../../../components/ui/Button.jsx";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
+import SearchableSelect from "../../../components/ui/SearchableSelect.jsx";
 import { formatCurrency } from "../../../utils/util.js";
 
 function ReceiptSummary({ receipt }) {
@@ -61,8 +61,14 @@ export default function ImportReceiptForm({
   onSubmit,
   onCancel,
 }) {
-  const activeProducts = useMemo(() => products.filter(p => p.isDeleted !== true), [products]);
-  const activeSuppliers = useMemo(() => suppliers.filter(s => s.isDeleted !== true), [suppliers]);
+  const activeProducts = useMemo(
+    () => products.filter((p) => p.isDeleted !== true),
+    [products],
+  );
+  const activeSuppliers = useMemo(
+    () => suppliers.filter((s) => s.isDeleted !== true),
+    [suppliers],
+  );
 
   const selectedProduct = useMemo(
     () =>
@@ -132,23 +138,18 @@ export default function ImportReceiptForm({
             <div className="imports-meta-grid">
               <label className="imports-field">
                 <span>Nhà cung cấp</span>
-                <div className="imports-input-with-icon">
-                  <Store size={18} />
-                  <select
-                    className="imports-input imports-input-icon"
-                    value={receipt.supplierId}
-                    onChange={(event) =>
-                      onMetaChange("supplierId", event.target.value)
-                    }
-                  >
-                    <option value="">Chọn nhà cung cấp...</option>
-                    {activeSuppliers.map((supplier) => (
-                      <option key={supplier.id} value={supplier.id}>
-                        {supplier.supplierName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SearchableSelect
+                  options={activeSuppliers.map((s) => ({
+                    value: s.id,
+                    label: s.supplierName,
+                  }))}
+                  value={receipt.supplierId}
+                  onChange={(val) => onMetaChange("supplierId", val)}
+                  placeholder="Chọn nhà cung cấp..."
+                  searchPlaceholder="Tìm nhà cung cấp..."
+                  icon={<Store size={16} />}
+                  maxVisible={7}
+                />
               </label>
 
               <label className="imports-field">
@@ -395,16 +396,6 @@ export default function ImportReceiptForm({
           <ReceiptSummary receipt={receipt} />
 
           <div className="imports-side-actions">
-            {onSaveDraft && (
-              <Button
-                variant="secondary"
-                className="w-full justify-center py-3 mb-2"
-                icon={<Save size={18} />}
-                onClick={onSaveDraft}
-              >
-                Lưu nháp
-              </Button>
-            )}
             <Button className="w-full justify-center py-3" onClick={onSubmit}>
               {mode === "edit" ? "Cập nhật phiếu nhập" : "Xác nhận nhập kho"}
             </Button>

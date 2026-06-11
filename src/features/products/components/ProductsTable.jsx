@@ -18,7 +18,9 @@ function ProductThumbnail({ imageUrl, name }) {
           }}
         />
       ) : (
-        <span className="text-[10px] font-bold text-slate-400 uppercase">N/A</span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase">
+          N/A
+        </span>
       )}
     </div>
   );
@@ -32,7 +34,9 @@ export default function ProductsTable({
   onDelete,
   onViewDetail,
 }) {
-  const categoryNameById = new Map(categories.map((category) => [Number(category.id), category.name]));
+  const categoryNameById = new Map(
+    categories.map((category) => [Number(category.id), category.name]),
+  );
 
   return (
     <DataTableCard className="relative min-h-[500px] flex flex-col">
@@ -43,6 +47,7 @@ export default function ProductsTable({
               <th className="table-th px-6 text-left">Mã Sản Phẩm</th>
               <th className="table-th px-6 text-left">Thông Tin Sản Phẩm</th>
               <th className="table-th px-6 text-left">Danh Mục</th>
+              <th className="table-th px-6 text-left">Vị trí</th>
               <th className="table-th px-6 text-right">Giá Bán (VNĐ)</th>
               <th className="table-th px-6 text-center">Tồn Kho</th>
               <th className="table-th px-6 text-right">Thao Tác</th>
@@ -55,7 +60,6 @@ export default function ProductsTable({
               products.map((product) => (
                 <tr
                   key={product.id}
-                  onDoubleClick={() => onViewDetail?.(product)}
                   className="hover:bg-slate-50  transition-colors cursor-pointer"
                 >
                   {/* Mã Sản Phẩm */}
@@ -84,7 +88,15 @@ export default function ProductsTable({
                   {/* Danh Mục */}
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-blue-100  text-blue-600">
-                      {categoryNameById.get(Number(product.categoryId)) || "Khác"}
+                      {categoryNameById.get(Number(product.categoryId)) ||
+                        "Khác"}
+                    </span>
+                  </td>
+
+                  {/* Ví trí của sản phẩm */}
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-blue-100  text-blue-600">
+                      {product.warehouseLocation}
                     </span>
                   </td>
 

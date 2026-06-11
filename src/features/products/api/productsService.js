@@ -1,13 +1,17 @@
 import api from '../../../lib/axios';
 
-const normalizeProductPayload = (data = {}) => {
+const normalizeProductPayload = (data = {}, isUpdate = false) => {
   const name = String(data.name ?? '').trim();
   const code = String(data.code ?? '').trim();
   const description = String(data.description ?? '').trim();
   const categoryId = Number(data.categoryId ?? 0);
-  const sellingPrice = Number(data.sellingPrice ?? 0);
-  const originalPrice = Number(data.originalPrice ?? 1);
-  const initialStock = Number(0);
+  const sellingPrice = Number(data.sellingPrice ?? data.price ?? 0);
+  const originalPrice = Number(data.originalPrice ?? data.importPrice ?? 1);
+  // Khi update: giữ nguyên số lượng tồn kho hiện tại từ data, không gán về 0
+  // Khi create: mặc định là 0
+  const initialStock = isUpdate
+    ? Number(data.quantity ?? data.initialStock ?? 0)
+    : Number(0);
   const imageUrl = String(data.imageUrl ?? '').trim();
   const warehouseLocation = String(data.warehouseLocation ?? '').trim();
   return {
@@ -34,7 +38,7 @@ const normalizeProductPayload = (data = {}) => {
     ImportPrice: originalPrice,
     SellingPrice: sellingPrice,
     InitialStock: initialStock,
-    WarehourseLocation: warehouseLocation,
+    WarehouseLocation: warehouseLocation,
     ImageUrl: imageUrl,
   };
 };
@@ -56,6 +60,7 @@ const toProductFormData = (payload = {}) => {
   append('ImportPrice', payload.ImportPrice);
   append('InitialStock', payload.InitialStock);
   append('ImageUrl', payload.ImageUrl || '');
+  append('WarehouseLocation', payload.WarehouseLocation);
 
   return formData;
 };
@@ -161,7 +166,8 @@ const productService = {
   // PUT /api/Products/{productId}
   async update(productId, data) {
     try {
-      const payload = normalizeProductPayload(data);
+      // isUpdate = true để giữ nguyên số lượng tồn kho, không ghi đè về 0
+      const payload = normalizeProductPayload(data, true);
       const formData = toProductFormData(payload);
       const response = await api.put(`/Products/${productId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },

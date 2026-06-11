@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "https://warehousemanagement-backend-1.onrender.com/api";
+const baseURL = "https://localhost:7161/api";
 
 const api = axios.create({
     baseURL,

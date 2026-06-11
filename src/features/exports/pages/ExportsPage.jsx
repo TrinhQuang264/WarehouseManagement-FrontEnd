@@ -130,9 +130,9 @@ export default function ExportsPage() {
     }
   }, [isAddMode, formReceipt.customerId, customers]);
   const [draftItem, setDraftItem] = useState(() => ({
-    productId: String(products[0]?.id || ""),
+    productId: "",
     quantity: 1,
-    unitPrice: products[0]?.price || 0,
+    unitPrice: 0,
   }));
   const [deleteConfirm, setDeleteConfirm] = useState({
     isOpen: false,
@@ -151,9 +151,9 @@ export default function ExportsPage() {
   useEffect(() => {
     if (isFormMode && products.length > 0) {
       setDraftItem((prev) => ({
-        productId: prev.productId || String(products[0].id),
+        productId: prev.productId || "",
         quantity: prev.quantity || 1,
-        unitPrice: prev.unitPrice || products[0].price || 0,
+        unitPrice: prev.unitPrice || 0,
       }));
     }
   }, [isFormMode, products]);
@@ -390,6 +390,11 @@ export default function ExportsPage() {
         unitPrice,
       },
     ]);
+    setDraftItem({
+      productId: "",
+      quantity: 1,
+      unitPrice: 0,
+    });
   }, [draftItem, formReceipt.items, products, updateReceiptItems]);
   const handleIncreaseQty = useCallback(
     (itemId) => {
@@ -435,10 +440,6 @@ export default function ExportsPage() {
     },
     [formReceipt.items, updateReceiptItems],
   );
-  const handleSaveDraft = useCallback(() => {
-    toast.info("Đã lưu phiếu xuất ở trạng thái bản nháp.");
-    navigate(EXPORT_URLS.list);
-  }, [navigate]);
   const handleSubmit = useCallback(async () => {
     try {
       // Ensure a valid customer is selected
@@ -567,7 +568,6 @@ export default function ExportsPage() {
           onIncreaseQty={handleIncreaseQty}
           onDecreaseQty={handleDecreaseQty}
           onRemoveItem={handleRemoveItem}
-          onSaveDraft={handleSaveDraft}
           onSubmit={handleSubmit}
           onCancel={closeForm}
         />

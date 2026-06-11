@@ -38,7 +38,9 @@ const DATE_RANGE_FILTERS = {
   month: (date) => {
     const d = new Date(date);
     const now = new Date();
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    return (
+      d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    );
   },
 };
 
@@ -52,7 +54,6 @@ function formatUserName(user) {
 }
 
 function buildEmptyReceipt(products) {
-  const defaultProduct = products && products.length > 0 ? products[0] : null;
   return {
     id: null,
     code: "NK-DRAFT",
@@ -63,21 +64,7 @@ function buildEmptyReceipt(products) {
     warehouse: "1",
     referenceCode: "",
     status: "draft",
-    items: defaultProduct
-      ? [
-          {
-            id: "draft-1",
-            productId: defaultProduct.id,
-            productName: defaultProduct.name || "",
-            imageUrl: defaultProduct.imageUrl || "",
-            sku: defaultProduct.code || "",
-            quantity: 1,
-            unitPrice: defaultProduct.importPrice || 0,
-            lineTotal: defaultProduct.importPrice || 0,
-            unit: "Cái",
-          },
-        ]
-      : [],
+    items: [],
   };
 }
 
@@ -87,7 +74,7 @@ export function useImports() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedDateRange, setSelectedDateRange] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const pageSize = 7;
 
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
@@ -97,12 +84,13 @@ export function useImports() {
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [productsData, suppliersData, purchasesData, categoriesData] = await Promise.all([
-        productsService.getAll(),
-        suppliersService.getAll(),
-        purchasesService.getAll(),
-        categoryService.getAll(),
-      ]);
+      const [productsData, suppliersData, purchasesData, categoriesData] =
+        await Promise.all([
+          productsService.getAll(),
+          suppliersService.getAll(),
+          purchasesService.getAll(),
+          categoryService.getAll(),
+        ]);
 
       // Handle potentially wrapped responses
       const fetchedProducts = productsData.data || productsData || [];
@@ -111,12 +99,17 @@ export function useImports() {
       const fetchedCategories = categoriesData?.data || categoriesData || [];
 
       const categoryMap = new Map(
-        (Array.isArray(fetchedCategories) ? fetchedCategories : []).map((c) => [Number(c.id), c.name])
+        (Array.isArray(fetchedCategories) ? fetchedCategories : []).map((c) => [
+          Number(c.id),
+          c.name,
+        ]),
       );
 
-      const productsWithCategory = (Array.isArray(fetchedProducts) ? fetchedProducts : []).map(p => ({
+      const productsWithCategory = (
+        Array.isArray(fetchedProducts) ? fetchedProducts : []
+      ).map((p) => ({
         ...p,
-        categoryName: categoryMap.get(Number(p.categoryId)) || null
+        categoryName: categoryMap.get(Number(p.categoryId)) || null,
       }));
 
       setProducts(productsWithCategory);
@@ -175,7 +168,12 @@ export function useImports() {
             id: p.id,
             code: p.referenceCode || `NK-${p.id}`,
             supplierId: p.supplierId,
-            date: p.createDate || p.purchaseDate || p.receiptDate || p.createdAt || new Date().toISOString(),
+            date:
+              p.createDate ||
+              p.purchaseDate ||
+              p.receiptDate ||
+              p.createdAt ||
+              new Date().toISOString(),
             note: p.note || "",
             referenceCode: p.referenceCode || "",
             status: STATUS_KEY_MAP[p.status ?? p.Status] || "draft",
@@ -244,8 +242,8 @@ export function useImports() {
           const selectedDateStr = selectedDateRange.replace("date:", "");
           const d = new Date(receipt.date);
           const year = d.getFullYear();
-          const month = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
           const receiptDateStr = `${year}-${month}-${day}`;
           return receiptDateStr === selectedDateStr;
         }
@@ -399,22 +397,29 @@ export function useImports() {
     }
   };
   const submitReceipt = async (receiptOrId) => {
-    const id = typeof receiptOrId === 'object' ? receiptOrId.id : receiptOrId;
-    const receipt = typeof receiptOrId === 'object' ? receiptOrId : getReceiptById(id);
-    
+    const id = typeof receiptOrId === "object" ? receiptOrId.id : receiptOrId;
+    const receipt =
+      typeof receiptOrId === "object" ? receiptOrId : getReceiptById(id);
+
     console.log("[useImports.submitReceipt] Receipt to submit:", receipt);
-    if (receipt && !(
+    if (
+      receipt &&
+      !(
         receipt.status === "draft" ||
         receipt.status === 0 ||
         receipt.status === "0"
-      )) {
-      throw new Error("Chỉ phiếu ở trạng thái bản nháp mới được gửi duyệt.");
+      )
+    ) {
+      throw new Error("Chỉ phiếu ở trạng thái  mới được gửi duyệt.");
     }
 
     try {
       console.log("[useImports.submitReceipt] Confirming receipt:", id);
       const response = await purchasesService.confirm(id);
-      console.log("[useImports.submitReceipt] Response from confirm:", response);
+      console.log(
+        "[useImports.submitReceipt] Response from confirm:",
+        response,
+      );
       await fetchData();
       return response;
     } catch (error) {

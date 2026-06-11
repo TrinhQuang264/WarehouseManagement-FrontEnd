@@ -33,7 +33,7 @@ export default function ReceiptTable({
   emptyMessage,
 }) {
   return (
-    <DataTableCard>
+    <DataTableCard className="relative min-h-[470px] flex flex-col">
       <div className="table-wrapper">
         <table className="table">
           <thead>
@@ -53,7 +53,6 @@ export default function ReceiptTable({
                 <tr
                   key={receipt.id}
                   className="group table-row-hover cursor-pointer"
-                  onDoubleClick={() => onViewDetail?.(receipt)}
                 >
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1">

@@ -124,9 +124,9 @@ export default function ImportsPage() {
     hydrateReceipt(buildEmptyReceipt(), products),
   );
   const [draftItem, setDraftItem] = useState(() => ({
-    productId: String(products[0]?.id || ""),
+    productId: "",
     quantity: 1,
-    unitPrice: products[0]?.importPrice || 0,
+    unitPrice: 0,
   }));
   const [deleteConfirm, setDeleteConfirm] = useState({
     isOpen: false,
@@ -146,9 +146,9 @@ export default function ImportsPage() {
   useEffect(() => {
     if (isFormMode && products.length > 0) {
       setDraftItem((prev) => ({
-        productId: prev.productId || String(products[0].id),
+        productId: prev.productId || "",
         quantity: prev.quantity || 1,
-        unitPrice: prev.unitPrice || products[0].importPrice || 0,
+        unitPrice: prev.unitPrice || 0,
       }));
     }
   }, [isFormMode, products]);
@@ -389,6 +389,11 @@ export default function ImportsPage() {
         unitPrice,
       },
     ]);
+    setDraftItem({
+      productId: "",
+      quantity: 1,
+      unitPrice: 0,
+    });
   }, [draftItem, formReceipt.items, products, updateReceiptItems]);
 
   const handleIncreaseQty = useCallback(
@@ -423,11 +428,6 @@ export default function ImportsPage() {
     },
     [formReceipt.items, updateReceiptItems],
   );
-
-  const handleSaveDraft = useCallback(() => {
-    toast.info("Đã lưu phiếu nhập ở trạng thái bản nháp.");
-    navigate(IMPORT_URLS.list);
-  }, [navigate]);
 
   const handleSubmit = useCallback(async () => {
     try {
@@ -550,7 +550,6 @@ export default function ImportsPage() {
           onIncreaseQty={handleIncreaseQty}
           onDecreaseQty={handleDecreaseQty}
           onRemoveItem={handleRemoveItem}
-          onSaveDraft={handleSaveDraft}
           onSubmit={handleSubmit}
           onCancel={closeForm}
         />

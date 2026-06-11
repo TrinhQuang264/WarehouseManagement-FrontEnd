@@ -2,7 +2,6 @@ import {
   CalendarDays,
   FileText,
   PackageMinus,
-  Save,
   Search,
   Trash2,
   UserRound,
@@ -11,6 +10,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import Button from "../../../components/ui/Button.jsx";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
+import SearchableSelect from "../../../components/ui/SearchableSelect.jsx";
 import { formatCurrency } from "../../../utils/util.js";
 
 function ReceiptSummary({ receipt }) {
@@ -61,8 +61,14 @@ export default function ExportReceiptForm({
   onSubmit,
   onCancel,
 }) {
-  const activeProducts = useMemo(() => products.filter(p => p.isDeleted !== true), [products]);
-  const activeCustomers = useMemo(() => customers.filter(c => c.isDeleted !== true), [customers]);
+  const activeProducts = useMemo(
+    () => products.filter((p) => p.isDeleted !== true),
+    [products],
+  );
+  const activeCustomers = useMemo(
+    () => customers.filter((c) => c.isDeleted !== true),
+    [customers],
+  );
 
   const selectedProduct = useMemo(
     () =>
@@ -135,23 +141,18 @@ export default function ExportReceiptForm({
             <div className="imports-meta-grid">
               <label className="imports-field">
                 <span>Khách hàng</span>
-                <div className="imports-input-with-icon">
-                  <UserRound size={18} />
-                  <select
-                    className="imports-input imports-input-icon"
-                    value={receipt.customerId}
-                    onChange={(event) =>
-                      onMetaChange("customerId", event.target.value)
-                    }
-                  >
-                    <option value="">Chọn khách hàng...</option>
-                    {activeCustomers.map((customer) => (
-                      <option key={customer.id} value={customer.id}>
-                        {customer.fullName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SearchableSelect
+                  options={activeCustomers.map((c) => ({
+                    value: c.id,
+                    label: c.fullName,
+                  }))}
+                  value={receipt.customerId}
+                  onChange={(val) => onMetaChange("customerId", val)}
+                  placeholder="Chọn khách hàng..."
+                  searchPlaceholder="Tìm khách hàng..."
+                  icon={<UserRound size={16} />}
+                  maxVisible={7}
+                />
               </label>
               <label className="imports-field">
                 <span>Ngày xuất</span>
@@ -232,14 +233,6 @@ export default function ExportReceiptForm({
                       </button>
                     ) : null}
                   </div>
-                  {selectedProduct ? (
-                    <div className="imports-selected-product-meta">
-                      <p className="text-xs text-slate-500">
-                        Đơn giá gợi ý: {formatCurrency(selectedProductPrice)} •
-                        Danh mục: {selectedProductCategory}
-                      </p>
-                    </div>
-                  ) : null}
                   {isSearchOpen && searchResults.length > 0 && (
                     <div className="imports-search-results imports-product-search-results">
                       {searchResults.map((product) => {
@@ -272,7 +265,11 @@ export default function ExportReceiptForm({
                                 {product.name} - SL: {availableStock}
                               </p>
                               <span>
-                                {product.code} - {product.categoryName || (product.categoryId ? `Danh mục ${product.categoryId}` : "")}
+                                {product.code} -{" "}
+                                {product.categoryName ||
+                                  (product.categoryId
+                                    ? `Danh mục ${product.categoryId}`
+                                    : "")}
                                 {isOutOfStock ? " • Hết hàng" : ""}
                               </span>
                             </div>
@@ -442,15 +439,6 @@ export default function ExportReceiptForm({
         <div className="imports-form-side">
           <ReceiptSummary receipt={receipt} />
           <div className="imports-side-actions">
-            {onSaveDraft && (
-              <Button
-                variant="outline"
-                onClick={onSaveDraft}
-                icon={<Save size={16} />}
-              >
-                Lưu nháp
-              </Button>
-            )}
             <Button className="w-full justify-center py-3" onClick={onSubmit}>
               {mode === "edit" ? "Cập nhật phiếu xuất" : "Xác nhận xuất kho"}
             </Button>

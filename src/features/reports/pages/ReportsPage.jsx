@@ -98,7 +98,7 @@ export default function ReportsPage() {
   const subtitleDateText = `Dữ liệu từ ${formatDateString(dateRange.start)} đến ${formatDateString(dateRange.end)}`;
 
   return (
-    <div className="reports-page px-2 md:px-4 py-4">
+    <div className="reports-page px-2 md:px-4">
       {/* Breadcrumbs */}
       <div className="page-header mb-4">
         <Breadcrumbs
@@ -437,89 +437,6 @@ export default function ReportsPage() {
           </div>
         </div>
       )}
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {/* Card 1: Tồn kho hiện tại */}
-        <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between gap-3 hover:shadow-md transition-shadow">
-          <div className="min-w-0">
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 truncate">
-              Tồn kho hiện tại
-            </p>
-            <h3 className="text-lg font-black text-slate-900 leading-tight">
-              {formatNumber(dashboardStats.totalStock)}
-            </h3>
-            <p
-              className={`text-[9px] font-bold mt-0.5 truncate ${
-                Number(dashboardStats.stockPercentChange) >= 0
-                  ? "text-green-600"
-                  : "text-red-500"
-              }`}
-            >
-              {Number(dashboardStats.stockPercentChange) >= 0 ? "+" : ""}
-              {dashboardStats.stockPercentChange}% tháng trước
-            </p>
-          </div>
-        </div>
-
-        {/* Card 2: Tổng giá trị tồn */}
-        <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between gap-3 hover:shadow-md transition-shadow">
-          <div className="min-w-0">
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 truncate">
-              Tổng giá trị tồn
-            </p>
-            <h3
-              className="text-lg font-black text-slate-900 leading-tight cursor-help truncate"
-              title={formatCurrency(dashboardStats.totalVal)}
-            >
-              {formatBillion(dashboardStats.totalVal)}
-            </h3>
-            <p className="text-[9px] text-green-600 font-bold mt-0.5">
-              Giá nhập ban đầu
-            </p>
-          </div>
-        </div>
-
-        {/* Card 3: Số lượt nhập kho */}
-        <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between gap-3 hover:shadow-md transition-shadow">
-          <div className="min-w-0">
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 truncate">
-              Số lượt nhập kho
-            </p>
-            <h3 className="text-lg font-black text-slate-900 leading-tight">
-              {dashboardStats.importCount}
-            </h3>
-            <p className="text-[9px] text-slate-400 font-medium mt-0.5 truncate">
-              ~{dashboardStats.averageImportsPerDay} phiếu/ngày
-            </p>
-          </div>
-        </div>
-
-        {/* Card 4: Sản phẩm sắp hết */}
-        <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between gap-3 hover:shadow-md transition-shadow">
-          <div className="min-w-0">
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 truncate">
-              Sản phẩm sắp hết
-            </p>
-            <h3
-              className={`text-lg font-black leading-tight ${dashboardStats.lowStockCount > 0 ? "text-red-500" : "text-slate-900"}`}
-            >
-              {dashboardStats.lowStockCount}
-            </h3>
-            <p
-              className={`text-[9px] font-bold mt-0.5 ${
-                dashboardStats.lowStockCount > 0
-                  ? "text-red-500"
-                  : "text-slate-400"
-              }`}
-            >
-              {dashboardStats.lowStockCount > 0
-                ? "Cần nhập ngưay"
-                : "Tồn kho an toàn"}
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

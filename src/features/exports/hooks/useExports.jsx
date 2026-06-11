@@ -38,12 +38,13 @@ const DATE_RANGE_FILTERS = {
   month: (date) => {
     const d = new Date(date);
     const now = new Date();
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    return (
+      d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    );
   },
 };
 
 function buildEmptyReceipt(products) {
-  const defaultProduct = products && products.length > 0 ? products[0] : null;
   return {
     id: null,
     code: "XK-DRAFT",
@@ -54,21 +55,7 @@ function buildEmptyReceipt(products) {
     warehouse: "1",
     referenceCode: "",
     status: "draft",
-    items: defaultProduct
-      ? [
-          {
-            id: "draft-1",
-            productId: defaultProduct.id,
-            productName: defaultProduct.name || "",
-            imageUrl: defaultProduct.imageUrl || "",
-            sku: defaultProduct.code || "",
-            quantity: 1,
-            unitPrice: defaultProduct.sellingPrice || defaultProduct.price || 0,
-            lineTotal: defaultProduct.sellingPrice || defaultProduct.price || 0,
-            unit: "Cái",
-          },
-        ]
-      : [],
+    items: [],
   };
 }
 
@@ -78,7 +65,7 @@ export function useExports() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedDateRange, setSelectedDateRange] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const pageSize = 7;
 
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -88,12 +75,13 @@ export function useExports() {
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [productsData, customersData, purchasesData, categoriesData] = await Promise.all([
-        productsService.getAll(),
-        customersService.getAll(),
-        purchasesService.getAll(),
-        categoryService.getAll(),
-      ]);
+      const [productsData, customersData, purchasesData, categoriesData] =
+        await Promise.all([
+          productsService.getAll(),
+          customersService.getAll(),
+          purchasesService.getAll(),
+          categoryService.getAll(),
+        ]);
 
       const fetchedProducts = productsData?.data || productsData || [];
       const fetchedCustomers = Array.isArray(customersData)
@@ -103,12 +91,17 @@ export function useExports() {
       const fetchedCategories = categoriesData?.data || categoriesData || [];
 
       const categoryMap = new Map(
-        (Array.isArray(fetchedCategories) ? fetchedCategories : []).map((c) => [Number(c.id), c.name])
+        (Array.isArray(fetchedCategories) ? fetchedCategories : []).map((c) => [
+          Number(c.id),
+          c.name,
+        ]),
       );
 
-      const productsWithCategory = (Array.isArray(fetchedProducts) ? fetchedProducts : []).map(p => ({
+      const productsWithCategory = (
+        Array.isArray(fetchedProducts) ? fetchedProducts : []
+      ).map((p) => ({
         ...p,
-        categoryName: categoryMap.get(Number(p.categoryId)) || null
+        categoryName: categoryMap.get(Number(p.categoryId)) || null,
       }));
 
       setProducts(productsWithCategory);
@@ -158,7 +151,12 @@ export function useExports() {
             id: p.id,
             code: p.referenceCode || `XK-${p.id}`,
             customerId: p.customerId,
-            date: p.createDate || p.purchaseDate || p.receiptDate || p.createdAt || new Date().toISOString(),
+            date:
+              p.createDate ||
+              p.purchaseDate ||
+              p.receiptDate ||
+              p.createdAt ||
+              new Date().toISOString(),
             note: p.note || "",
             referenceCode: p.referenceCode || "",
             status: STATUS_KEY_MAP[p.status ?? p.Status] || "draft",
@@ -229,8 +227,8 @@ export function useExports() {
           const selectedDateStr = selectedDateRange.replace("date:", "");
           const d = new Date(receipt.date);
           const year = d.getFullYear();
-          const month = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
           const receiptDateStr = `${year}-${month}-${day}`;
           return receiptDateStr === selectedDateStr;
         }
@@ -378,22 +376,29 @@ export function useExports() {
     }
   };
   const submitReceipt = async (receiptOrId) => {
-    const id = typeof receiptOrId === 'object' ? receiptOrId.id : receiptOrId;
-    const receipt = typeof receiptOrId === 'object' ? receiptOrId : getReceiptById(id);
+    const id = typeof receiptOrId === "object" ? receiptOrId.id : receiptOrId;
+    const receipt =
+      typeof receiptOrId === "object" ? receiptOrId : getReceiptById(id);
 
     console.log("[useExports.submitReceipt] Receipt to submit:", receipt);
-    if (receipt && !(
+    if (
+      receipt &&
+      !(
         receipt.status === "draft" ||
         receipt.status === 0 ||
         receipt.status === "0"
-      )) {
+      )
+    ) {
       throw new Error("Chỉ phiếu ở trạng thái bản nháp mới được gửi duyệt.");
     }
 
     try {
       console.log("[useExports.submitReceipt] Confirming receipt:", id);
       const response = await purchasesService.confirm(id);
-      console.log("[useExports.submitReceipt] Response from confirm:", response);
+      console.log(
+        "[useExports.submitReceipt] Response from confirm:",
+        response,
+      );
       await fetchData();
       return response;
     } catch (error) {
