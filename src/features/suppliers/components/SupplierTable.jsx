@@ -19,7 +19,7 @@ function SupplierTable({ suppliers, loading, onEdit, onDelete, showDelete = true
                         </tr>
                     </thead>
                     <tbody
-                        className={`divide-y divide-slate-100transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+                        className={`transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
                     >
                         {suppliers.length > 0 ? (
                             suppliers.map((supplier) => (

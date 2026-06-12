@@ -35,7 +35,6 @@ export default function Button({
       `}
       {...rest}
     >
-      {/* Hiển thị spinner nếu đang loading, ngược lại hiển thị icon */}
       {loading ? (
         <Loader2 size={16} className="animate-spin" />
       ) : icon ? (

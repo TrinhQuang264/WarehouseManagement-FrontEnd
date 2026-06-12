@@ -1,22 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, Package, Search, X } from "lucide-react";
 import { getProductImageUrl } from "../../utils/util.js";
-/**
- * SearchableSelect - Dropdown tùy chỉnh với ô tìm kiếm tích hợp
- *
- * Props:
- *  - options: [{ value, label, ...extra }]
- *  - value: giá trị đang chọn (string | number)
- *  - onChange: (value) => void
- *  - placeholder: string – text hiển thị khi chưa chọn
- *  - searchPlaceholder: string – placeholder cho ô tìm kiếm
- *  - icon: ReactNode – icon hiển thị bên trái trigger
- *  - className: string – class bổ sung cho wrapper
- *  - maxVisible: number – số item hiển thị trước khi scroll (mặc định 7)
- *  - renderOption: (option, isSelected) => ReactNode – custom option renderer
- *  - renderTriggerLabel: (selectedOption) => ReactNode – custom trigger label renderer
- *  - filterFn: (option, search) => boolean – custom filter function
- */
+
 export default function SearchableSelect({
   options = [],
   value = "",
@@ -35,12 +20,10 @@ export default function SearchableSelect({
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
 
-  // Lấy label của item đang được chọn
   const selectedOption = options.find(
     (opt) => String(opt.value) === String(value),
   );
 
-  // Lọc danh sách theo từ khóa tìm kiếm
   const filteredOptions = filterFn
     ? options.filter((opt) => filterFn(opt, search))
     : options.filter((opt) =>
@@ -49,7 +32,6 @@ export default function SearchableSelect({
           .includes(search.toLowerCase().trim()),
       );
 
-  // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
@@ -61,7 +43,6 @@ export default function SearchableSelect({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Focus vào ô tìm kiếm khi mở dropdown
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       setTimeout(() => searchInputRef.current?.focus(), 50);
@@ -87,7 +68,6 @@ export default function SearchableSelect({
     searchInputRef.current?.focus();
   };
 
-  // Chiều cao tối đa của list: 7 item × ~44px/item (hoặc ~72px cho custom)
   const ITEM_HEIGHT = renderOption ? 72 : 44;
   const maxHeight = maxVisible * ITEM_HEIGHT;
 
@@ -97,7 +77,6 @@ export default function SearchableSelect({
       className={`searchable-select-wrapper ${className}`}
       style={{ position: "relative" }}
     >
-      {/* Trigger button */}
       <button
         type="button"
         className="searchable-select-trigger"
@@ -121,10 +100,8 @@ export default function SearchableSelect({
         />
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
         <div className="searchable-select-dropdown" role="listbox">
-          {/* Ô tìm kiếm */}
           <div className="searchable-select-search-wrap">
             <Search size={14} className="searchable-select-search-icon" />
             <input
@@ -153,12 +130,10 @@ export default function SearchableSelect({
             )}
           </div>
 
-          {/* Danh sách options */}
           <div
             className="searchable-select-list"
             style={{ maxHeight: `${maxHeight}px`, overflowY: "auto" }}
           >
-            {/* Option "không chọn" – chỉ hiển thị khi không có renderOption */}
             {!search && !renderOption && (
               <button
                 type="button"
@@ -167,12 +142,16 @@ export default function SearchableSelect({
                 onClick={() => handleSelect("")}
               >
                 <span>{placeholder}</span>
-                {!value && <Check size={14} className="searchable-select-check" />}
+                {!value && (
+                  <Check size={14} className="searchable-select-check" />
+                )}
               </button>
             )}
 
             {filteredOptions.length === 0 ? (
-              <div className="searchable-select-empty">Không tìm thấy kết quả</div>
+              <div className="searchable-select-empty">
+                Không tìm thấy kết quả
+              </div>
             ) : (
               filteredOptions.map((opt) => {
                 const isSelected = String(opt.value) === String(value);
@@ -189,7 +168,10 @@ export default function SearchableSelect({
                   >
                     {renderOption(opt, isSelected)}
                     {isSelected && (
-                      <Check size={14} className="searchable-select-check searchable-select-check-overlay" />
+                      <Check
+                        size={14}
+                        className="searchable-select-check searchable-select-check-overlay"
+                      />
                     )}
                   </button>
                 ) : (
@@ -216,15 +198,16 @@ export default function SearchableSelect({
   );
 }
 
-/**
- * ProductOption - Component hiển thị sản phẩm trong dropdown SearchableSelect
- */
 export function ProductOption({ opt, showStock = true }) {
   return (
     <div className="ss-product-option">
       <div className="ss-product-thumb">
         {opt.imageUrl ? (
-          <img src={getProductImageUrl(opt.imageUrl)} alt={opt.label} className="ss-product-thumb-img" />
+          <img
+            src={getProductImageUrl(opt.imageUrl)}
+            alt={opt.label}
+            className="ss-product-thumb-img"
+          />
         ) : (
           <Package size={16} className="ss-product-thumb-fallback" />
         )}

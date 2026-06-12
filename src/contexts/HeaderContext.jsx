@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useCallback } from "react";
 
 export const HeaderContext = createContext({
@@ -6,7 +5,7 @@ export const HeaderContext = createContext({
   setSearchValue: () => {},
   actionButton: null,
   setActionButton: () => {},
-  extraActions: [], // Mảng các nút action phụ
+  extraActions: [],
   setExtraActions: () => {},
   onSearch: null,
   setOnSearch: () => {},
@@ -57,7 +56,6 @@ function HeaderProvider({ children }) {
   );
 }
 
-// Custom hook to use header context
 function useHeader() {
   const context = React.useContext(HeaderContext);
   if (!context) {

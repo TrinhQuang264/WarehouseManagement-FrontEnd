@@ -23,7 +23,6 @@ export default function CustomerModal({
   // Reset form khi mở modal hoặc thay đổi khách hàng đang sửa
   useEffect(() => {
     if (editingCustomer) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         fullName: editingCustomer.fullName,
         code: editingCustomer.code,
@@ -32,7 +31,6 @@ export default function CustomerModal({
         address: editingCustomer.address,
       });
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         fullName: "",
         code: nextCode || "",

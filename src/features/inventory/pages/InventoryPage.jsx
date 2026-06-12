@@ -31,7 +31,8 @@ export default function InventoryPage() {
     totalCount,
   } = useInventory();
 
-  const { setActionButton, setExtraActions, setOnSearch, resetHeader } = useHeader();
+  const { setActionButton, setExtraActions, setOnSearch, resetHeader } =
+    useHeader();
   const navigate = useNavigate();
 
   const handleExport = useCallback(() => {
@@ -40,15 +41,19 @@ export default function InventoryPage() {
         toast.error("Không có dữ liệu để xuất");
         return;
       }
-      const dataToExport = products.map(p => ({
+      const dataToExport = products.map((p) => ({
         "Mã sản phẩm": p.code || "",
         "Tên sản phẩm": p.name || "",
-        "Nhóm": categories.find(c => c.id === p.categoryId)?.name || "Linh kiện",
+        Nhóm:
+          categories.find((c) => c.id === p.categoryId)?.name || "Linh kiện",
         "Số lượng tồn": p.quantity ?? 0,
-        "Đơn giá (VNĐ)": p.price ?? p.sellingPrice ?? 0,
+        "Đơn giá (VNĐ)": p.sellingPrice ?? 0,
         "Trạng thái": (p.quantity ?? 0) <= 10 ? "Tồn thấp" : "An toàn",
       }));
-      downloadCSV(dataToExport, `TonKho_${new Date().toLocaleDateString("vi-VN").replace(/\//g, "-")}.csv`);
+      downloadCSV(
+        dataToExport,
+        `TonKho_${new Date().toLocaleDateString("vi-VN").replace(/\//g, "-")}.csv`,
+      );
       toast.success("Xuất dữ liệu thành công!");
     } catch (error) {
       console.error("[InventoryPage] Export error:", error);
@@ -62,7 +67,8 @@ export default function InventoryPage() {
       icon: <Plus size={18} />,
       onClick: () => navigate("/import/create"),
       searchPlaceholder: "Tìm kiếm tên sản phẩm, mã SKU...",
-      className: "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
+      className:
+        "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
     });
     setExtraActions([
       {
@@ -74,7 +80,14 @@ export default function InventoryPage() {
     ]);
     setOnSearch(() => setSearch);
     return () => resetHeader();
-  }, [setActionButton, setExtraActions, setOnSearch, resetHeader, setSearch, handleExport]);
+  }, [
+    setActionButton,
+    setExtraActions,
+    setOnSearch,
+    resetHeader,
+    setSearch,
+    handleExport,
+  ]);
 
   if (isFirstFetch && loading) {
     return <Loading text="Đang tải dữ liệu kiểm kê..." />;

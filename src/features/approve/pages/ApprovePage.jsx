@@ -29,7 +29,6 @@ export default function ApprovePage() {
   const { setActionButton, setOnSearch, setTitle, setSubtitle, resetHeader } =
     useHeader();
 
-  // Dialog state
   const [approveConfirm, setApproveConfirm] = useState({
     isOpen: false,
     receipt: null,
@@ -91,7 +90,7 @@ export default function ApprovePage() {
   return (
     <div className="approve-page">
       <section className="imports-table-section">
-        <div className="mb-4 flex flex-wrap items-center gap-3 justify-between">
+        <div className="mb-2 flex flex-wrap items-center gap-3 justify-between">
           <div className="page-header">
             <Breadcrumbs />
           </div>
@@ -127,7 +126,6 @@ export default function ApprovePage() {
         resourceName="phiếu chờ duyệt"
       />
 
-      {/* Confirm Approve Modal */}
       <ConfirmModal
         isOpen={approveConfirm.isOpen}
         onClose={() => setApproveConfirm({ isOpen: false, receipt: null })}
@@ -139,7 +137,6 @@ export default function ApprovePage() {
         variant="success"
       />
 
-      {/* Confirm Cancel Modal */}
       <ConfirmModal
         isOpen={cancelConfirm.isOpen}
         onClose={() => setCancelConfirm({ isOpen: false, receipt: null })}

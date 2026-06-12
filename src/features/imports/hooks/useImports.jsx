@@ -44,7 +44,6 @@ const DATE_RANGE_FILTERS = {
   },
 };
 
-
 function buildEmptyReceipt() {
   return {
     id: null,
@@ -84,7 +83,6 @@ export function useImports() {
           categoryService.getAll(),
         ]);
 
-      // Handle potentially wrapped responses
       const fetchedProducts = productsData.data || productsData || [];
       const fetchedSuppliers = suppliersData.data || suppliersData || [];
       const fetchedPurchases = purchasesData.data || purchasesData || [];
@@ -119,27 +117,21 @@ export function useImports() {
           ).find((s) => s.id === p.supplierId);
 
           let items = p.items || [];
-          if (items.length === 0 && p.id) {
-            // If items are not included in getAll, they might need to be fetched separately,
-            // but for now we map what we have.
-          }
 
           const mappedItems = items.map((item, index) => {
             const product = (
               Array.isArray(fetchedProducts) ? fetchedProducts : []
             ).find((prod) => prod.id === item.productId);
             const qty = item.quantity || 1;
-            const price = item.unitCost || item.unitPrice || 0;
+            const price = item.unitCost || item.unitCost || 0;
             return {
               ...item,
               id: item.id || `${p.id}-${item.productId}-${index}`,
-              productName:
-                product?.name || item.productName || "Sản phẩm chưa xác định",
-              imageUrl: product?.imageUrl || "",
-              sku: product?.code || "N/A",
-              unit: "Cái",
+              productName: product?.name,
+              imageUrl: product?.imageUrl,
+              sku: product?.code,
               quantity: qty,
-              unitPrice: price,
+              unitCost: price,
               lineTotal: qty * price,
               categoryId: product?.categoryId,
               description: product?.description || "",
@@ -158,7 +150,7 @@ export function useImports() {
           return {
             ...p,
             id: p.id,
-            code: p.referenceCode || `NK-${p.id}`,
+            code: p.receiptCode,
             supplierId: p.supplierId,
             date:
               p.createDate ||
@@ -167,12 +159,9 @@ export function useImports() {
               p.createdAt ||
               new Date().toISOString(),
             note: p.note || "",
-            referenceCode: p.referenceCode || "",
+            referenceCode: p.referenceCode,
             status: STATUS_KEY_MAP[p.status ?? p.Status] || "draft",
-            supplierName:
-              p.supplierName ||
-              supplier?.supplierName ||
-              "Nhà cung cấp chưa xác định",
+            supplierName: p.supplierName || supplier?.supplierName,
             supplierAddress: supplier?.address || "Chưa cập nhật",
             operatorName: "Hệ thống",
             items: mappedItems,
@@ -289,20 +278,20 @@ export function useImports() {
     [receipts],
   );
 
-  const createEmptyReceipt = useCallback(
-    () => buildEmptyReceipt(),
-    [],
-  );
+  const createEmptyReceipt = useCallback(() => buildEmptyReceipt(), []);
 
-  const deleteReceipt = useCallback(async (id) => {
-    try {
-      await purchasesService.softDelete(id);
-      await fetchData();
-    } catch (error) {
-      console.error("Error deleting receipt:", error);
-      throw error;
-    }
-  }, [fetchData]);
+  const deleteReceipt = useCallback(
+    async (id) => {
+      try {
+        await purchasesService.softDelete(id);
+        await fetchData();
+      } catch (error) {
+        console.error("Error deleting receipt:", error);
+        throw error;
+      }
+    },
+    [fetchData],
+  );
 
   const createReceipt = async (receiptData, { submit = false } = {}) => {
     const supplier = suppliers.find(
@@ -324,7 +313,7 @@ export function useImports() {
       items: (receiptData.items || []).map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
-        unitCost: item.unitPrice || 0,
+        unitCost: item.unitCost || 0,
       })),
       ...(submit ? { status: 1, Status: 1 } : {}),
     };
@@ -370,7 +359,7 @@ export function useImports() {
       items: (receiptData.items || []).map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
-        unitCost: item.unitPrice || 0,
+        unitCost: item.unitCost || 0,
       })),
       ...(submit ? { status: 1, Status: 1 } : {}),
     };

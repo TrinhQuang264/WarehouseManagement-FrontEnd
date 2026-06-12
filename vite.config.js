@@ -16,7 +16,6 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       proxy: {
         "/api": {
-          // Ưu tiên lấy từ .env, fallback nếu không có
           target: process.env.VITE_BACKEND_ORIGIN,
           changeOrigin: true,
           secure: false,

@@ -99,12 +99,12 @@ export default function ProductsTable({
 
                   {/* Giá Bán */}
                   <td className="px-6 py-4 text-sm font-bold text-slate-900 text-right">
-                    {formatCurrency(product.price)}
+                    {formatCurrency(product.sellingPrice)}
                   </td>
 
                   {/* Mô tả */}
                   <td className="px-6 py-4 max-w-[200px] relative group">
-                    <div 
+                    <div
                       className="text-xs text-slate-600 truncate cursor-help"
                       title={product.description || "Chưa có mô tả"}
                     >

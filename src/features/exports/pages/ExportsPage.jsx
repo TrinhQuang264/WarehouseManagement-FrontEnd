@@ -35,20 +35,18 @@ function hydrateReceipt(receipt, products) {
       (productItem) => String(productItem.id) === String(item.productId),
     );
     const quantity = Number(item.quantity) || 1;
-    const unitPrice = Number(item.unitPrice ?? product?.price ?? 0);
+    const unitCost = Number(item.unitCost ?? product?.price ?? 0);
     return {
       ...item,
-      id: item.id || `${receipt.id || "draft"}-${item.productId}-${index}`,
+      id: item.id,
       productId: Number(item.productId),
-      productName:
-        product?.name || item.productName || "Sản phẩm chưa xác định",
-      imageUrl: product?.imageUrl || item.imageUrl || "",
-      sku: product?.code || item.sku || "N/A",
-      unit: item.unit || "Cái",
-      description: product?.description || item.description || "",
+      productName: product?.name,
+      imageUrl: product?.imageUrl,
+      sku: product?.code,
+      description: product?.description,
       quantity,
-      unitPrice,
-      lineTotal: quantity * unitPrice,
+      unitCost,
+      lineTotal: quantity * unitCost,
     };
   });
   const subTotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
@@ -143,7 +141,7 @@ export default function ExportsPage() {
   const [draftItem, setDraftItem] = useState(() => ({
     productId: "",
     quantity: 1,
-    unitPrice: 0,
+    unitCost: 0,
   }));
   const [deleteConfirm, setDeleteConfirm] = useState({
     isOpen: false,
@@ -167,7 +165,7 @@ export default function ExportsPage() {
       setDraftItem((prev) => ({
         productId: prev.productId || "",
         quantity: prev.quantity || 1,
-        unitPrice: prev.unitPrice || 0,
+        unitCost: prev.unitCost || 0,
       }));
     }
   }, [isFormMode, products]);
@@ -323,20 +321,18 @@ export default function ExportsPage() {
             (productItem) => String(productItem.id) === String(item.productId),
           );
           const quantity = Math.max(1, Number(item.quantity) || 1);
-          const unitPrice = Math.max(0, Number(item.unitPrice) || 0);
+          const unitCost = Math.max(0, Number(item.unitCost) || 0);
           return {
             ...item,
-            id: item.id || `draft-${item.productId}-${index}`,
+            id: item.id,
             productId: Number(item.productId),
-            productName:
-              product?.name || item.productName || "Sản phẩm chưa xác định",
-            imageUrl: product?.imageUrl || item.imageUrl || "",
-            sku: product?.code || item.sku || "N/A",
-            unit: item.unit || "Cái",
-            description: product?.description || item.description || "",
+            productName: product?.name,
+            imageUrl: product?.imageUrl,
+            sku: product?.code,
+            description: product?.description,
             quantity,
-            unitPrice,
-            lineTotal: quantity * unitPrice,
+            unitCost,
+            lineTotal: quantity * unitCost,
           };
         });
         const subTotal = normalizedItems.reduce(
@@ -372,8 +368,8 @@ export default function ExportsPage() {
         setDraftItem((prev) => ({
           ...prev,
           productId: String(value),
-          unitPrice:
-            product?.sellingPrice || product?.price || prev.unitPrice || 0,
+          unitCost:
+            product?.sellingPrice || product?.price || prev.unitCost || 0,
         }));
         return;
       }
@@ -401,26 +397,26 @@ export default function ExportsPage() {
       );
       return;
     }
-    const unitPrice = Math.max(
+    const unitCost = Math.max(
       0,
-      Number(draftItem.unitPrice) || product.sellingPrice || product.price || 0,
+      Number(draftItem.unitCost) || product.sellingPrice || product.price || 0,
     );
     updateReceiptItems([
       ...formReceipt.items,
       {
         id: `draft-${product.id}-${Date.now()}`,
         productId: product.id,
-        productName: product.name || "",
-        imageUrl: product.imageUrl || "",
-        sku: product.code || "",
+        productName: product.name,
+        imageUrl: product.imageUrl,
+        sku: product.code,
         quantity,
-        unitPrice,
+        unitCost,
       },
     ]);
     setDraftItem({
       productId: "",
       quantity: 1,
-      unitPrice: 0,
+      unitCost: 0,
     });
   }, [draftItem, formReceipt.items, products, updateReceiptItems]);
   const handleIncreaseQty = useCallback(

@@ -159,7 +159,6 @@ const authService = {
     return localStorage.getItem('accessToken');
   },
 
-  // Lấy userId từ localStorage hoặc giải mã JWT
   getUserId() {
     const user = authService.getStoredUser();
     if (user?.id || user?.Id) {

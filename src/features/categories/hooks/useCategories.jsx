@@ -7,37 +7,30 @@ import toast from "../../../utils/toast";
 const PAGE_SIZE = 7;
 
 export function useCategories() {
-  // URL query params: đồng bộ search/page với URL
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Dữ liệu danh mục hiển thị trên trang
   const [categories, setCategories] = useState([]);
   const [allActiveCategories, setAllActiveCategories] = useState([]);
 
-  // Trạng thái loading chung, loading fetch danh sách, loading submit action
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFirstFetch, setIsFirstFetch] = useState(true);
 
-  // Giá trị khởi tạo từ URL
   const initialSearch = searchParams.get("search") || "";
   const initialPage = Number(searchParams.get("page")) || 1;
 
-  // State tìm kiếm + phân trang
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const [totalCount, setTotalCount] = useState(0);
 
-  // UI state: modal add/edit/delete, drawer thùng rác
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isTrashOpen, setIsTrashOpen] = useState(false);
 
-  // Refs nội bộ: bỏ debounce lần mount đầu + hủy request cũ khi fetch mới
   const isFirstMount = useRef(true);
   const abortControllerRef = useRef(null);
 
@@ -63,7 +56,6 @@ export function useCategories() {
   }, [search]);
 
   const fetchCategories = useCallback(async () => {
-    // Hủy request cũ nếu đang chạy (tránh race condition)
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -75,37 +67,40 @@ export function useCategories() {
     try {
       const [response, productsRes] = await Promise.all([
         categoryService.getAll(),
-        productService.getAll()
+        productService.getAll(),
       ]);
       if (signal.aborted) return;
 
-      let allItems = Array.isArray(response) ? response : (response.data || []);
-      let allProducts = Array.isArray(productsRes) ? productsRes : (productsRes.data || []);
-      const activeProducts = allProducts.filter(p => !p.isDeleted);
+      let allItems = Array.isArray(response) ? response : response.data || [];
+      let allProducts = Array.isArray(productsRes)
+        ? productsRes
+        : productsRes.data || [];
+      const activeProducts = allProducts.filter((p) => !p.isDeleted);
 
-      const activeItems = allItems.filter(item =>
-        item.isDeleted === false
-      ).map(item => {
-        const productCount = activeProducts.filter(p => Number(p.categoryId) === Number(item.id)).length;
-        return {
-          ...item,
-          productCount
-        };
-      });
+      const activeItems = allItems
+        .filter((item) => item.isDeleted === false)
+        .map((item) => {
+          const productCount = activeProducts.filter(
+            (p) => Number(p.categoryId) === Number(item.id),
+          ).length;
+          return {
+            ...item,
+            productCount,
+          };
+        });
 
       setAllActiveCategories(activeItems);
       let filteredItems = [...activeItems];
       if (debouncedSearch) {
         const searchLower = debouncedSearch.toLowerCase();
-        filteredItems = filteredItems.filter(item =>
-          item.name?.toLowerCase().includes(searchLower) ||
-          item.seoDescription?.toLowerCase().includes(searchLower)
+        filteredItems = filteredItems.filter(
+          (item) =>
+            item.name?.toLowerCase().includes(searchLower) ||
+            item.seoDescription?.toLowerCase().includes(searchLower),
         );
       }
 
       const total = filteredItems.length;
-
-      // Phân trang
       const start = (currentPage - 1) * pageSize;
       const paginatedItems = filteredItems.slice(start, start + pageSize);
 
@@ -141,7 +136,8 @@ export function useCategories() {
       return true;
     } catch (error) {
       console.error("useCategories - handleAddCategory error:", error);
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      const serverMsg =
+        error?.response?.data?.message || error?.response?.data?.error;
       toast.error(serverMsg || "Không thể thêm danh mục. Vui lòng thử lại.");
       return false;
     } finally {
@@ -169,8 +165,11 @@ export function useCategories() {
       return true;
     } catch (error) {
       console.error("useCategories - handleUpdateCategory error:", error);
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
-      toast.error(serverMsg || "Lỗi khi cập nhật danh mục. Hãy kiểm tra lại dữ liệu.");
+      const serverMsg =
+        error?.response?.data?.message || error?.response?.data?.error;
+      toast.error(
+        serverMsg || "Lỗi khi cập nhật danh mục. Hãy kiểm tra lại dữ liệu.",
+      );
       return false;
     } finally {
       setIsSubmitting(false);
@@ -186,7 +185,6 @@ export function useCategories() {
       toast.success(`Đã xóa danh mục "${selectedCategory.name}"`);
       setIsDeleteModalOpen(false);
       setSelectedCategory(null);
-      // Auto lùi trang nếu xóa hết item trên trang hiện tại
       if (categories.length === 1 && currentPage > 1) {
         setCurrentPage((p) => p - 1);
       } else {
@@ -194,35 +192,32 @@ export function useCategories() {
       }
     } catch (error) {
       console.error("useCategories - handleDeleteCategory error:", error);
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      const serverMsg =
+        error?.response?.data?.message || error?.response?.data?.error;
       toast.error(serverMsg || "Không thể xóa danh mục này.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Mở Modal để Sửa
   const openEditModal = (category) => {
     setSelectedCategory(category);
     setIsModalOpen(true);
   };
 
-  // Mở Modal để Xóa
   const openDeleteModal = (category) => {
     setSelectedCategory(category);
     setIsDeleteModalOpen(true);
   };
 
   return {
-    // Dữ liệu & Loading
     categories,
     allActiveCategories,
-    loading,        // giữ để không breaking change component cũ
-    isFetching,     // spinner bảng
-    isSubmitting,   // spinner nút submit modal
+    loading,
+    isFetching,
+    isSubmitting,
     isFirstFetch,
-
-    // Tìm kiếm & Phân trang
+    
     search,
     debouncedSearch,
     setSearch,
@@ -231,8 +226,6 @@ export function useCategories() {
     pageSize,
     setPageSize,
     totalCount,
-
-    // Modal state
     isModalOpen,
     setIsModalOpen,
     isDeleteModalOpen,
@@ -242,7 +235,6 @@ export function useCategories() {
     isTrashOpen,
     setIsTrashOpen,
 
-    // Actions
     handleAddCategory,
     handleUpdateCategory,
     handleDeleteCategory,

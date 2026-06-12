@@ -4,114 +4,102 @@ import SearchBar from "../ui/SearchBar";
 import Button from "../ui/Button";
 
 export default function Header() {
-    const {
-        searchValue,
-        setSearchValue,
-        actionButton,
-        extraActions = [],
-        onSearch,
-        title,
-        subtitle,
-    } = useHeader();
+  const {
+    searchValue,
+    setSearchValue,
+    actionButton,
+    extraActions = [],
+    onSearch,
+    title,
+    subtitle,
+  } = useHeader();
 
-    // Local state for the input UI to handle debouncing
-    const [localSearch, setLocalSearch] = useState(searchValue);
-    const debounceTimerRef = useRef(null);
+  const [localSearch, setLocalSearch] = useState(searchValue);
+  const debounceTimerRef = useRef(null);
 
-    // Sync local state when external searchValue changes (e.g. page reset)
-    useEffect(() => {
-        setLocalSearch(searchValue);
-    }, [searchValue]);
+  useEffect(() => {
+    setLocalSearch(searchValue);
+  }, [searchValue]);
 
-    // Handle 1000ms debounce
-    const handleSearchChange = (value) => {
-        setLocalSearch(value);
+  const handleSearchChange = (value) => {
+    setLocalSearch(value);
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
 
-        // Clear existing timer
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
+    debounceTimerRef.current = setTimeout(() => {
+      setSearchValue(value);
+      if (onSearch) {
+        onSearch(value);
+      }
+    }, 50);
+  };
 
-        // Set new timer for instant response
-        debounceTimerRef.current = setTimeout(() => {
-            setSearchValue(value);
-            if (onSearch) {
-                onSearch(value);
-            }
-        }, 50); // Almost instant
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
+  }, []);
 
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
-            }
-        };
-    }, []);
-
-    return (
-        <header className="header">
-            <div className="header-content">
-                <div className="header-left">
-                    {title && (
-                        <div className="header-title-block">
-                            <h1 className="header-title">{title}</h1>
-                            {subtitle && (
-                                <p className="header-subtitle">{subtitle}</p>
-                            )}
-                        </div>
-                    )}
-
-                    {onSearch && (
-                        <div className="header-search">
-                            <SearchBar
-                                value={localSearch}
-                                onChange={handleSearchChange}
-                                placeholder={
-                                    actionButton?.searchPlaceholder ||
-                                    "Tìm kiếm..."
-                                }
-                                className="w-full"
-                            />
-                        </div>
-                    )}
-                </div>
-
-                <div className="header-actions flex items-center gap-3">
-                    {extraActions.map((action, index) => (
-                        <Button
-                            key={index}
-                            onClick={action.onClick}
-                            icon={action.icon}
-                            variant={action.variant || "secondary"}
-                            className={action.className || ""}
-                        >
-                            {action.label}
-                        </Button>
-                    ))}
-
-                    {actionButton && (
-                        <div className="header-action">
-                            {actionButton.render ? (
-                                actionButton.render()
-                            ) : (
-                                <Button
-                                    onClick={actionButton.onClick}
-                                    icon={actionButton.icon}
-                                    variant={actionButton.variant || "primary"}
-                                    className={
-                                        actionButton.className ||
-                                        "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"
-                                    }
-                                >
-                                    {actionButton.label}
-                                </Button>
-                            )}
-                        </div>
-                    )}
-                </div>
+  return (
+    <header className="header">
+      <div className="header-content">
+        <div className="header-left">
+          {title && (
+            <div className="header-title-block">
+              <h1 className="header-title">{title}</h1>
+              {subtitle && <p className="header-subtitle">{subtitle}</p>}
             </div>
-        </header>
-    );
+          )}
+
+          {onSearch && (
+            <div className="header-search">
+              <SearchBar
+                value={localSearch}
+                onChange={handleSearchChange}
+                placeholder={actionButton?.searchPlaceholder || "Tìm kiếm..."}
+                className="w-full"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="header-actions flex items-center gap-3">
+          {extraActions.map((action, index) => (
+            <Button
+              key={index}
+              onClick={action.onClick}
+              icon={action.icon}
+              variant={action.variant || "secondary"}
+              className={action.className || ""}
+            >
+              {action.label}
+            </Button>
+          ))}
+
+          {actionButton && (
+            <div className="header-action">
+              {actionButton.render ? (
+                actionButton.render()
+              ) : (
+                <Button
+                  onClick={actionButton.onClick}
+                  icon={actionButton.icon}
+                  variant={actionButton.variant || "primary"}
+                  className={
+                    actionButton.className ||
+                    "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"
+                  }
+                >
+                  {actionButton.label}
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
 }

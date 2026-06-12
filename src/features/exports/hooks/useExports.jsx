@@ -122,21 +122,19 @@ export function useExports() {
             const product = (
               Array.isArray(fetchedProducts) ? fetchedProducts : []
             ).find((prod) => prod.id === item.productId);
-            const qty = item.quantity || 1;
-            const price = item.unitCost || item.unitPrice || 0;
+            const qty = item.quantity;
+            const price = item.unitCost;
             return {
               ...item,
-              id: item.id || `${p.id}-${item.productId}-${index}`,
-              productName:
-                product?.name || item.productName || "Sản phẩm chưa xác định",
-              imageUrl: product?.imageUrl || "",
-              sku: product?.code || "N/A",
-              unit: "Cái",
+              id: item.id,
+              productName: product?.name,
+              imageUrl: product?.imageUrl,
+              sku: product?.code,
               quantity: qty,
-              unitPrice: price,
+              unitCost: price,
               lineTotal: qty * price,
               categoryId: product?.categoryId,
-              description: product?.description || "",
+              description: product?.description,
             };
           });
 
@@ -149,34 +147,22 @@ export function useExports() {
           return {
             ...p,
             id: p.id,
-            code: p.referenceCode || `XK-${p.id}`,
+            code: p.receiptCode,
             customerId: p.customerId,
-            date:
-              p.createDate ||
-              p.purchaseDate ||
-              p.receiptDate ||
-              p.createdAt ||
-              new Date().toISOString(),
-            note: p.note || "",
-            referenceCode: p.referenceCode || "",
+            date: p.createDate,
+            note: p.note,
+            referenceCode: p.referenceCode,
             status: STATUS_KEY_MAP[p.status ?? p.Status] || "draft",
-            customerName:
-              p.customerName ||
-              customer?.fullName ||
-              customer?.name ||
-              "Khách hàng chưa xác định",
-            customerAddress: customer?.address || "Chưa cập nhật",
-            customerPhone: customer?.phoneNumber || "Chưa cập nhật",
-            operatorName: "Hệ thống",
+            customerName: p.customerName,
+            customerAddress: customer?.address,
+            customerPhone: customer?.phoneNumber,
             items,
             itemCount: items.length,
             totalQuantity,
             subTotal,
             discountAmount: 0,
             totalAmount: subTotal,
-            statusLabel:
-              STATUS_LABELS[STATUS_KEY_MAP[p.status] || "draft"] ||
-              "Không xác định",
+            statusLabel: STATUS_LABELS[STATUS_KEY_MAP[p.status] || "draft"],
             itemSummary: items
               .map((item) => `${item.quantity} x ${item.productName}`)
               .join(", "),
@@ -287,15 +273,18 @@ export function useExports() {
     [products],
   );
 
-  const deleteReceipt = useCallback(async (id) => {
-    try {
-      await purchasesService.softDelete(id);
-      await fetchData();
-    } catch (error) {
-      console.error("Error deleting export receipt:", error);
-      throw error;
-    }
-  }, [fetchData]);
+  const deleteReceipt = useCallback(
+    async (id) => {
+      try {
+        await purchasesService.softDelete(id);
+        await fetchData();
+      } catch (error) {
+        console.error("Error deleting export receipt:", error);
+        throw error;
+      }
+    },
+    [fetchData],
+  );
 
   const createReceipt = async (receiptData, { submit = false } = {}) => {
     const customer = customers.find(
@@ -303,21 +292,18 @@ export function useExports() {
     );
     const payload = {
       type: 2,
-      Type: 2,
-      customerId: receiptData.customerId ? Number(receiptData.customerId) : 0,
+      customerId: receiptData.customerId,
       warehouseId: 1,
-      customerName: customer
-        ? customer.fullName || customer.name || ""
-        : "Khách hàng chưa xác định",
+      customerName: customer.fullName,
       receiptDate: receiptData.date
         ? new Date(receiptData.date).toISOString()
         : new Date().toISOString(),
-      referenceCode: receiptData.referenceCode || "",
-      note: receiptData.note || "",
+      referenceCode: receiptData.referenceCode,
+      note: receiptData.note,
       items: (receiptData.items || []).map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
-        unitCost: item.unitPrice || 0,
+        unitCost: item.unitCost,
       })),
       ...(submit ? { status: 1, Status: 1 } : {}),
     };
@@ -348,18 +334,16 @@ export function useExports() {
       Type: 2,
       customerId: receiptData.customerId ? Number(receiptData.customerId) : 0,
       warehouseId: 1,
-      customerName: customer
-        ? customer.fullName || customer.name || ""
-        : "Khách hàng chưa xác định",
+      customerName: customer.fullName,
       receiptDate: receiptData.date
         ? new Date(receiptData.date).toISOString()
         : new Date().toISOString(),
-      referenceCode: receiptData.referenceCode || "",
+      referenceCode: receiptData.referenceCode,
       note: receiptData.note || "",
       items: (receiptData.items || []).map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
-        unitCost: item.unitPrice || 0,
+        unitCost: item.unitCost,
       })),
       ...(submit ? { status: 1, Status: 1 } : {}),
     };

@@ -32,7 +32,7 @@ function ImportReceiptPaper({ receipt }) {
 
           <div>
             <span>Tham chiếu đơn:</span>
-            <strong>{receipt.referenceCode || "Không có"}</strong>
+            <strong>{receipt.referenceCode}</strong>
           </div>
 
           <div>
@@ -85,7 +85,7 @@ function ImportReceiptPaper({ receipt }) {
               <td>{String(index + 1).padStart(2, "0")}</td>
               <td className="imports-paper-cell-name">{item.productName}</td>
               <td>{item.quantity}</td>
-              <td>{formatCurrency(item.unitPrice)}</td>
+              <td>{formatCurrency(item.unitCost)}</td>
               <td className=" font-bold">{formatCurrency(item.lineTotal)}</td>
             </tr>
           ))}
@@ -219,25 +219,20 @@ function ImportReceiptDocumentView({ receipt, showStatus }) {
             <span>Thành tiền</span>
           </div>
           {receipt.items.map((item, index) => (
-            <div
-              className="imports-document-row"
-              key={item.id || `${item.productId}-${index}`}
-            >
+            <div className="imports-document-row" key={item.id}>
               <div className="imports-document-item">
                 <div>
                   <p className="imports-document-item-name">
                     {item.productName}
                   </p>
-                  <p className="imports-document-item-meta">
-                    SKU: {item.sku || "N/A"}
-                  </p>
+                  <p className="imports-document-item-meta">SKU: {item.sku}</p>
                   <p className="imports-document-item-meta">
                     {item.description || "Không có mô tả."}
                   </p>
                 </div>
               </div>
               <strong>{formatNumber(item.quantity)}</strong>
-              <strong>{formatCurrency(item.unitPrice)}</strong>
+              <strong>{formatCurrency(item.unitCost)}</strong>
               <strong>{formatCurrency(item.lineTotal)}</strong>
             </div>
           ))}
@@ -281,7 +276,7 @@ export default function ImportReceiptDetail({
             {showStatus && (
               <div className="imports-paper-status-aside">
                 <span className="imports-paper-badge">
-                  <b>Trạng thái: </b> {receipt.statusLabel || "CHÍNH THỨC"}
+                  <b>Trạng thái: </b> {receipt.statusLabel}
                 </span>
               </div>
             )}

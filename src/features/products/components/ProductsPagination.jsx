@@ -1,11 +1,11 @@
-import React from 'react';
-import PaginationBar from '../../../components/ui/PaginationBar.jsx';
+import React from "react";
+import PaginationBar from "../../../components/ui/PaginationBar.jsx";
 
 export default function ProductsPagination({
   currentPage,
   setCurrentPage,
   pageSize,
-  totalCount
+  totalCount,
 }) {
   return (
     <PaginationBar

@@ -35,21 +35,19 @@ function hydrateReceipt(receipt, products) {
       (productItem) => String(productItem.id) === String(item.productId),
     );
     const quantity = Number(item.quantity) || 1;
-    const unitPrice = Number(item.unitPrice ?? product?.importPrice ?? 0);
+    const unitCost = Number(item.unitCost ?? product?.importPrice ?? 0);
 
     return {
       ...item,
-      id: item.id || `${receipt.id || "draft"}-${item.productId}-${index}`,
+      id: item.id,
       productId: Number(item.productId),
-      productName:
-        product?.name || item.productName || "Sản phẩm chưa xác định",
-      imageUrl: product?.imageUrl || item.imageUrl || "",
+      productName: product?.name || item.productName,
+      imageUrl: product?.imageUrl || item.imageUrl,
       sku: product?.code || item.sku || "N/A",
-      unit: item.unit || "Cái",
-      description: product?.description || item.description || "",
+      description: product?.description,
       quantity,
-      unitPrice,
-      lineTotal: quantity * unitPrice,
+      unitCost,
+      lineTotal: quantity * unitCost,
     };
   });
 
@@ -99,8 +97,14 @@ export default function ImportsPage() {
     pageSize,
   } = useImports();
 
-  const { setActionButton, setExtraActions, setOnSearch, setTitle, setSubtitle, resetHeader } =
-    useHeader();
+  const {
+    setActionButton,
+    setExtraActions,
+    setOnSearch,
+    setTitle,
+    setSubtitle,
+    resetHeader,
+  } = useHeader();
 
   const isAddMode = location.pathname === IMPORT_URLS.new;
   const isEditMode = location.pathname.startsWith(getEditBasePath());
@@ -130,7 +134,7 @@ export default function ImportsPage() {
   const [draftItem, setDraftItem] = useState(() => ({
     productId: "",
     quantity: 1,
-    unitPrice: 0,
+    unitCost: 0,
   }));
   const [deleteConfirm, setDeleteConfirm] = useState({
     isOpen: false,
@@ -155,7 +159,7 @@ export default function ImportsPage() {
       setDraftItem((prev) => ({
         productId: prev.productId || "",
         quantity: prev.quantity || 1,
-        unitPrice: prev.unitPrice || 0,
+        unitCost: prev.unitCost || 0,
       }));
     }
   }, [isFormMode, products]);
@@ -249,7 +253,7 @@ export default function ImportsPage() {
                 variant: "danger",
               },
             ]
-          : []
+          : [],
       );
       setOnSearch(() => setSearch);
       setTitle("");
@@ -328,20 +332,18 @@ export default function ImportsPage() {
             (productItem) => String(productItem.id) === String(item.productId),
           );
           const quantity = Math.max(1, Number(item.quantity) || 1);
-          const unitPrice = Math.max(0, Number(item.unitPrice) || 0);
+          const unitCost = Math.max(0, Number(item.unitCost) || 0);
           return {
             ...item,
-            id: item.id || `draft-${item.productId}-${index}`,
+            id: item.id,
             productId: Number(item.productId),
-            productName:
-              product?.name || item.productName || "Sản phẩm chưa xác định",
-            imageUrl: product?.imageUrl || item.imageUrl || "",
-            sku: product?.code || item.sku || "N/A",
-            unit: item.unit || "Cái",
-            description: product?.description || item.description || "",
+            productName: product?.name,
+            imageUrl: product?.imageUrl,
+            sku: product?.code,
+            description: product?.description,
             quantity,
-            unitPrice,
-            lineTotal: quantity * unitPrice,
+            unitCost,
+            lineTotal: quantity * unitCost,
           };
         });
         const subTotal = normalizedItems.reduce(
@@ -378,7 +380,7 @@ export default function ImportsPage() {
         setDraftItem((prev) => ({
           ...prev,
           productId: String(value),
-          unitPrice: product?.importPrice || prev.unitPrice || 0,
+          unitCost: product?.importPrice || prev.unitCost || 0,
         }));
         return;
       }
@@ -398,9 +400,9 @@ export default function ImportsPage() {
     }
 
     const quantity = Math.max(1, Number(draftItem.quantity) || 1);
-    const unitPrice = Math.max(
+    const unitCost = Math.max(
       0,
-      Number(draftItem.unitPrice) || product.importPrice || 0,
+      Number(draftItem.unitCost) || product.importPrice || 0,
     );
 
     updateReceiptItems([
@@ -409,13 +411,13 @@ export default function ImportsPage() {
         id: `draft-${product.id}-${Date.now()}`,
         productId: product.id,
         quantity,
-        unitPrice,
+        unitCost,
       },
     ]);
     setDraftItem({
       productId: "",
       quantity: 1,
-      unitPrice: 0,
+      unitCost: 0,
     });
   }, [draftItem, formReceipt.items, products, updateReceiptItems]);
 
@@ -457,18 +459,33 @@ export default function ImportsPage() {
       if (isEditMode && sourceReceipt) {
         const status = sourceReceipt.status;
         const statusLabel = sourceReceipt.statusLabel;
-        if (status === 2 || status === "completed" || statusLabel === "Đã duyệt") {
+        if (
+          status === 2 ||
+          status === "completed" ||
+          statusLabel === "Đã duyệt"
+        ) {
           toast.error("Phiếu không được sửa đổi khi đã duyệt.");
           return;
         }
-        if (status === 3 || status === "cancelled" || statusLabel === "Đã huỷ") {
+        if (
+          status === 3 ||
+          status === "cancelled" ||
+          statusLabel === "Đã huỷ"
+        ) {
           toast.error("Phiếu không được sửa đổi khi đã huỷ.");
           return;
         }
       }
 
-      if (!formReceipt.supplierId || !formReceipt.referenceCode || !formReceipt.items || formReceipt.items.length === 0) {
-        toast.error("Vui lòng nhập các thông tin bắt buộc (nhà cung cấp, mã tham chiếu, sản phẩm).");
+      if (
+        !formReceipt.supplierId ||
+        !formReceipt.referenceCode ||
+        !formReceipt.items ||
+        formReceipt.items.length === 0
+      ) {
+        toast.error(
+          "Vui lòng nhập các thông tin bắt buộc (nhà cung cấp, mã tham chiếu, sản phẩm).",
+        );
         return;
       }
 
@@ -548,8 +565,7 @@ export default function ImportsPage() {
           </label>
         </div>
         {(() => {
-          const codeToCheck =
-            sourceReceipt.receiptCode || sourceReceipt.code || "";
+          const codeToCheck = sourceReceipt.receiptCode;
           const isExport = codeToCheck.slice(0, 2).toUpperCase() === "SO";
           const DetailComponent = isExport
             ? ExportReceiptDetail
@@ -657,7 +673,9 @@ export default function ImportsPage() {
         title="Thùng rác phiếu nhập kho"
         service={purchasesService}
         onDataChange={refreshList}
-        filterItems={(item) => item.type === 1 || item.receiptCode?.startsWith("PO")}
+        filterItems={(item) =>
+          item.type === 1 || item.receiptCode?.startsWith("PO")
+        }
       />
     </div>
   );

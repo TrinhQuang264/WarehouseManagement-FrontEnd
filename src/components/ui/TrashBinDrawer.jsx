@@ -25,7 +25,6 @@ export default function TrashBinDrawer({
     if (!isOpen) return;
     setLoading(true);
     try {
-      // Sử dụng API chuyên dụng cho thùng rác theo yêu cầu
       const response = await service.getTrash();
 
       let trashItems =
@@ -33,21 +32,23 @@ export default function TrashBinDrawer({
         response.data ||
         (Array.isArray(response) ? response : []);
 
-      // Filter items if filterItems is provided
       if (filterItems) {
         trashItems = trashItems.filter(filterItems);
       }
-
-      // Vẫn áp dụng tìm kiếm trong thùng rác (Client-side)
       if (search) {
         const searchLower = search.toLowerCase();
         trashItems = trashItems.filter((item) => {
           const itemName =
-            item.name || item.fullName || item.supplierName || item.customerName || "";
+            item.name ||
+            item.fullName ||
+            item.supplierName ||
+            item.customerName ||
+            "";
           return (
             itemName.toLowerCase().includes(searchLower) ||
             (item.code && item.code.toLowerCase().includes(searchLower)) ||
-            (item.receiptCode && item.receiptCode.toLowerCase().includes(searchLower))
+            (item.receiptCode &&
+              item.receiptCode.toLowerCase().includes(searchLower))
           );
         });
       }
@@ -86,12 +87,16 @@ export default function TrashBinDrawer({
       fetchTrash();
       onDataChange?.();
     } catch (error) {
-      const serverMsg = error?.response?.data?.message || error?.response?.data?.Message || error?.response?.data?.error;
-      toast.error(serverMsg || "Không thể xóa do dữ liệu đang được sử dụng (ràng buộc)");
+      const serverMsg =
+        error?.response?.data?.message ||
+        error?.response?.data?.Message ||
+        error?.response?.data?.error;
+      toast.error(
+        serverMsg || "Không thể xóa do dữ liệu đang được sử dụng (ràng buộc)",
+      );
     }
   };
 
-  // Prevent scrolling when drawer is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -107,15 +112,12 @@ export default function TrashBinDrawer({
 
   const drawerContent = (
     <div className="fixed inset-0 z-[1000] flex justify-end overflow-hidden">
-      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity animate-fadeIn"
         onClick={onClose}
       />
 
-      {/* Drawer */}
       <div className="relative w-full max-w-2xl bg-white shadow-2xl h-full flex flex-col animate-slideInRight">
-        {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white z-10">
           <div className="flex">
             <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
@@ -134,7 +136,6 @@ export default function TrashBinDrawer({
           </button>
         </div>
 
-        {/* Toolbar */}
         <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 shrink-0">
           <div className="relative">
             <Search
@@ -151,7 +152,6 @@ export default function TrashBinDrawer({
           </div>
         </div>
 
-        {/* Body */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pb-24">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 gap-3">

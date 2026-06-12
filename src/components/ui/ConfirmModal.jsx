@@ -1,7 +1,7 @@
-import React from 'react';
-import { AlertTriangle } from 'lucide-react';
-import Modal from './Modal';
-import Button from './Button';
+import React from "react";
+import { AlertTriangle } from "lucide-react";
+import Modal from "./Modal";
+import Button from "./Button";
 
 /**
  * ConfirmModal - Cửa sổ xác nhận hành động (Xóa, Hủy...)
@@ -18,23 +18,19 @@ export default function ConfirmModal({
   isOpen,
   onClose,
   onConfirm,
-  title = 'Xác nhận xóa',
-  message = 'Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác.',
-  confirmText = 'Xác nhận',
+  title = "Xác nhận xóa",
+  message = "Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác.",
+  confirmText = "Xác nhận",
   loading = false,
-  variant = 'danger'
+  variant = "danger",
 }) {
   const footer = (
     <>
-      <Button 
-        variant="secondary" 
-        onClick={onClose} 
-        disabled={loading}
-      >
+      <Button variant="secondary" onClick={onClose} disabled={loading}>
         Hủy bỏ
       </Button>
-      <Button 
-        variant={variant === 'danger' ? 'danger' : 'primary'}
+      <Button
+        variant={variant === "danger" ? "danger" : "primary"}
         onClick={onConfirm}
         loading={loading}
       >
@@ -44,15 +40,21 @@ export default function ConfirmModal({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} footer={footer} size="sm">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      footer={footer}
+      size="sm"
+    >
       <div className="flex items-start gap-4">
-        <div className={`p-3 rounded-full shrink-0 ${variant === 'danger' ? 'bg-red-100 text-red-600 ' : 'bg-blue-100 text-blue-600 '}`}>
+        <div
+          className={`p-3 rounded-full shrink-0 ${variant === "danger" ? "bg-red-100 text-red-600 " : "bg-blue-100 text-blue-600 "}`}
+        >
           <AlertTriangle size={24} />
         </div>
         <div>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            {message}
-          </p>
+          <p className="text-slate-600 text-sm leading-relaxed">{message}</p>
         </div>
       </div>
     </Modal>

@@ -69,13 +69,13 @@ export default function ApproveTable({
                   </td>
                   <td className="px-6 py-4">
                     <Badge variant={TYPE_VARIANTS[receipt.type] || "gray"}>
-                      {TYPE_LABELS[receipt.type] || "Không xác định"}
+                      {TYPE_LABELS[receipt.type]}
                     </Badge>
                   </td>
                   <td className="px-6 py-4 text-sm font-semibold text-slate-900">
                     {receipt.type === 2
-                      ? receipt.customerName || "Khách hàng chưa xác định"
-                      : receipt.supplierName || "Nhà cung cấp chưa xác định"}
+                      ? receipt.customerName
+                      : receipt.supplierName}
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
                     {formatDateTime(receipt.createDate)}

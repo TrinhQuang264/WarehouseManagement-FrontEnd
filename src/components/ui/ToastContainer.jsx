@@ -47,7 +47,6 @@ export default function ToastContainer() {
 
 function ToastItem({ toast, onClose }) {
   const configs = {
-    // ... (keep success, error, warning, info configs)
     success: {
       icon: <CheckCircle className="text-emerald-500" size={20} />,
       bg: "bg-emerald-50 ",

@@ -55,7 +55,6 @@ export default function ExportReceiptForm({
   onIncreaseQty,
   onDecreaseQty,
   onRemoveItem,
-  onSaveDraft,
   onSubmit,
   onCancel,
 }) {
@@ -75,14 +74,11 @@ export default function ExportReceiptForm({
       ) || null,
     [activeProducts, draftItem.productId],
   );
-  const selectedProductStock = Number(
-    selectedProduct?.quantity ?? selectedProduct?.stock ?? 0,
-  );
+  const selectedProductStock = Number(selectedProduct?.quantity ?? 0);
   const isSelectedProductOutOfStock = selectedProductStock <= 0;
   const isDraftQuantityTooLarge =
     selectedProduct && Number(draftItem.quantity || 0) > selectedProductStock;
 
-  // Map products to SearchableSelect options
   const productOptions = useMemo(
     () =>
       activeProducts.map((p) => ({
@@ -92,10 +88,10 @@ export default function ExportReceiptForm({
         categoryName:
           p.categoryName || (p.categoryId ? `Danh mục ${p.categoryId}` : ""),
         imageUrl: p.imageUrl,
-        stock: Number(p.quantity ?? p.stock ?? 0),
+        stock: Number(p.quantity ?? 0),
         sellingPrice: p.sellingPrice,
         price: p.price,
-        isOutOfStock: Number(p.quantity ?? p.stock ?? 0) <= 0,
+        isOutOfStock: Number(p.quantity ?? 0) <= 0,
       })),
     [activeProducts],
   );
@@ -108,10 +104,10 @@ export default function ExportReceiptForm({
       onDraftItemChange("productId", "");
       return;
     }
-    const stock = Number(product.quantity ?? product.stock ?? 0);
+    const stock = Number(product.quantity ?? 0);
     if (stock <= 0) return;
     onDraftItemChange("productId", String(product.id));
-    onDraftItemChange("unitPrice", product.sellingPrice || product.price || 0);
+    onDraftItemChange("unitCost", product.sellingPrice);
   };
 
   return (
@@ -258,9 +254,9 @@ export default function ExportReceiptForm({
                   type="number"
                   min="0"
                   className="imports-input imports-input-right"
-                  value={draftItem.unitPrice}
+                  value={draftItem.unitCost}
                   onChange={(event) =>
-                    onDraftItemChange("unitPrice", event.target.value)
+                    onDraftItemChange("unitCost", event.target.value)
                   }
                 />
               </label>
@@ -361,7 +357,7 @@ export default function ExportReceiptForm({
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right text-sm">
-                        {formatCurrency(item.unitPrice)}
+                        {formatCurrency(item.unitCost)}
                       </td>
                       <td className="px-6 py-4 text-right text-sm font-bold text-slate-900">
                         {formatCurrency(item.lineTotal)}

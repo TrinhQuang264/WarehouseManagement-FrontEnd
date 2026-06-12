@@ -24,7 +24,7 @@ export default function PaginationBar({
   }
 
   const pages = [];
-  const delta = 1; // số trang hiển thị xung quanh currentPage
+  const delta = 1;
 
   const rangeStart = Math.max(2, currentPage - delta);
   const rangeEnd = Math.min(totalPages - 1, currentPage + delta);

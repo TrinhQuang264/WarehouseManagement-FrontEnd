@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import productService from '../../products/api/productsService';
-import categoryService from '../../categories/api/categoriesService';
-import purchasesService from '../../imports/api/purchasesService';
-
+import { useState, useEffect, useMemo, useCallback } from "react";
+import productService from "../../products/api/productsService";
+import categoryService from "../../categories/api/categoriesService";
+import purchasesService from "../../imports/api/purchasesService";
 
 export function useReports() {
   const [products, setProducts] = useState([]);
@@ -10,13 +9,12 @@ export function useReports() {
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(false);
 
-
   // Filters
-  const [selectedDateRange, setSelectedDateRange] = useState('month'); // 'month', 'lastMonth', 'quarter', 'custom'
-  const [customStartDate, setCustomStartDate] = useState('');
-  const [customEndDate, setCustomEndDate] = useState('');
-  const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedDateRange, setSelectedDateRange] = useState("month"); // 'month', 'lastMonth', 'quarter', 'custom'
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -27,14 +25,16 @@ export function useReports() {
       const [prodRes, catRes, purchaseRes] = await Promise.all([
         productService.getAll(),
         categoryService.getAll(),
-        purchasesService.getAll()
+        purchasesService.getAll(),
       ]);
 
       setProducts(Array.isArray(prodRes) ? prodRes : prodRes?.data || []);
       setCategories(Array.isArray(catRes) ? catRes : catRes?.data || []);
-      setPurchases(Array.isArray(purchaseRes) ? purchaseRes : purchaseRes?.data || []);
+      setPurchases(
+        Array.isArray(purchaseRes) ? purchaseRes : purchaseRes?.data || [],
+      );
     } catch (error) {
-      console.error('Error fetching reports data:', error);
+      console.error("Error fetching reports data:", error);
     } finally {
       setLoading(false);
     }
@@ -50,19 +50,23 @@ export function useReports() {
     let start = new Date();
     let end = new Date();
 
-    if (selectedDateRange === 'month') {
+    if (selectedDateRange === "month") {
       start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
       end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    } else if (selectedDateRange === 'lastMonth') {
+    } else if (selectedDateRange === "lastMonth") {
       start = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
       end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-    } else if (selectedDateRange === 'quarter') {
+    } else if (selectedDateRange === "quarter") {
       const qStartMonth = Math.floor(now.getMonth() / 3) * 3;
       start = new Date(now.getFullYear(), qStartMonth, 1, 0, 0, 0, 0);
       end = new Date(now.getFullYear(), qStartMonth + 3, 0, 23, 59, 59, 999);
-    } else if (selectedDateRange === 'custom') {
-      start = customStartDate ? new Date(customStartDate) : new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-      end = customEndDate ? new Date(customEndDate) : new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    } else if (selectedDateRange === "custom") {
+      start = customStartDate
+        ? new Date(customStartDate)
+        : new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+      end = customEndDate
+        ? new Date(customEndDate)
+        : new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
       // Ensure custom dates cover full days
       start.setHours(0, 0, 0, 0);
       end.setHours(23, 59, 59, 999);
@@ -98,7 +102,8 @@ export function useReports() {
 
       completedPurchases.forEach((p) => {
         const typeValue = Number(p.type ?? p.Type);
-        const dateStr = p.createDate || p.purchaseDate || p.receiptDate || p.createdAt;
+        const dateStr =
+          p.createDate || p.purchaseDate || p.receiptDate || p.createdAt;
         if (!dateStr) return;
         const d = new Date(dateStr);
         const items = p.items || [];
@@ -106,7 +111,7 @@ export function useReports() {
         items.forEach((item) => {
           if (Number(item.productId) !== Number(product.id)) return;
           const qty = item.quantity || 0;
-          const price = item.unitCost || item.unitPrice || 0;
+          const price = item.unitCost || item.unitCost || 0;
 
           // Accumulate for weighted average cost (all-time imports)
           if (typeValue === 1) {
@@ -133,12 +138,16 @@ export function useReports() {
       });
 
       // Weighted average cost (from all-time completed imports)
-      let averageCost = product.originalPrice || product.price || product.sellingPrice || 0;
+      let averageCost =
+        product.originalPrice || product.price || product.sellingPrice || 0;
       if (totalImportQtyAllTime > 0) {
         averageCost = totalImportCostAllTime / totalImportQtyAllTime;
       }
       // Avoid a cost of 1 or less if possible
-      if (averageCost <= 1 && (product.originalPrice > 1 || product.sellingPrice > 1)) {
+      if (
+        averageCost <= 1 &&
+        (product.originalPrice > 1 || product.sellingPrice > 1)
+      ) {
         averageCost = product.originalPrice || product.sellingPrice || 0;
       }
 
@@ -181,7 +190,7 @@ export function useReports() {
         item.code.toLowerCase().includes(keyword);
 
       const matchesCategory =
-        selectedCategory === 'all' ||
+        selectedCategory === "all" ||
         Number(item.categoryId) === Number(selectedCategory);
 
       return matchesSearch && matchesCategory;
@@ -225,7 +234,7 @@ export function useReports() {
         exportVal: 0,
         closingQty: 0,
         closingVal: 0,
-      }
+      },
     );
   }, [filteredReportData]);
 
@@ -234,10 +243,17 @@ export function useReports() {
     const now = new Date();
     // 1. Current stock qty & total value
     const totalStock = products.reduce((sum, p) => sum + (p.quantity || 0), 0);
-    const totalVal = products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.originalPrice || p.price || p.sellingPrice || 0)), 0);
+    const totalVal = products.reduce(
+      (sum, p) =>
+        sum +
+        (p.quantity || 0) * (p.originalPrice || p.price || p.sellingPrice || 0),
+      0,
+    );
 
     // 2. Count low stock products (<= 10)
-    const lowStockCount = products.filter((p) => (p.quantity || 0) <= 10).length;
+    const lowStockCount = products.filter(
+      (p) => (p.quantity || 0) <= 10,
+    ).length;
 
     // Only completed purchases
     const completedImportPurchases = purchases.filter((p) => {
@@ -249,7 +265,8 @@ export function useReports() {
     // 3. Count completed import purchases in selected period
     const { start, end } = dateRange;
     const periodImports = completedImportPurchases.filter((p) => {
-      const dateStr = p.createDate || p.purchaseDate || p.receiptDate || p.createdAt;
+      const dateStr =
+        p.createDate || p.purchaseDate || p.receiptDate || p.createdAt;
       if (!dateStr) return false;
       const d = new Date(dateStr);
       return d >= start && d <= end;
@@ -262,7 +279,15 @@ export function useReports() {
     const averageImportsPerDay = (importCount / diffDays).toFixed(1);
 
     // Dynamic month-over-month comparisons (premium detail)
-    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+    const endOfLastMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
 
     // Stock at end of last month = sum of all completed imports up to end of last month - exports
     const lastMonthClosingStock = products.reduce((sum, p) => {
@@ -272,7 +297,11 @@ export function useReports() {
         const statusValue = Number(pur.status ?? pur.Status);
         const typeValue = Number(pur.type ?? pur.Type);
         if (statusValue !== 2) return;
-        const dateStr = pur.createDate || pur.purchaseDate || pur.receiptDate || pur.createdAt;
+        const dateStr =
+          pur.createDate ||
+          pur.purchaseDate ||
+          pur.receiptDate ||
+          pur.createdAt;
         if (!dateStr) return;
         const d = new Date(dateStr);
         if (d > endOfLastMonth) return;
@@ -286,9 +315,13 @@ export function useReports() {
       return sum + Math.max(0, qIn - qOut);
     }, 0);
 
-    const stockPercentChange = lastMonthClosingStock > 0
-      ? (((totalStock - lastMonthClosingStock) / lastMonthClosingStock) * 100).toFixed(1)
-      : '0.0';
+    const stockPercentChange =
+      lastMonthClosingStock > 0
+        ? (
+            ((totalStock - lastMonthClosingStock) / lastMonthClosingStock) *
+            100
+          ).toFixed(1)
+        : "0.0";
 
     return {
       totalStock,
@@ -302,9 +335,10 @@ export function useReports() {
 
   // Export to Excel / CSV function
   const handleExport = useCallback(() => {
-    let csvContent = '\uFEFF'; // UTF-8 BOM for Excel compatibility
-    csvContent += 'MÃ LINH KIỆN,TÊN LINH KIỆN,TỒN ĐẦU KỲ (Số lượng),TỒN ĐẦU KỲ (Giá trị),NHẬP TRONG KỲ (Số lượng),NHẬP TRONG KỲ (Giá trị),XUẤT TRONG KỲ (Số lượng),XUẤT TRONG KỲ (Giá trị),TỒN CUỐI KỲ (Số lượng),TỒN CUỐI KỲ (Giá trị)\n';
-    
+    let csvContent = "\uFEFF"; // UTF-8 BOM for Excel compatibility
+    csvContent +=
+      "MÃ LINH KIỆN,TÊN LINH KIỆN,TỒN ĐẦU KỲ (Số lượng),TỒN ĐẦU KỲ (Giá trị),NHẬP TRONG KỲ (Số lượng),NHẬP TRONG KỲ (Giá trị),XUẤT TRONG KỲ (Số lượng),XUẤT TRONG KỲ (Giá trị),TỒN CUỐI KỲ (Số lượng),TỒN CUỐI KỲ (Giá trị)\n";
+
     filteredReportData.forEach((row) => {
       csvContent += `"${row.code}","${row.name}",${row.openingQty},${row.openingVal},${row.importQty},${row.importVal},${row.exportQty},${row.exportVal},${row.closingQty},${row.closingVal}\n`;
     });
@@ -312,11 +346,14 @@ export function useReports() {
     // Add totals row
     csvContent += `"TỔNG CỘNG","",${columnTotals.openingQty},${columnTotals.openingVal},${columnTotals.importQty},${columnTotals.importVal},${columnTotals.exportQty},${columnTotals.exportVal},${columnTotals.closingQty},${columnTotals.closingVal}\n`;
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `bao_cao_nhap_xuat_ton_${new Date().toISOString().slice(0, 10)}.csv`);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `bao_cao_nhap_xuat_ton_${new Date().toISOString().slice(0, 10)}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

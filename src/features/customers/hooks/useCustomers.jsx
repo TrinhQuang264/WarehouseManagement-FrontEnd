@@ -5,7 +5,6 @@ import toast from "../../../utils/toast";
 
 const PAGE_SIZE = 7;
 
-// Hàm chuẩn hóa dữ liệu đầu vào cho Customer giống như Supplier
 const normalizeCustomerPayload = (data = {}) => ({
   fullName: String(data.fullName || "").trim(),
   phoneNumber: String(data.phoneNumber || "").trim(),
@@ -16,17 +15,14 @@ const normalizeCustomerPayload = (data = {}) => ({
 export function useCustomers() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // States danh sách tương tự useSuppliers
   const [customers, setCustomers] = useState([]);
   const [allActiveCustomers, setAllActiveCustomers] = useState([]);
 
-  // States quản lý trạng thái loading / submit
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFirstFetch, setIsFirstFetch] = useState(true);
 
-  // Đồng bộ hóa việc đọc dữ liệu ban đầu từ URL params
   const initialSearch = searchParams.get("search") || "";
   const initialPage = Number(searchParams.get("page")) || 1;
 
@@ -36,7 +32,6 @@ export function useCustomers() {
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const [totalCount, setTotalCount] = useState(0);
 
-  // States điều khiển các Modals đóng/mở công khai
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -45,7 +40,7 @@ export function useCustomers() {
   const isFirstMount = useRef(true);
   const abortControllerRef = useRef(null);
 
-  // 1. Đồng bộ state lên URL Search Params
+  // Đồng bộ state lên URL Search Params
   useEffect(() => {
     const params = new URLSearchParams();
     if (currentPage > 1) params.set("page", currentPage);
@@ -53,7 +48,7 @@ export function useCustomers() {
     setSearchParams(params, { replace: true });
   }, [currentPage, debouncedSearch, setSearchParams]);
 
-  // 2. Debounce chuỗi tìm kiếm đầu vào (delay 300ms)
+  // Debounce chuỗi tìm kiếm đầu vào (delay 300ms)
   useEffect(() => {
     if (isFirstMount.current) {
       isFirstMount.current = false;
@@ -62,13 +57,13 @@ export function useCustomers() {
 
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-      setCurrentPage(1); // Reset về trang 1 khi tìm kiếm thay đổi
+      setCurrentPage(1);
     }, 300);
 
     return () => clearTimeout(timer);
   }, [search]);
 
-  // 3. Hàm fetch dữ liệu cốt lõi kết hợp Client-side filter & phân trang
+  // Hàm fetch dữ liệu cốt lõi kết hợp Client-side filter & phân trang
   const fetchCustomers = useCallback(async () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -82,16 +77,13 @@ export function useCustomers() {
       const response = await customersService.getAll();
       if (signal.aborted) return;
 
-      // Chuẩn hóa cấu trúc mảng trả về từ API
       const allItems = Array.isArray(response)
         ? response
         : response?.data || response?.items || [];
 
-      // Lọc các item chưa bị xóa mềm (nếu hệ thống của bạn dùng flag isDeleted)
       const activeItems = allItems.filter((item) => item.isDeleted !== true);
       setAllActiveCustomers(activeItems);
 
-      // Thực hiện bộ lọc Client-side theo logic tìm kiếm của bạn
       let filteredItems = [...activeItems];
       if (debouncedSearch) {
         const query = debouncedSearch.toLowerCase();
@@ -136,13 +128,13 @@ export function useCustomers() {
     return `KH${String(allActiveCustomers.length + 1).padStart(3, "0")}`;
   }, [allActiveCustomers.length]);
 
-  // 4. CRUD Operations đồng bộ hoàn toàn với style của Supplier
+  // Add khách hàng
   const handleAddCustomer = async (data) => {
     setIsSubmitting(true);
     try {
       const payload = {
         ...normalizeCustomerPayload(data),
-        code: nextCode, // Tự động gán mã KHxxx theo logic cũ của bạn
+        code: nextCode,
       };
       await customersService.create(payload);
       toast.success("Thêm khách hàng mới thành công!");
@@ -152,7 +144,9 @@ export function useCustomers() {
     } catch (error) {
       console.error("useCustomers - handleAddCustomer error:", error);
       const serverMsg =
-        error?.response?.data?.Message || error?.response?.data?.message || error?.response?.data?.error;
+        error?.response?.data?.Message ||
+        error?.response?.data?.message ||
+        error?.response?.data?.error;
       toast.error(serverMsg || "Không thể thêm khách hàng. Vui lòng thử lại.");
       return false;
     } finally {
@@ -160,6 +154,7 @@ export function useCustomers() {
     }
   };
 
+  // Update khách hàng
   const handleUpdateCustomer = async (id, data) => {
     setIsSubmitting(true);
     try {
@@ -173,7 +168,9 @@ export function useCustomers() {
     } catch (error) {
       console.error("useCustomers - handleUpdateCustomer error:", error);
       const serverMsg =
-        error?.response?.data?.Message || error?.response?.data?.message || error?.response?.data?.error;
+        error?.response?.data?.Message ||
+        error?.response?.data?.message ||
+        error?.response?.data?.error;
       toast.error(
         serverMsg || "Lỗi khi cập nhật khách hàng. Hãy kiểm tra lại dữ liệu.",
       );
@@ -183,17 +180,16 @@ export function useCustomers() {
     }
   };
 
+  // Delete khách hàng
   const handleDeleteCustomer = async () => {
     if (!selectedCustomer) return;
     setIsSubmitting(true);
     try {
-      // Gọi tới hàm delete từ service của bạn
       await customersService.softDelete(selectedCustomer.id);
       toast.success(`Đã xóa khách hàng "${selectedCustomer.fullName}"`);
       setIsDeleteModalOpen(false);
       setSelectedCustomer(null);
 
-      // Nếu xóa item cuối cùng của trang hiện tại, lùi lại 1 trang
       if (customers.length === 1 && currentPage > 1) {
         setCurrentPage((p) => p - 1);
       } else {
@@ -203,7 +199,9 @@ export function useCustomers() {
     } catch (error) {
       console.error("useCustomers - handleDeleteCustomer error:", error);
       const serverMsg =
-        error?.response?.data?.Message || error?.response?.data?.message || error?.response?.data?.error;
+        error?.response?.data?.Message ||
+        error?.response?.data?.message ||
+        error?.response?.data?.error;
       toast.error(serverMsg || "Không thể xóa khách hàng này.");
       return false;
     } finally {
@@ -211,7 +209,6 @@ export function useCustomers() {
     }
   };
 
-  // 5. Các hàm mở Modal đồng bộ tên gọi
   const openEditModal = (customer) => {
     setSelectedCustomer(customer);
     setIsModalOpen(true);
@@ -222,30 +219,29 @@ export function useCustomers() {
     setIsDeleteModalOpen(true);
   };
 
-  // Tính toán số trang (Tổng số item lọc được / kích thước trang)
   const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
   return {
-    customers, // Danh sách khách hàng đã được phân trang (tương đương paginatedCustomers cũ)
-    allActiveCustomers, // Toàn bộ danh sách khách hàng đang hoạt động (chưa xóa)
+    customers,
+    allActiveCustomers,
     loading,
     isFetching,
     isSubmitting,
     isFirstFetch,
     search,
     debouncedSearch,
-    setSearch, // Hàm binding trực tiếp vào ô Input tìm kiếm
+    setSearch,
     currentPage,
     setCurrentPage,
     pageSize,
     setPageSize,
     totalCount,
     totalPages,
-    isModalOpen, // Quản lý Modal Form (Thêm/Sửa)
+    isModalOpen,
     setIsModalOpen,
-    isDeleteModalOpen, // Quản lý Modal Xác nhận xóa
+    isDeleteModalOpen,
     setIsDeleteModalOpen,
-    selectedCustomer, // Object Customer đang được chọn để Sửa hoặc Xóa (tương đương editingCustomer / deletingCustomer)
+    selectedCustomer,
     setSelectedCustomer,
     isTrashOpen,
     setIsTrashOpen,

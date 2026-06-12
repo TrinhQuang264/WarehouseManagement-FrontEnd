@@ -1,8 +1,6 @@
-import { ClipboardList, Clock3, PackageCheck, Wallet } from 'lucide-react';
+import { ClipboardList, Clock3, PackageCheck, Wallet } from "lucide-react";
 import ReceiptStats from "../../receipts/components/ReceiptStats.jsx";
 import { formatCompact } from "../../../utils/util.js";
-
-// Stat configuration with icons matching ExportStats
 const STAT_CONFIG = [
   {
     key: "totalReceipts",

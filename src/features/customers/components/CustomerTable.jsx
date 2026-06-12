@@ -22,7 +22,7 @@ export default function CustomerTable({
             </tr>
           </thead>
           <tbody
-            className={`divide-y divide-slate-100 dark:divide-slate-800/50 transition-opacity duration-300 ${
+            className={`transition-opacity duration-300 ${
               loading ? "opacity-50 pointer-events-none" : "opacity-100"
             }`}
           >

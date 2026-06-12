@@ -114,7 +114,7 @@ export default function ProductsPage() {
                 variant: "danger",
               },
             ]
-          : []
+          : [],
       );
 
       setOnSearch(() => searchProducts);
@@ -215,8 +215,7 @@ export default function ProductsPage() {
     const safeImageUrl = sanitizeImageUrlForPayload(data.imageUrl);
     const payload = {
       ...data,
-      originalPrice: data.originalPrice || data.importPrice || 1,
-      importPrice: data.originalPrice || data.importPrice || 1,
+      originalPrice: data.originalPrice || 1,
       imageUrl: safeImageUrl,
     };
 

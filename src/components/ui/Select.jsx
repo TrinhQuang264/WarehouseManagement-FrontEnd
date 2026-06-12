@@ -1,8 +1,5 @@
 import React from 'react';
 
-/**
- * Select - Thành phần Dropdown dùng chung
- */
 export default function Select({
   label,
   icon,

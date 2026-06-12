@@ -1,6 +1,15 @@
-import ReceiptTable from '../../receipts/components/ReceiptTable.jsx';
+import ReceiptTable from "../../receipts/components/ReceiptTable.jsx";
 
-export default function ExportTable({ receipts, onEdit, onViewDetail, onDelete, onSubmit, showDelete, showStatus, isAdmin }) {
+export default function ExportTable({
+  receipts,
+  onEdit,
+  onViewDetail,
+  onDelete,
+  onSubmit,
+  showDelete,
+  showStatus,
+  isAdmin,
+}) {
   return (
     <ReceiptTable
       receipts={receipts}

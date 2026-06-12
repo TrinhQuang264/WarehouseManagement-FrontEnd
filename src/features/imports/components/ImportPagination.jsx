@@ -1,4 +1,4 @@
-import ReceiptPagination from '../../receipts/components/ReceiptPagination.jsx';
+import ReceiptPagination from "../../receipts/components/ReceiptPagination.jsx";
 
 export default function ImportPagination({
   currentPage,
@@ -7,5 +7,14 @@ export default function ImportPagination({
   totalCount,
   totalPages,
 }) {
-  return <ReceiptPagination currentPage={currentPage} setCurrentPage={setCurrentPage} pageSize={pageSize} totalCount={totalCount} totalPages={totalPages} label="phiếu nhập" />;
+  return (
+    <ReceiptPagination
+      currentPage={currentPage}
+      setCurrentPage={setCurrentPage}
+      pageSize={pageSize}
+      totalCount={totalCount}
+      totalPages={totalPages}
+      label="phiếu nhập"
+    />
+  );
 }

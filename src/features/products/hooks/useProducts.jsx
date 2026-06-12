@@ -3,41 +3,10 @@ import { useSearchParams } from "react-router-dom";
 import productService from "../api/productsService";
 import categoryService from "../../categories/api/categoriesService";
 import toast from "../../../utils/toast";
+import { extractApiErrorMessage } from "../../../utils/apiUtils";
+import { normalizeProduct, filterProducts } from "../utils/productUtils";
 
 const PAGE_SIZE = 10;
-const extractApiErrorMessage = (error, fallback) => {
-  const data = error?.response?.data;
-  if (!data) return fallback;
-
-  const directMessage = data.message || data.error || data.title || data.detail;
-  if (directMessage) return directMessage;
-
-  const validation = data.errors;
-  if (validation && typeof validation === "object") {
-    const firstKey = Object.keys(validation)[0];
-    const firstValue = firstKey ? validation[firstKey] : null;
-    if (Array.isArray(firstValue) && firstValue.length > 0) {
-      return firstValue[0];
-    }
-    if (typeof firstValue === "string" && firstValue.trim()) {
-      return firstValue;
-    }
-  }
-
-  return fallback;
-};
-const normalizeProduct = (item = {}) => {
-  const normalizedPrice = item.price ?? item.Price ?? item.sellingPrice ?? item.SellingPrice ?? 0;
-  const normalizedOriginalPrice = item.originalPrice ?? item.OriginalPrice ?? item.importPrice ?? item.ImportPrice ?? item.purchasePrice ?? item.PurchasePrice ?? item.costPrice ?? item.CostPrice ?? 0;
-
-  return {
-    ...item,
-    originalPrice: normalizedOriginalPrice,
-    importPrice: normalizedOriginalPrice,
-    price: normalizedPrice,
-    sellingPrice: normalizedPrice,
-  };
-};
 
 export function useProducts(defaultPageSize = PAGE_SIZE) {
   // URL query params for sync search/page/filter with browser URL
@@ -149,32 +118,12 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
       }
       allItems = Array.from(seen.values());
 
-      let filteredItems = [...allItems];
-
-      // 1. Search
-      if (debouncedSearch) {
-        const lowerSearch = debouncedSearch.toLowerCase();
-        filteredItems = filteredItems.filter(item => 
-          item.name?.toLowerCase().includes(lowerSearch) ||
-          item.code?.toLowerCase().includes(lowerSearch) ||
-          item.description?.toLowerCase().includes(lowerSearch)
-        );
-      }
-
-      // 2. Category Filter
-      if (selectedCategoryId) {
-        filteredItems = filteredItems.filter(item => 
-          item.categoryId === Number(selectedCategoryId)
-        );
-      }
-
-      // 3. Price Filter
-      if (minPrice !== "") {
-        filteredItems = filteredItems.filter(item => item.price >= Number(minPrice));
-      }
-      if (maxPrice !== "") {
-        filteredItems = filteredItems.filter(item => item.price <= Number(maxPrice));
-      }
+      const filteredItems = filterProducts(allItems, {
+        debouncedSearch,
+        selectedCategoryId,
+        minPrice,
+        maxPrice,
+      });
 
       const total = filteredItems.length;
 

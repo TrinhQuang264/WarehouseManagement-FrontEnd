@@ -23,26 +23,25 @@ import {
 import "../../styles/slidebar.css";
 
 const mainMenu = [
-    { to: "/", icon: LayoutDashboard, label: "Tổng quan" },
-    { to: "/import", icon: Download, label: "Nhập kho" },
-    { to: "/export", icon: Upload, label: "Xuất kho" },
-    { to: "/approve", icon: PackageOpen, label: "Duyệt phiếu" },
-    { to: "/inventory", icon: Package, label: "Tồn kho" },
+  { to: "/", icon: LayoutDashboard, label: "Tổng quan" },
+  { to: "/import", icon: Download, label: "Nhập kho" },
+  { to: "/export", icon: Upload, label: "Xuất kho" },
+  { to: "/approve", icon: PackageOpen, label: "Duyệt phiếu" },
+  { to: "/inventory", icon: Package, label: "Tồn kho" },
 ];
 
 const managerMenu = [
-    { to: "/products", icon: Smartphone, label: "Sản phẩm" },
-    { to: "/categories", icon: FolderTree, label: "Danh mục" },
-    { to: "/customers", icon: Users2, label: "Khách hàng" },
-    { to: "/suppliers", icon: Store, label: "Nhà cung cấp" },
+  { to: "/products", icon: Smartphone, label: "Sản phẩm" },
+  { to: "/categories", icon: FolderTree, label: "Danh mục" },
+  { to: "/customers", icon: Users2, label: "Khách hàng" },
+  { to: "/suppliers", icon: Store, label: "Nhà cung cấp" },
 ];
 
 const systemMenu = [
-    { to: "/users", icon: Users, label: "Người dùng" },
-    { to: "/reports", icon: BarChart3, label: "Báo cáo" },
+  { to: "/users", icon: Users, label: "Người dùng" },
+  { to: "/reports", icon: BarChart3, label: "Báo cáo" },
 ];
 
-// ─── Tooltip — render qua Portal vào document.body ───────────────────────────
 function Tooltip({ label, anchorEl, visible }) {
   const [pos, setPos] = useState({ top: 0, left: 0 });
 
@@ -66,7 +65,6 @@ function Tooltip({ label, anchorEl, visible }) {
   );
 }
 
-// ─── Hook hover + anchor ref ──────────────────────────────────────────────────
 function useTooltip() {
   const ref = useRef(null);
   const [hovered, setHovered] = useState(false);
@@ -77,7 +75,6 @@ function useTooltip() {
   return { ref, hovered, handlers };
 }
 
-// ─── Icon link (collapsed) ────────────────────────────────────────────────────
 function CollapsedLink({ item }) {
   const Icon = item.icon;
   const { ref, hovered, handlers } = useTooltip();
@@ -100,7 +97,6 @@ function CollapsedLink({ item }) {
   );
 }
 
-// ─── Profile icon (collapsed) ─────────────────────────────────────────────────
 function CollapsedProfile({ user }) {
   const { ref, hovered, handlers } = useTooltip();
   const label =
@@ -128,7 +124,6 @@ function CollapsedProfile({ user }) {
   );
 }
 
-// ─── Logout icon (collapsed) ─────────────────────────────────────────────────
 function CollapsedLogout({ onLogout }) {
   const { ref, hovered, handlers } = useTooltip();
 
@@ -147,7 +142,6 @@ function CollapsedLogout({ onLogout }) {
   );
 }
 
-// ─── Nav link đầy đủ (expanded) ──────────────────────────────────────────────
 function SidebarLink({ item }) {
   const Icon = item.icon;
   return (
@@ -164,7 +158,6 @@ function SidebarLink({ item }) {
   );
 }
 
-// ─── Sidebar chính ────────────────────────────────────────────────────────────
 export default function Sidebar({ user, onLogout }) {
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -187,8 +180,6 @@ export default function Sidebar({ user, onLogout }) {
     }
   });
 
-  // Thêm class "sidebar-ready" sau khi mount để bật transition width
-  // → tránh animation chạy lúc load trang
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const id = requestAnimationFrame(() => setReady(true));
@@ -211,10 +202,10 @@ export default function Sidebar({ user, onLogout }) {
 
   const isAdmin = user?.role?.toLowerCase() === "admin";
   const filteredMainMenu = mainMenu.filter(
-    (item) => isAdmin || item.to !== "/approve"
+    (item) => isAdmin || item.to !== "/approve",
   );
   const filteredManagerMenu = managerMenu.filter(
-    (item) => isAdmin || item.to !== "/categories"
+    (item) => isAdmin || item.to !== "/categories",
   );
 
   const shellClass = [
@@ -228,7 +219,6 @@ export default function Sidebar({ user, onLogout }) {
 
   return (
     <aside className={shellClass}>
-      {/* ── HEADER ── */}
       <div className="sidebar-header">
         <div className="sidebar-logo-area">
           <div className="sidebar-logo-icon">
@@ -293,12 +283,13 @@ export default function Sidebar({ user, onLogout }) {
                 </span>
               </div>
               {expandedSections.system &&
-                systemMenu.map((item) => <SidebarLink key={item.to} item={item} />)}
+                systemMenu.map((item) => (
+                  <SidebarLink key={item.to} item={item} />
+                ))}
             </>
           )}
         </nav>
 
-        {/* User info */}
         <div className="sidebar-user">
           <div className="flex items-center gap-3 px-2 py-2">
             <NavLink
@@ -325,7 +316,9 @@ export default function Sidebar({ user, onLogout }) {
                     "Người dùng"}
                 </p>
                 <p className="text-xs text-slate-500 truncate">
-                  {user?.role?.toLowerCase() === 'admin' ? 'Quản lý kho' : 'Nhân viên kho'}
+                  {user?.role?.toLowerCase() === "admin"
+                    ? "Quản lý kho"
+                    : "Nhân viên kho"}
                 </p>
               </div>
             </NavLink>

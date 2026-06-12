@@ -8,7 +8,6 @@ import categoryService from "../api/categoriesService";
 import "../styles/Categories.css";
 
 export default function CategoriesPage() {
-  // Categories module state/actions
   const {
     categories,
     loading,
@@ -36,7 +35,6 @@ export default function CategoriesPage() {
     refreshList,
   } = useCategories();
 
-  // Header controls for page-level actions/search
   const { setActionButton, setExtraActions, setOnSearch, resetHeader } = useHeader();
   const closeModal = useCallback(() => setIsModalOpen(false), [setIsModalOpen]);
   const closeDeleteModal = useCallback(

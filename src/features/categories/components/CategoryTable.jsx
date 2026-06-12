@@ -1,12 +1,7 @@
 import React from "react";
 import { Edit, Trash2, FolderOpen } from "lucide-react";
 
-function CategoryTable({
-  categories,
-  loading,
-  onEdit,
-  onDelete,
-}) {
+function CategoryTable({ categories, loading, onEdit, onDelete }) {
   return (
     <div className="table-wrapper">
       <table className="table">
@@ -19,7 +14,7 @@ function CategoryTable({
           </tr>
         </thead>
         <tbody
-          className={`divide-y divide-slate-100 transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+          className={` divide-slate-100 transition-opacity duration-300 ${loading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
         >
           {categories.length > 0 ? (
             categories.map((category) => (
@@ -34,14 +29,17 @@ function CategoryTable({
                         {category.name}
                       </span>
                       {category.seoAlias && (
-                        <span className="text-[10px] text-slate-400 font-mono">/{category.seoAlias}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          /{category.seoAlias}
+                        </span>
                       )}
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-5">
                   <p className="text-sm text-slate-500 max-w-sm line-clamp-1 italic">
-                    {category.seoDescription || "Chưa có mô tả SEO cho danh mục này"}
+                    {category.seoDescription ||
+                      "Chưa có mô tả SEO cho danh mục này"}
                   </p>
                 </td>
                 <td className="px-6 py-5 text-center">

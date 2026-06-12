@@ -63,7 +63,7 @@ export function useInventory() {
       const lowStockCount = allItems.filter(p => (p.quantity ?? 0) <= 10).length;
       const totalValue = allItems.reduce((sum, p) => {
         const qty = Number(p.quantity ?? 0);
-        const price = Number(p.price ?? p.sellingPrice ?? 0);
+        const price = Number(p.sellingPrice ?? 0);
         return sum + qty * price;
       }, 0);
 

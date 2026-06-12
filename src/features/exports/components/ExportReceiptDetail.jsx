@@ -20,7 +20,6 @@ function ExportReceiptPaper({ receipt }) {
         </div>
         <div className="imports-paper-title-wrap">
           <h2>Phiếu Xuất Kho</h2>
-          {/* Badge đã được chuyển ra ngoài phiếu */}
         </div>
       </div>
 
@@ -33,7 +32,7 @@ function ExportReceiptPaper({ receipt }) {
 
           <div>
             <span>Tham chiếu đơn:</span>
-            <strong>{receipt.referenceCode || "Không có"}</strong>
+            <strong>{receipt.referenceCode}</strong>
           </div>
 
           <div>
@@ -90,7 +89,7 @@ function ExportReceiptPaper({ receipt }) {
               <td>{String(index + 1).padStart(2, "0")}</td>
               <td className="imports-paper-cell-name">{item.productName}</td>
               <td className="">{item.quantity}</td>
-              <td className="">{formatCurrency(item.unitPrice)}</td>
+              <td className="">{formatCurrency(item.unitCost)}</td>
               <td className=" font-bold">{formatCurrency(item.lineTotal)}</td>
             </tr>
           ))}
@@ -246,7 +245,7 @@ function ExportReceiptDocumentView({ receipt, showStatus }) {
                 </div>
               </div>
               <strong>{formatNumber(item.quantity)}</strong>
-              <strong>{formatCurrency(item.unitPrice)}</strong>
+              <strong>{formatCurrency(item.unitCost)}</strong>
               <strong>{formatCurrency(item.lineTotal)}</strong>
             </div>
           ))}
@@ -286,7 +285,6 @@ export default function ExportReceiptDetail({
               <ExportReceiptPaper receipt={receipt} />
             </div>
 
-            {/* Badge trạng thái nằm ngoài phiếu, bên phải */}
             {showStatus && (
               <div className="imports-paper-status-aside">
                 <span className="imports-paper-badge">

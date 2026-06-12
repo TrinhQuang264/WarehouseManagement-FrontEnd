@@ -101,7 +101,7 @@ export default function ImportReceiptForm({
       return;
     }
     onDraftItemChange("productId", String(product.id));
-    onDraftItemChange("unitPrice", product.importPrice || product.price || 0);
+    onDraftItemChange("unitCost", product.importPrice || product.price || 0);
   };
 
   return (
@@ -241,9 +241,9 @@ export default function ImportReceiptForm({
                   type="number"
                   min="0"
                   className="imports-input imports-input-right"
-                  value={draftItem.unitPrice}
+                  value={draftItem.unitCost}
                   onChange={(event) =>
-                    onDraftItemChange("unitPrice", event.target.value)
+                    onDraftItemChange("unitCost", event.target.value)
                   }
                 />
               </label>
@@ -325,7 +325,7 @@ export default function ImportReceiptForm({
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right text-sm">
-                        {formatCurrency(item.unitPrice)}
+                        {formatCurrency(item.unitCost)}
                       </td>
                       <td className="px-6 py-4 text-right text-sm font-bold text-slate-900 ">
                         {formatCurrency(item.lineTotal)}

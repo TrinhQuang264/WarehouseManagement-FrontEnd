@@ -1,4 +1,3 @@
-// Map variant → className (bg + text)
 const variantStyles = {
   green: "bg-emerald-100  text-emerald-700 ",
   red: "bg-red-100  text-red-700 ",

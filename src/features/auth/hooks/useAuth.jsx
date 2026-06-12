@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
       const decoded = decodeJWT(token);
       if (!decoded || !decoded.exp) return;
 
-      const expirationTime = decoded.exp * 1000; // exp in seconds
+      const expirationTime = decoded.exp * 1000; 
       const currentTime = Date.now();
       const timeRemaining = expirationTime - currentTime;
 
@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
 
     // Chạy kiểm tra định kỳ mỗi 15 giây
     const interval = setInterval(checkAndRefreshToken, 15000);
-    checkAndRefreshToken(); // Kiểm tra ngay lập tức khi load app
+    checkAndRefreshToken();
 
     return () => clearInterval(interval);
   }, [user]);

@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Box, AlertCircle } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth.jsx';
-import Input from '../../../components/ui/Input.jsx';
-import Button from '../../../components/ui/Button.jsx';
-import PasswordValidator from '../components/PasswordValidator.jsx';
-import '../styles/Login.css';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Box, AlertCircle } from "lucide-react";
+import { useAuth } from "../hooks/useAuth.jsx";
+import Input from "../../../components/ui/Input.jsx";
+import Button from "../../../components/ui/Button.jsx";
+import PasswordValidator from "../components/PasswordValidator.jsx";
+import "../styles/Login.css";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError } = useAuth();
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [hasLoginAttempted, setHasLoginAttempted] = useState(false);
@@ -22,22 +22,22 @@ export default function LoginPage() {
       { regex: /[A-Z]/ },
       { regex: /[a-z]/ },
       { regex: /[0-9]/ },
-      { regex: /[^A-Za-z0-9]/ }
+      { regex: /[^A-Za-z0-9]/ },
     ];
 
     for (let req of requirements) {
       if (!req.regex.test(pass)) {
-        return 'Mật khẩu chưa đúng yêu cầu, Hãy kiểm tra lại.';
+        return "Mật khẩu chưa đúng yêu cầu, Hãy kiểm tra lại.";
       }
     }
     return null;
   };
-  const [validationError, setValidationError] = useState('');
+  const [validationError, setValidationError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
-    setValidationError('');
+    setValidationError("");
 
     const passError = validatePassword(password);
     if (passError) {
@@ -48,7 +48,7 @@ export default function LoginPage() {
 
     const result = await login(username, password);
     if (result.success) {
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
     }
   };
 
@@ -60,8 +60,9 @@ export default function LoginPage() {
         <div
           className="absolute top-0 left-0 w-full h-full"
           style={{
-            backgroundImage: 'radial-gradient(#137fec 0.5px, transparent 0.5px)',
-            backgroundSize: '20px 20px',
+            backgroundImage:
+              "radial-gradient(#137fec 0.5px, transparent 0.5px)",
+            backgroundSize: "20px 20px",
           }}
         />
       </div>
@@ -81,7 +82,10 @@ export default function LoginPage() {
               label="Tên đăng nhập"
               type="text"
               value={username}
-              onChange={(e) => { clearError(); setUsername(e.target.value); }}
+              onChange={(e) => {
+                clearError();
+                setUsername(e.target.value);
+              }}
               placeholder="Nhập tên đăng nhập"
               required
             />
@@ -89,9 +93,13 @@ export default function LoginPage() {
             <div className="relative">
               <Input
                 label="Mật khẩu"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => { clearError(); setValidationError(''); setPassword(e.target.value); }}
+                onChange={(e) => {
+                  clearError();
+                  setValidationError("");
+                  setPassword(e.target.value);
+                }}
                 onFocus={() => setIsPasswordFocused(true)}
                 onBlur={() => setIsPasswordFocused(false)}
                 placeholder="Nhập mật khẩu"
@@ -128,11 +136,18 @@ export default function LoginPage() {
                   type="checkbox"
                   className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary"
                 />
-                <span className="ml-2 text-sm text-slate-600">Ghi nhớ đăng nhập</span>
+                <span className="ml-2 text-sm text-slate-600">
+                  Ghi nhớ đăng nhập
+                </span>
               </label>
             </div>
 
-            <Button type="submit" loading={isLoading} className="w-full py-3" size="lg">
+            <Button
+              type="submit"
+              loading={isLoading}
+              className="w-full py-3"
+              size="lg"
+            >
               Đăng nhập
             </Button>
           </form>
