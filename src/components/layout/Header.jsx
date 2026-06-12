@@ -84,10 +84,8 @@ export default function Header() {
                             key={index}
                             onClick={action.onClick}
                             icon={action.icon}
-                            className={
-                                action.className ||
-                                "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                            }
+                            variant={action.variant || "secondary"}
+                            className={action.className || ""}
                         >
                             {action.label}
                         </Button>
@@ -101,6 +99,7 @@ export default function Header() {
                                 <Button
                                     onClick={actionButton.onClick}
                                     icon={actionButton.icon}
+                                    variant={actionButton.variant || "primary"}
                                     className={
                                         actionButton.className ||
                                         "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"

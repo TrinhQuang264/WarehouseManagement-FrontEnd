@@ -1,4 +1,4 @@
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Eye } from "lucide-react";
 import { formatCurrency, getProductImageUrl } from "../../../utils/util";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
 
@@ -127,6 +127,13 @@ export default function ProductsTable({
                   {/* Thao Tác */}
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => onViewDetail?.(product)}
+                        className="action-btn text-slate-400 hover:text-primary"
+                        title="Chi tiết"
+                      >
+                        <Eye size={18} />
+                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

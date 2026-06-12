@@ -119,7 +119,7 @@ export default function ProductsPage() {
                 label: "Thùng rác",
                 icon: <Trash2 size={18} />,
                 onClick: () => setIsTrashOpen(true),
-                className: "bg-red-500 text-white hover:bg-red-600",
+                variant: "danger",
               },
             ]
           : []

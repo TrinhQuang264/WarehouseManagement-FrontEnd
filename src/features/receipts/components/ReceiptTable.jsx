@@ -78,7 +78,7 @@ export default function ReceiptTable({
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600 ">
-                    {formatDateTime(receipt.date)}
+                    {formatDateTime(receipt.createDate)}
                   </td>
                   <td className="px-6 py-4 text-center text-sm font-semibold text-slate-700 ">
                     {receipt.totalQuantity}
@@ -88,73 +88,77 @@ export default function ReceiptTable({
                   </td>
                   {showStatus && (
                     <td className="px-6 py-4">
-                      <Badge variant={STATUS_VARIANTS[receipt.status] || "gray"}>
+                      <Badge
+                        variant={STATUS_VARIANTS[receipt.status] || "gray"}
+                      >
                         {receipt.statusLabel}
                       </Badge>
                     </td>
                   )}
                   <td className="px-6 py-4 text-right">
                     {(() => {
-                      const isDraft = receipt.status === 'draft' || receipt.status === 0 || receipt.status === '0';
+                      const isDraft =
+                        receipt.status === "draft" ||
+                        receipt.status === 0 ||
+                        receipt.status === "0";
                       const canModify = isAdmin || isDraft;
                       return (
                         <div className="flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onViewDetail?.(receipt);
-                        }}
-                        className="action-btn text-slate-400 hover:text-primary"
-                        title="Xem chi tiết"
-                      >
-                        <Eye size={18} />
-                      </button>
-                      {canModify && (
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            onEdit?.(receipt);
-                          }}
-                          className="action-btn text-slate-400 hover:text-primary"
-                          title="Chỉnh sửa"
-                        >
-                          <Edit size={18} />
-                        </button>
-                      )}
-                      {isDraft &&
-                        onSubmit && (
                           <button
                             type="button"
                             onClick={(event) => {
                               event.stopPropagation();
-                              onSubmit?.(receipt);
+                              onViewDetail?.(receipt);
                             }}
-                            className="flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs font-semibold shadow-sm hover:shadow transition-all"
-                            title="Gửi duyệt"
+                            className="action-btn text-slate-400 hover:text-primary"
+                            title="Xem chi tiết"
                           >
-                            <SendHorizonal size={14} />
-                            Gửi duyệt
+                            <Eye size={18} />
                           </button>
-                        )}
-                      {showDelete && canModify && (
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            onDelete?.(receipt);
-                          }}
-                          className="action-btn text-slate-400 hover:text-red-500"
-                          title="Xóa"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      )}
-                    </div>
-                  );
-                })()}
-              </td>
+                          {canModify && (
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                onEdit?.(receipt);
+                              }}
+                              className="action-btn text-slate-400 hover:text-primary"
+                              title="Chỉnh sửa"
+                            >
+                              <Edit size={18} />
+                            </button>
+                          )}
+                          {isDraft && onSubmit && (
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                onSubmit?.(receipt);
+                              }}
+                              className="flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs font-semibold shadow-sm hover:shadow transition-all"
+                              title="Gửi duyệt"
+                            >
+                              <SendHorizonal size={14} />
+                              Gửi duyệt
+                            </button>
+                          )}
+                          {showDelete && canModify && (
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                onDelete?.(receipt);
+                              }}
+                              className="action-btn text-slate-400 hover:text-red-500"
+                              title="Xóa"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </td>
                 </tr>
               ))
             ) : (

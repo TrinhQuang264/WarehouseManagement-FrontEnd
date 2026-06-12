@@ -97,8 +97,14 @@ export default function ExportsPage() {
     pageSize,
     totalPages,
   } = useExports();
-  const { setActionButton, setExtraActions, setOnSearch, setTitle, setSubtitle, resetHeader } =
-    useHeader();
+  const {
+    setActionButton,
+    setExtraActions,
+    setOnSearch,
+    setTitle,
+    setSubtitle,
+    resetHeader,
+  } = useHeader();
 
   const isAddMode = location.pathname === EXPORT_URLS.new;
   const isEditMode = location.pathname.startsWith(getEditBasePath());
@@ -229,9 +235,6 @@ export default function ExportsPage() {
       setExtraActions([]);
       setOnSearch(null);
       setTitle(pageTitle);
-      setSubtitle(
-        "Xem lại chứng từ xuất kho và toàn bộ dòng hàng đã bàn giao cho khách hàng.",
-      );
     } else if (isFormMode) {
       setActionButton(null);
       setExtraActions([]);
@@ -254,10 +257,10 @@ export default function ExportsPage() {
                 label: "Thùng rác",
                 icon: <Trash2 size={18} />,
                 onClick: openTrash,
-                className: "border border-red-200 text-red-600 hover:bg-red-50",
+                variant: "danger",
               },
             ]
-          : []
+          : [],
       );
       setOnSearch(() => setSearch);
       setTitle("");
@@ -654,7 +657,9 @@ export default function ExportsPage() {
         title="Thùng rác phiếu xuất kho"
         service={purchasesService}
         onDataChange={refreshList}
-        filterItems={(item) => item.type === 2 || item.receiptCode?.startsWith("SO")}
+        filterItems={(item) =>
+          item.type === 2 || item.receiptCode?.startsWith("SO")
+        }
       />
     </div>
   );

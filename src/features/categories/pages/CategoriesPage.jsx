@@ -67,7 +67,7 @@ export default function CategoriesPage() {
         label: "Thùng rác",
         icon: <Trash2 size={18} />,
         onClick: openTrash,
-        className: "bg-red-500 text-red-600 hover:bg-red-300",
+        variant: "danger",
       }
     ]);
 

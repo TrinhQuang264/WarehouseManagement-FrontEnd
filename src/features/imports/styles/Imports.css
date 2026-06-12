@@ -673,14 +673,15 @@
 
 .imports-paper {
   position: relative;
-  width: 100%;
-  max-width: 860px;
+  width: 940px;
+  max-width: 940px;
   min-height: 980px;
   background: #ffffff;
   border: 1px solid #d4d4d8;
   border-radius: 0.5rem;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
-  padding: 3rem;
+  padding: 50px;
+  color: #000000;
 }
 
 .imports-paper-topbar {
@@ -711,7 +712,7 @@
   margin-top: 0.5rem;
   font-size: 1.375rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #000000;
 }
 
 .imports-paper-address {
@@ -719,7 +720,7 @@
   max-width: 18rem;
   font-size: 0.75rem;
   line-height: 1.7;
-  color: #64748b;
+  color: #000000;
 }
 
 .imports-paper-title-wrap {
@@ -737,7 +738,7 @@
 .imports-paper-title-wrap p {
   font-size: 0.75rem;
   letter-spacing: 0.08em;
-  color: #94a3b8;
+  color: #000000;
 }
 
 .imports-paper-badge {
@@ -753,9 +754,9 @@
 }
 
 .imports-paper-meta {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3rem;
+  /* display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); */
+  gap: 9rem;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
   border-bottom: 1px solid #f1f5f9;
@@ -786,7 +787,7 @@
 .imports-paper-meta-col strong,
 .imports-paper-summary strong {
   font-size: 0.875rem;
-  color: #0f172a;
+  color: #000000;
 }
 
 .imports-paper-col-index { width: 8%; }
@@ -821,7 +822,7 @@
 .imports-paper-table th {
   text-align: left;
   font-weight: 800;
-  color: #475569;
+  color: #000000;
 }
 
 .imports-paper-table tbody tr {
@@ -1056,7 +1057,6 @@
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 }
-
 
 
 

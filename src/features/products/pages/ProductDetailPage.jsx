@@ -8,7 +8,6 @@ import { formatCurrency, getProductImageUrl } from "../../../utils/util.js";
 import productService from "../api/productsService";
 import categoryService from "../../categories/api/categoriesService";
 
-
 function ProductImage({ imageUrl, alt, className }) {
   const fullImageUrl = getProductImageUrl(imageUrl);
   if (!fullImageUrl) {
@@ -299,10 +298,10 @@ export default function ProductDetailPage() {
             <div className="p-6 grid grid-cols-3 gap-6">
               <div className="p-4 bg-slate-50 rounded-lg">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
-                  Giá nhập
+                  Giá Bán
                 </label>
                 <p className="text-lg font-bold text-slate-900">
-                  {formatCurrency(product.importPrice)}
+                  {formatCurrency(product.sellingPrice)}
                 </p>
               </div>
             </div>
@@ -341,7 +340,7 @@ export default function ProductDetailPage() {
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>
               )}
             </button> */}
-            {/* <button 
+      {/* <button 
               onClick={() => setActiveTab('variants')}
               className={`py-4 relative font-bold text-sm transition-colors ${
                 activeTab === 'variants' 
@@ -363,10 +362,10 @@ export default function ProductDetailPage() {
               Nhà cung cấp liên kết
               {activeTab === 'suppliers' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>}
             </button> */}
-          {/* </nav>
+      {/* </nav>
         </div> */}
 
-        {/* <div className="p-6">
+      {/* <div className="p-6">
           {activeTab === "history" && (
             <DataTableCard>
               <div className="table-wrapper">

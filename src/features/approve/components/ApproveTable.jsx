@@ -44,6 +44,7 @@ export default function ApproveTable({
               <th className="table-th px-6">Ngày tạo</th>
               <th className="table-th px-6 text-center">Số lượng</th>
               <th className="table-th px-6 text-right">Tổng tiền</th>
+              <th className="table-th px-6 text-right">Người YC</th>
               <th className="table-th px-6 text-center">Thao tác</th>
             </tr>
           </thead>
@@ -77,13 +78,22 @@ export default function ApproveTable({
                       : receipt.supplierName || "Nhà cung cấp chưa xác định"}
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
-                    {formatDateTime(receipt.purchaseDate || receipt.createDate)}
+                    {formatDateTime(receipt.createDate)}
                   </td>
                   <td className="px-6 py-4 text-center text-sm font-semibold text-slate-700">
-                    {formatNumber(receipt.totalQuantity || (receipt.items || []).reduce((sum, item) => sum + item.quantity, 0))}
+                    {formatNumber(
+                      receipt.totalQuantity ||
+                        (receipt.items || []).reduce(
+                          (sum, item) => sum + item.quantity,
+                          0,
+                        ),
+                    )}
                   </td>
                   <td className="px-6 py-4 text-right text-sm font-bold text-slate-900">
-                    {formatCurrency(receipt.totalAmount || receipt.totalCost)}
+                    {formatCurrency(receipt.totalAmount)}
+                  </td>
+                  <td className="px-6 py-4 text-right text-sm font-bold text-slate-900">
+                    {receipt.createdByName}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">

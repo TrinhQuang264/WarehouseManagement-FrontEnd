@@ -24,29 +24,45 @@ function ExportReceiptPaper({ receipt }) {
         </div>
       </div>
 
-      <div className="imports-paper-meta">
-        <div className="imports-paper-meta-col">
+      <div className="imports-paper-meta flex w-full">
+        <div className="imports-paper-meta-col w-[250px] shrink-0">
           <div>
             <span>Mã phiếu:</span>
-            <strong>{receipt.code}</strong>
-          </div>
-          <div>
-            <span>Tham chiếu đơn:</span>
             <strong>{receipt.receiptCode}</strong>
           </div>
+
+          <div>
+            <span>Tham chiếu đơn:</span>
+            <strong>{receipt.referenceCode || "Không có"}</strong>
+          </div>
+
           <div>
             <span>Người lập phiếu:</span>
-            <strong>{receipt.operatorName}</strong>
+            <strong>{receipt.createdByName}</strong>
           </div>
         </div>
-        <div className="imports-paper-meta-col">
+
+        <div className="imports-paper-meta-col flex-1">
           <div>
             <span>Khách hàng:</span>
             <strong>{receipt.customerName}</strong>
           </div>
+
           <div>
-            <span>Ngày xuất:</span>
+            <span>Ngày tạo phiếu:</span>
             <strong>{formatDateTime(receipt.date)}</strong>
+          </div>
+          <div>
+            <span>
+              {receipt.approvedDate
+                ? "Ngày duyệt phiếu"
+                : receipt.canceledDate
+                  ? "Ngày hủy phiếu"
+                  : ""}
+            </span>
+            <strong>
+              {formatDateTime(receipt.approvedDate ?? receipt.canceledDate)}
+            </strong>
           </div>
         </div>
       </div>
@@ -55,7 +71,6 @@ function ExportReceiptPaper({ receipt }) {
         <colgroup>
           <col className="imports-paper-col-index" />
           <col className="imports-paper-col-name" />
-          <col className="imports-paper-col-unit" />
           <col className="imports-paper-col-qty" />
           <col className="imports-paper-col-price" />
           <col className="imports-paper-col-total" />
@@ -82,23 +97,47 @@ function ExportReceiptPaper({ receipt }) {
         </tbody>
       </table>
 
-      <div className="imports-paper-summary">
-        <div className="imports-paper-summary-total">
-          <span>Tổng tiền:</span>
-          <strong>{formatCurrency(receipt.totalAmount)}</strong>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: receipt.isCanceled ? "1fr 22rem" : "1fr",
+          gap: "2rem",
+          alignItems: "start",
+          color: "black",
+        }}
+      >
+        {receipt.isCanceled && (
+          <div style={{ color: "red" }}>
+            <span>Lý do hủy: </span>
+            <span>{receipt.noteCancel}</span>
+          </div>
+        )}
+        <div
+          className="imports-paper-summary"
+          style={receipt.isCanceled ? { margin: 0, maxWidth: "100%" } : {}}
+        >
+          <div className="imports-paper-summary-total">
+            <span>Tổng tiền hàng:</span>
+            <strong>{formatCurrency(receipt.totalAmount)}</strong>
+          </div>
         </div>
       </div>
 
       <div className="imports-paper-signatures">
         <div>
           <span>Người lập phiếu</span>
-          <strong>{receipt.operatorName}</strong>
+          <strong>{receipt.createdByName}</strong>
         </div>
         <div>
           <span>
-            {receipt.status == 2 ? "Người duyệt phiếu" : "Người huỷ phiếu"}
+            {receipt.approvedByName
+              ? "Người duyệt phiếu"
+              : receipt.canceledByName
+                ? "Người hủy phiếu"
+                : ""}
           </span>
-          <strong>{receipt.approverName}</strong>
+
+          <strong>{receipt.approvedByName ?? receipt.canceledByName}</strong>
         </div>
         <div>
           <span>Khách hàng</span>
@@ -115,30 +154,64 @@ function ExportReceiptDocumentView({ receipt, showStatus }) {
       <section className="imports-document-section">
         <div className="imports-document-grid">
           <div className="imports-document-field">
-            <span>Ngày xuất</span>
-            <strong>{formatDateTime(receipt.date)}</strong>
+            <span>Mã phiếu</span>
+            <strong>{receipt.receiptCode}</strong>
           </div>
-          {showStatus && (
-            <div className="imports-document-field">
-              <span>Trạng thái</span>
-              <strong>{receipt.statusLabel || "Không xác định"}</strong>
-            </div>
-          )}
+          <div className="imports-document-field">
+            <span>Tham chiếu đơn</span>
+            <strong>{receipt.referenceCode}</strong>
+          </div>
           <div className="imports-document-field">
             <span>Khách hàng</span>
             <strong>{receipt.customerName}</strong>
           </div>
-          <div className="imports-document-field">
-            <span>Mã tham chiếu</span>
-            <strong>{receipt.referenceCode || "Không có"}</strong>
-          </div>
+          {showStatus && (
+            <div className="imports-document-field">
+              <span>Trạng thái</span>
+              <strong>{receipt.statusLabel}</strong>
+            </div>
+          )}
           <div className="imports-document-field">
             <span>Người lập phiếu</span>
-            <strong>{receipt.operatorName}</strong>
+            <strong>{receipt.createdByName}</strong>
           </div>
-          <div className="imports-document-field imports-document-field-full">
+          <div className="imports-document-field">
+            <span>Ngày tạo phiếu</span>
+            <strong>{formatDateTime(receipt.createDate)}</strong>
+          </div>
+          <div className="imports-document-field">
+            <span>
+              {receipt.approvedByName
+                ? "Người duyệt phiếu"
+                : receipt.canceledByName
+                  ? "Người hủy phiếu"
+                  : ""}
+            </span>
+            <strong>{receipt.approvedByName ?? receipt.canceledByName}</strong>
+          </div>
+          <div className="imports-document-field">
+            <span>
+              {receipt.approvedDate
+                ? "Ngày duyệt phiếu"
+                : receipt.canceledDate
+                  ? "Ngày hủy phiếu"
+                  : ""}
+            </span>
+            <strong>
+              {formatDateTime(receipt.approvedDate ?? receipt.canceledDate)}
+            </strong>
+          </div>
+          <div className="imports-document-field">
             <span>Ghi chú</span>
             <strong>{receipt.note || "Không có ghi chú."}</strong>
+          </div>
+          <div className="imports-document-field">
+            {receipt.isCanceled && (
+              <div className="text-red-900">
+                <span>Lý do hủy: </span>
+                <strong>{receipt.noteCancel || "Không có ghi chú."}</strong>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -160,17 +233,6 @@ function ExportReceiptDocumentView({ receipt, showStatus }) {
               key={item.id || `${item.productId}-${index}`}
             >
               <div className="imports-document-item">
-                <div className="imports-document-item-thumb">
-                  {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.productName}
-                      className="imports-document-item-image"
-                    />
-                  ) : (
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                  )}
-                </div>
                 <div>
                   <p className="imports-document-item-name">
                     {item.productName}
@@ -236,7 +298,10 @@ export default function ExportReceiptDetail({
         </div>
       ) : (
         <>
-          <ExportReceiptDocumentView receipt={receipt} showStatus={showStatus} />
+          <ExportReceiptDocumentView
+            receipt={receipt}
+            showStatus={showStatus}
+          />
           <div className="imports-print-source" aria-hidden="true">
             <div ref={paperRef}>
               <ExportReceiptPaper receipt={receipt} />

@@ -1,29 +1,25 @@
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from "lucide-react";
 
 const variantStyles = {
-  primary:
-    'bg-primary  text-white shadow-sm shadow-primary/20',
-  secondary:
-    'border border-slate-200  text-slate-600  hover:bg-slate-50',
-  danger:
-    'bg-accent-red hover:bg-red-600 text-white',
-  ghost:
-    'text-slate-600   hover:bg-slate-100 ',
+  primary: "bg-primary  text-white shadow-sm shadow-primary/20",
+  secondary: "border border-slate-200  text-slate-600  hover:bg-slate-50",
+  danger: "bg-accent-red hover:bg-red-600 text-white",
+  ghost: "text-slate-600   hover:bg-slate-100 ",
 };
 
 const sizeStyles = {
-  sm: 'px-3 py-1.5 text-xs gap-1.5',
-  md: 'px-4 py-2 text-sm gap-2',
-  lg: 'px-5 py-2.5 text-base gap-2',
+  sm: "px-3 py-1.5 text-xs gap-1.5",
+  md: "px-4 py-2 text-sm gap-2",
+  lg: "px-5 py-2.5 text-base gap-2",
 };
 
 export default function Button({
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   loading = false,
   icon,
   children,
-  className = '',
+  className = "",
   disabled,
   ...rest
 }) {

@@ -247,7 +247,7 @@ export default function ImportsPage() {
                 label: "Thùng rác",
                 icon: <Trash2 size={18} />,
                 onClick: openTrash,
-                className: "border border-red-200 text-red-600 hover:bg-red-50",
+                variant: "danger",
               },
             ]
           : []
