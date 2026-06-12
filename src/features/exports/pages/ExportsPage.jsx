@@ -474,11 +474,19 @@ export default function ExportsPage() {
         if (sourceReceipt) {
           const status = sourceReceipt.status;
           const statusLabel = sourceReceipt.statusLabel;
-          if (status === 2 || status === "completed" || statusLabel === "Đã duyệt") {
+          if (
+            status === 2 ||
+            status === "completed" ||
+            statusLabel === "Đã duyệt"
+          ) {
             toast.error("Phiếu không được sửa đổi khi đã duyệt.");
             return;
           }
-          if (status === 3 || status === "cancelled" || statusLabel === "Đã huỷ") {
+          if (
+            status === 3 ||
+            status === "cancelled" ||
+            statusLabel === "Đã huỷ"
+          ) {
             toast.error("Phiếu không được sửa đổi khi đã huỷ.");
             return;
           }
@@ -493,8 +501,15 @@ export default function ExportsPage() {
         }
       }
 
-      if (!receiptData.customerId || !receiptData.referenceCode || !receiptData.items || receiptData.items.length === 0) {
-        toast.error("Vui lòng nhập các thông tin bắt buộc (khách hàng, mã tham chiếu, sản phẩm).");
+      if (
+        !receiptData.customerId ||
+        !receiptData.referenceCode ||
+        !receiptData.items ||
+        receiptData.items.length === 0
+      ) {
+        toast.error(
+          "Vui lòng nhập các thông tin bắt buộc (khách hàng, mã tham chiếu, sản phẩm).",
+        );
         return;
       }
 
@@ -565,7 +580,7 @@ export default function ExportsPage() {
             items={[
               { label: "Tổng quan", path: COMMON_URLS.dashboard },
               { label: "Xuất kho", path: EXPORT_URLS.list },
-              { label: sourceReceipt.code },
+              { label: sourceReceipt.receiptCode },
             ]}
           />
           <label className="imports-view-toggle">

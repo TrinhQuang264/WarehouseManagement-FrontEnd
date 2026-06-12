@@ -14,6 +14,7 @@ function CategoryTable({
           <tr className="bg-slate-50/80 border-b border-slate-200">
             <th className="table-th px-6">Tên Danh Mục</th>
             <th className="table-th px-6">Mô Tả SEO</th>
+            <th className="table-th px-6 text-center">Số sản phẩm</th>
             <th className="table-th px-6 text-right">Thao Tác</th>
           </tr>
         </thead>
@@ -43,6 +44,11 @@ function CategoryTable({
                     {category.seoDescription || "Chưa có mô tả SEO cho danh mục này"}
                   </p>
                 </td>
+                <td className="px-6 py-5 text-center">
+                  <span className="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700 min-w-8">
+                    {category.productCount ?? 0}
+                  </span>
+                </td>
                 <td className="px-6 py-5 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <button
@@ -66,7 +72,7 @@ function CategoryTable({
           ) : (
             <tr>
               <td
-                colSpan="3"
+                colSpan="4"
                 className="px-6 py-12 text-center text-slate-400 italic"
               >
                 Không tìm thấy danh mục nào thỏa mãn điều kiện...

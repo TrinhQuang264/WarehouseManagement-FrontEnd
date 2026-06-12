@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import categoryService from "../api/categoriesService";
+import productService from "../../products/api/productsService";
 import toast from "../../../utils/toast";
 
 const PAGE_SIZE = 7;
@@ -72,14 +73,25 @@ export function useCategories() {
     setIsFetching(true);
     setLoading(true);
     try {
-      const response = await categoryService.getAll();
+      const [response, productsRes] = await Promise.all([
+        categoryService.getAll(),
+        productService.getAll()
+      ]);
       if (signal.aborted) return;
 
       let allItems = Array.isArray(response) ? response : (response.data || []);
+      let allProducts = Array.isArray(productsRes) ? productsRes : (productsRes.data || []);
+      const activeProducts = allProducts.filter(p => !p.isDeleted);
 
       const activeItems = allItems.filter(item =>
         item.isDeleted === false
-      );
+      ).map(item => {
+        const productCount = activeProducts.filter(p => Number(p.categoryId) === Number(item.id)).length;
+        return {
+          ...item,
+          productCount
+        };
+      });
 
       setAllActiveCategories(activeItems);
       let filteredItems = [...activeItems];

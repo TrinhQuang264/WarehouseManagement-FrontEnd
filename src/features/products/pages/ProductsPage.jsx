@@ -9,13 +9,10 @@ import TrashBinDrawer from "../../../components/ui/TrashBinDrawer";
 import productService from "../api/productsService";
 
 import "../styles/Products.css";
-
-import ProductsSearchFilter from "../components/ProductsSearchFilter";
 import ProductsTable from "../components/ProductsTable";
 import ProductsPagination from "../components/ProductsPagination";
 import ProductForm from "../components/ProductForm";
 import ProductImageUpload from "../components/ProductImageUpload";
-import ProductDetailPage from "./ProductDetailPage";
 import ConfirmModal from "../../../components/ui/ConfirmModal.jsx";
 import toast from "../../../utils/toast";
 import { PRODUCT_URLS } from "../../../constants/urls";
@@ -70,15 +67,10 @@ export default function ProductsPage() {
     filteredProducts,
     categories,
     loading,
-    minPrice,
-    maxPrice,
     currentPage,
     pageSize,
     totalCount,
-    setMinPrice,
-    setMaxPrice,
     setCurrentPage,
-    resetFilters,
     searchProducts,
 
     // Form handlers - these will be managed locally now
@@ -219,10 +211,6 @@ export default function ProductsPage() {
     openDeleteModal(product);
   };
 
-  const handleViewDetail = (product) => {
-    navigate(PRODUCT_URLS.detail(product.id));
-  };
-
   const onSubmit = async (data) => {
     const safeImageUrl = sanitizeImageUrlForPayload(data.imageUrl);
     const payload = {
@@ -292,10 +280,6 @@ export default function ProductsPage() {
   };
 
   // Render switches based on mode
-  if (mode.detail) {
-    return <ProductDetailPage />;
-  }
-
   if (mode.isModify) {
     return (
       <div className="products-page">
@@ -377,21 +361,12 @@ export default function ProductsPage() {
           </div>
         </div>
         <div className="space-y-6">
-          <ProductsSearchFilter
-            minPrice={minPrice}
-            setMinPrice={setMinPrice}
-            maxPrice={maxPrice}
-            setMaxPrice={setMaxPrice}
-            onResetFilters={resetFilters}
-          />
-
           <ProductsTable
             products={filteredProducts}
             categories={categories}
             loading={loading}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onViewDetail={handleViewDetail}
             showDelete={isAdmin}
           />
 

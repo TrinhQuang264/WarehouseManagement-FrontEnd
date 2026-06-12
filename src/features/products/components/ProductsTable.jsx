@@ -32,7 +32,6 @@ export default function ProductsTable({
   loading,
   onEdit,
   onDelete,
-  onViewDetail,
   showDelete = true,
 }) {
   const categoryNameById = new Map(
@@ -50,7 +49,7 @@ export default function ProductsTable({
               <th className="table-th px-6 text-left">Danh Mục</th>
               <th className="table-th px-6 text-left">Vị trí</th>
               <th className="table-th px-6 text-right">Giá Bán (VNĐ)</th>
-              <th className="table-th px-6 text-center">Tồn Kho</th>
+              <th className="table-th px-6 text-left">Mô tả</th>
               <th className="table-th px-6 text-right">Thao Tác</th>
             </tr>
           </thead>
@@ -68,7 +67,7 @@ export default function ProductsTable({
                     {product.code}
                   </td>
 
-                  {/* Thông Tin Sản Phẩm (Ảnh + Tên + Mô Tả) */}
+                  {/* Thông Tin Sản Phẩm (Ảnh + Tên) */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <ProductThumbnail
@@ -78,9 +77,6 @@ export default function ProductsTable({
                       <div>
                         <p className="text-sm font-bold text-slate-900 ">
                           {product.name}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {product.description || "N/A"}
                         </p>
                       </div>
                     </div>
@@ -106,34 +102,27 @@ export default function ProductsTable({
                     {formatCurrency(product.price)}
                   </td>
 
-                  {/* Tồn Kho */}
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-sm font-medium text-slate-900 ">
-                        {product.quantity}
-                      </span>
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          product.quantity > 50
-                            ? "bg-emerald-500"
-                            : product.quantity > 10
-                              ? "bg-amber-500"
-                              : "bg-red-500"
-                        }`}
-                      />
+                  {/* Mô tả */}
+                  <td className="px-6 py-4 max-w-[200px] relative group">
+                    <div 
+                      className="text-xs text-slate-600 truncate cursor-help"
+                      title={product.description || "Chưa có mô tả"}
+                    >
+                      {product.description || "—"}
                     </div>
+                    {product.description && (
+                      <div className="absolute z-50 hidden group-hover:block bg-slate-950 text-white text-[11px] p-2.5 rounded-lg shadow-xl -top-2 left-1/2 -translate-y-full -translate-x-1/2 min-w-[250px] max-w-[320px] whitespace-normal break-words leading-relaxed">
+                        <div className="relative">
+                          {product.description}
+                          <div className="absolute w-2.5 h-2.5 bg-slate-950 rotate-45 left-1/2 -translate-x-1/2 top-full mt-[5px]"></div>
+                        </div>
+                      </div>
+                    )}
                   </td>
 
                   {/* Thao Tác */}
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => onViewDetail?.(product)}
-                        className="action-btn text-slate-400 hover:text-primary"
-                        title="Chi tiết"
-                      >
-                        <Eye size={18} />
-                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -163,7 +152,7 @@ export default function ProductsTable({
             ) : (
               <tr>
                 <td
-                  colSpan="6"
+                  colSpan="7"
                   className="px-6 py-12 text-center text-slate-400 italic"
                 >
                   Không tìm thấy sản phẩm ...

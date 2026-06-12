@@ -1,8 +1,8 @@
 import React from "react";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
 
-function SupplierTable({ suppliers, loading, onEdit, onDelete, onViewDetail, showDelete = true }) {
+function SupplierTable({ suppliers, loading, onEdit, onDelete, showDelete = true }) {
     return (
         <DataTableCard className="min-h-[500px] flex flex-col relative">
             <div className="table-wrapper">
@@ -55,15 +55,6 @@ function SupplierTable({ suppliers, loading, onEdit, onDelete, onViewDetail, sho
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <div className="action-buttons-group">
-                                            <button
-                                                onClick={() =>
-                                                    onViewDetail?.(supplier)
-                                                }
-                                                className="action-btn text-slate-400 hover:text-primary"
-                                                title="Chi tiết"
-                                            >
-                                                <Eye size={18} />
-                                            </button>
                                             <button
                                                 onClick={() => onEdit(supplier)}
                                                 className="action-btn text-slate-400 hover:text-primary"

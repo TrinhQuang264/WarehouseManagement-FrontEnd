@@ -1,91 +1,237 @@
 import { useState, useEffect } from 'react';
-import dashboardService from '../api/dashboardService';
+import productsService from '../../products/api/productsService';
+import purchasesService from '../../imports/api/purchasesService';
+import categoryService from '../../categories/api/categoriesService';
 
-// MOCK DATA — Dùng khi chưa có backend
-const MOCK_STATS = {
-  totalInventory: 24510,
-  lowStockCount: 18,
-  todayImport: 1240,
-  todayExport: 958,
-};
-
-export const MOCK_CHART_DATA = [
-  { day: 'Thứ 2', import: 85, export: 60 },
-  { day: 'Thứ 3', import: 70, export: 40 },
-  { day: 'Thứ 4', import: 45, export: 55 },
-  { day: 'Thứ 5', import: 95, export: 75 },
-  { day: 'Thứ 6', import: 50, export: 30 },
-  { day: 'Thứ 7', import: 35, export: 20 },
-  { day: 'CN', import: 25, export: 15 },
-];
-
-export const MOCK_ALLOCATION = [
-  { name: 'Màn hình', value: 45, color: '#137fec' }, // bg-primary
-  { name: 'Pin điện thoại', value: 25, color: '#f59e0b' }, // bg-accent-orange
-  { name: 'Vỏ & Linh kiện khác', value: 30, color: '#10b981' }, // bg-accent-green
-];
-
-export const MOCK_TOP_PRODUCTS = [
-  {
-    id: 1,
-    name: 'Màn hình iPhone 13 Pro Max',
-    type: 'OLED Zin',
-    sku: 'SCR-I13PM-001',
-    sold: 452,
-    stock: 1240,
-    revenue: 1250000000,
-    status: 'selling',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB-19TXUkPkRvBcNrvpN1fPSgnvDrg-MqaYnnClRW_vFiHS2azMg76QMhV-MpZp24pIsAH1S_g8kpwN5eGjTUX7bFLBOMUKMmjjJeDFpNvuxwefnLcs8lzg3PzttmK1HQlLwZFkCxMa0wkOfzsSC-vWV61X7KKJvZ9-3kmW7tjuRw5GduPl1qPU3M_EXAZTESo3lw0rsCH4mMdm5uNMVmnAcpa0fLnAuaUmxlY6ZoJGeGet5pbC7ydHHH4XRvWAFjstF_7PxWHFD8A',
-  },
-  {
-    id: 2,
-    name: 'Pin Samsung Galaxy S21 Ultra',
-    type: 'Chính hãng',
-    sku: 'BAT-SS21U-024',
-    sold: 321,
-    stock: 85,
-    revenue: 245000000,
-    status: 'low',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBFaSW0OUOozyVpchJ5OgoYxAGAwl13QvIQIs3AmX3XO7SUT58szoPU4lCp4Jhel0bSvh54pMGL6e-2XR9kuCN_CMJ_FvBN4drIGq4NsSpGa2XcnlQzZ8dAGE-TfXRfBpwKj8Y2ZXTUgHStQ6PxepV9xM1HG7AH1FN4YajxrnGP-Xx9gyYBlPfUD2pZaicZO31-rjbJ_Fol0YAjF7JalYkCm-xJeq0DkpcJmJ3dBlEeIYT4MgqqCxlf2TQcwBuQUTvUq3kltX5l1-Y',
-  },
-  {
-    id: 3,
-    name: 'Vỏ mặt sau iPhone 14',
-    type: 'Kính zin',
-    sku: 'BKC-I14-99',
-    sold: 215,
-    stock: 512,
-    revenue: 158000000,
-    status: 'selling',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC7mROHl8WLDtgoDb18UjBAO6n1kYMfBe1AnQihVm8sV7g-kjB_hlDt10kCBqae1kYEhXGTT_t4ztGd83eEWqFLRyTKYQKP-xuiYlA3y5chzfM_a1Qprpxw2Bv8TCqa32yECLPABreh4aARvhHf5NheSWdJcmyhiPwYz3OrCAD0OGPn08WD-ZL7ZHDxUVHIkrJMLVhsP-Hhsnld629uSBbhw5suJJGy6reXfrgJzRci_VrClS8YZrPeTcC6lmRW0loDIW5EQn9Q5_g',
-  },
-];
+const COLORS = ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'];
 
 export function useDashboard() {
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [availableYears, setAvailableYears] = useState([currentYear]);
+  
   const [stats, setStats] = useState(null);
+  const [chartData, setChartData] = useState([]);
+  const [allocation, setAllocation] = useState([]);
+  const [lineChartData, setLineChartData] = useState([]);
+  const [restockProducts, setRestockProducts] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
+    const fetchAllData = async () => {
       try {
-        const data = await dashboardService.getStats();
-        setStats(data);
-      } catch {
-        // API chưa có → dùng mock data
-        console.info('[useDashboard] Sử dụng mock data (API chưa kết nối)');
-        setStats(MOCK_STATS);
+        setLoading(true);
+
+        // Fetch all APIs in parallel
+        const [productsRes, purchasesRes, categoriesRes] = await Promise.all([
+          productsService.getAll().catch(() => []),
+          purchasesService.getAll().catch(() => []),
+          categoryService.getAll().catch(() => []),
+        ]);
+
+        // Trích xuất dữ liệu mảng an toàn
+        const products = Array.isArray(productsRes?.data) ? productsRes.data : Array.isArray(productsRes) ? productsRes : [];
+        const purchases = Array.isArray(purchasesRes?.data) ? purchasesRes.data : Array.isArray(purchasesRes) ? purchasesRes : [];
+        const categories = Array.isArray(categoriesRes?.data) ? categoriesRes.data : Array.isArray(categoriesRes) ? categoriesRes : [];
+
+        // 1. STATS (4 Cards)
+        const totalProducts = products.length;
+        let totalInventory = 0;
+        let lowStockCount = 0;
+        let inventoryValue = 0;
+
+        products.forEach(p => {
+          const qty = p.quantity || p.initialStock || 0;
+          const price = p.sellingPrice || p.price || 0;
+          totalInventory += qty;
+          inventoryValue += qty * price;
+          if (qty < 10) lowStockCount += 1;
+        });
+
+        setStats({
+          totalProducts,
+          totalInventory,
+          lowStockCount,
+          inventoryValue
+        });
+
+        // Tự động tìm các năm có dữ liệu
+        const yearsSet = new Set([currentYear]);
+        purchases.forEach(p => {
+          const dateStr = p.receiptDate || p.createDate || p.purchaseDate || p.createdAt;
+          if (dateStr) {
+            yearsSet.add(new Date(dateStr).getFullYear());
+          }
+        });
+        const sortedYears = Array.from(yearsSet).sort((a, b) => b - a);
+        setAvailableYears(sortedYears);
+
+        // Đảm bảo selectedYear hợp lệ
+        const yearToUse = sortedYears.includes(selectedYear) ? selectedYear : currentYear;
+        if (!sortedYears.includes(selectedYear)) {
+            setSelectedYear(currentYear);
+        }
+
+        // 2. MAIN CHART (12 Months Bar Chart)
+        const months = Array.from({ length: 12 }, (_, i) => ({
+          name: `Th.${i + 1}`,
+          import: 0,
+          export: 0
+        }));
+
+        purchases.forEach(p => {
+          const dateStr = p.receiptDate || p.createDate || p.purchaseDate || p.createdAt;
+          if (!dateStr) return;
+          const d = new Date(dateStr);
+          if (d.getFullYear() === yearToUse) {
+            const m = d.getMonth(); // 0-11
+            const type = Number(p.type || p.Type);
+            const totalQty = (p.items || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
+            
+            if (type === 1) { // Import
+              months[m].import += totalQty;
+            } else if (type === 2) { // Export
+              months[m].export += totalQty;
+            }
+          }
+        });
+        setChartData(months);
+
+        // 3. PIE CHART (Tồn kho theo danh mục)
+        const categoryMap = {};
+        products.forEach(p => {
+          const catId = p.categoryId;
+          const qty = p.quantity || p.initialStock || 0;
+          if (!categoryMap[catId]) {
+            categoryMap[catId] = 0;
+          }
+          categoryMap[catId] += qty;
+        });
+
+        const categoryArray = Object.keys(categoryMap).map(catId => {
+          const cat = categories.find(c => String(c.id) === String(catId));
+          return {
+            name: cat ? cat.name : 'Khác',
+            value: categoryMap[catId]
+          };
+        }).sort((a, b) => b.value - a.value);
+
+        // Map colors and calc percentage
+        const totalPie = categoryArray.reduce((sum, item) => sum + item.value, 0);
+        const topCats = categoryArray.slice(0, 4).map((c, i) => ({
+          name: c.name,
+          value: totalPie > 0 ? Math.round((c.value / totalPie) * 100) : 0,
+          color: COLORS[i % COLORS.length]
+        }));
+        setAllocation(topCats);
+
+        // 4. LINE CHART (Xu hướng xuất kho 30 ngày)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
+        thirtyDaysAgo.setHours(0,0,0,0);
+
+        const lineData = [];
+        for(let i=0; i<30; i++) {
+          const target = new Date(thirtyDaysAgo);
+          target.setDate(target.getDate() + i);
+          lineData.push({
+            dateObj: target,
+            day: `${target.getDate()}/${target.getMonth()+1}`,
+            export: 0
+          });
+        }
+
+        const exportPurchases = purchases.filter(p => Number(p.type || p.Type) === 2);
+        exportPurchases.forEach(p => {
+          const dateStr = p.receiptDate || p.createDate || p.purchaseDate || p.createdAt;
+          if (!dateStr) return;
+          const d = new Date(dateStr);
+          d.setHours(0,0,0,0);
+          
+          if (d >= thirtyDaysAgo) {
+            const index = Math.floor((d - thirtyDaysAgo) / (1000 * 60 * 60 * 24));
+            if (index >= 0 && index < 30) {
+              const qty = (p.items || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
+              lineData[index].export += qty;
+            }
+          }
+        });
+        setLineChartData(lineData);
+
+        // 5. RESTOCK TABLE
+        const lowStockList = products
+          .filter(p => (p.quantity || p.initialStock || 0) < 10)
+          .map(p => {
+            const stock = p.quantity || p.initialStock || 0;
+            return {
+              id: p.code || p.id,
+              name: p.name,
+              stock: stock,
+              status: stock <= 3 ? 'Nguy hiểm' : 'Cảnh báo',
+              color: stock <= 3 ? 'red' : 'orange'
+            };
+          })
+          .sort((a, b) => a.stock - b.stock)
+          .slice(0, 5);
+        setRestockProducts(lowStockList);
+
+        // 6. TOP SELLING TABLE
+        const productSales = {};
+        exportPurchases.forEach(p => {
+          // Lấy status của xuất kho (thường status = 2 là đã hoàn thành)
+          // Tùy theo logic API của bạn, tôi lấy tất cả hoặc status hoàn thành
+          const isCompleted = p.status === 2 || p.status === 'completed';
+          if (isCompleted || true) { // Tạm tính tất cả nếu không check kĩ status
+            (p.items || []).forEach(item => {
+              const pid = item.productId;
+              const qty = item.quantity || 1;
+              const price = item.unitPrice || item.unitCost || 0;
+              
+              if (!productSales[pid]) {
+                productSales[pid] = { qty: 0, revenue: 0 };
+              }
+              productSales[pid].qty += qty;
+              productSales[pid].revenue += qty * price;
+            });
+          }
+        });
+
+        const topSellingList = Object.keys(productSales)
+          .map(pid => {
+            const prod = products.find(x => String(x.id) === String(pid));
+            return {
+              id: prod?.code || pid,
+              name: prod?.name || 'Không xác định',
+              sold: productSales[pid].qty,
+              revenue: productSales[pid].revenue
+            };
+          })
+          .sort((a, b) => b.sold - a.sold)
+          .slice(0, 5);
+          
+        setTopProducts(topSellingList);
+
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu dashboard:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchDashboard();
-  }, []);
+
+    fetchAllData();
+  }, [selectedYear]);
 
   return {
     stats,
     loading,
-    chartData: MOCK_CHART_DATA,
-    allocation: MOCK_ALLOCATION,
-    topProducts: MOCK_TOP_PRODUCTS
+    chartData,
+    allocation,
+    lineChartData,
+    restockProducts,
+    topProducts,
+    selectedYear,
+    setSelectedYear,
+    availableYears
   };
 }

@@ -8,91 +8,88 @@ import { useAuth } from "../features/auth/hooks/useAuth.jsx";
 const MainLayout = lazy(() => import("../components/layout/MainLayout"));
 const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
 const DashboardPage = lazy(
-    () => import("../features/dashboard/components/DashboardPage"),
+  () => import("../features/dashboard/components/DashboardPage"),
 );
 const UsersPage = lazy(() => import("../features/users/pages/UsersPage"));
 const ProductsPage = lazy(
-    () => import("../features/products/pages/ProductsPage"),
+  () => import("../features/products/pages/ProductsPage"),
 );
 const CategoriesPage = lazy(
-    () => import("../features/categories/pages/CategoriesPage"),
+  () => import("../features/categories/pages/CategoriesPage"),
 );
 const InventoryPage = lazy(
-    () => import("../features/inventory/components/InventoryPage"),
+  () => import("../features/inventory/pages/InventoryPage"),
 );
 const ImportsPage = lazy(() => import("../features/imports/pages/ImportsPage"));
 const ExportsPage = lazy(() => import("../features/exports/pages/ExportsPage"));
 const ApprovePage = lazy(() => import("../features/approve/pages/ApprovePage"));
 const SuppliersPage = lazy(
-    () => import("../features/suppliers/pages/SuppliersPage"),
+  () => import("../features/suppliers/pages/SuppliersPage"),
 );
 const CustomersPage = lazy(
-    () => import("../features/customers/pages/CustomersPage"),
+  () => import("../features/customers/pages/CustomersPage"),
 );
 const ProfilePage = lazy(() => import("../features/profile/pages/ProfilePage"));
 const ReportsPage = lazy(() => import("../features/reports/pages/ReportsPage"));
 
 export default function AppRouter() {
-    const { user } = useAuth();
-    const isAdmin = user?.role?.toLowerCase() === "admin";
+  const { user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase() === "admin";
 
-    return (
-        <Suspense fallback={<Loading text="Đang tải giao diện..." />}>
-            <Routes>
-                <Route
-                    path="/login"
-                    element={
-                        <PublicRoute>
-                            <LoginPage />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/"
-                    element={
-                        <ProtectedRoute>
-                            <MainLayout />
-                        </ProtectedRoute>
-                    }
-                >
-                    <Route index element={<DashboardPage />} />
-                    {isAdmin && <Route path="users" element={<UsersPage />} />}
-                    <Route path="products" element={<ProductsPage />} />
-                    <Route path="products/create" element={<ProductsPage />} />
-                    <Route
-                        path="products/update/:id"
-                        element={<ProductsPage />}
-                    />
-                    <Route path="products/:id" element={<ProductsPage />} />
-                    {isAdmin && <Route path="categories" element={<CategoriesPage />} />}
-                    {isAdmin && <Route
-                        path="categories/create"
-                        element={<CategoriesPage />}
-                    />}
-                    {isAdmin && <Route
-                        path="categories/update/:id"
-                        element={<CategoriesPage />}
-                    />}
-                    {isAdmin && <Route path="categories/:id" element={<CategoriesPage />} />}
-                    <Route path="import" element={<ImportsPage />} />
-                    <Route path="import/create" element={<ImportsPage />} />
-                    <Route path="import/update/:id" element={<ImportsPage />} />
-                    <Route path="import/:id" element={<ImportsPage />} />
-                    <Route path="export" element={<ExportsPage />} />
-                    <Route path="export/create" element={<ExportsPage />} />
-                    <Route path="export/update/:id" element={<ExportsPage />} />
-                    <Route path="export/:id" element={<ExportsPage />} />
-                    {isAdmin && <Route path="approve" element={<ApprovePage />} />}
-                    <Route path="inventory" element={<InventoryPage />} />
-                    <Route path="suppliers" element={<SuppliersPage />} />
-                    <Route path="suppliers/:id" element={<SuppliersPage />} />
-                    <Route path="customers" element={<CustomersPage />} />
-                    <Route path="customers/:id" element={<CustomersPage />} />
-                    {isAdmin && <Route path="reports" element={<ReportsPage />} />}
-                    <Route path="profile" element={<ProfilePage />} />
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Route>
-            </Routes>
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<Loading text="Đang tải giao diện..." />}>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DashboardPage />} />
+          {isAdmin && <Route path="users" element={<UsersPage />} />}
+          <Route path="products" element={<ProductsPage />} />
+          <Route path="products/create" element={<ProductsPage />} />
+          <Route path="products/update/:id" element={<ProductsPage />} />
+          <Route path="products/:id" element={<ProductsPage />} />
+          {isAdmin && <Route path="categories" element={<CategoriesPage />} />}
+          {isAdmin && (
+            <Route path="categories/create" element={<CategoriesPage />} />
+          )}
+          {isAdmin && (
+            <Route path="categories/update/:id" element={<CategoriesPage />} />
+          )}
+          {isAdmin && (
+            <Route path="categories/:id" element={<CategoriesPage />} />
+          )}
+          <Route path="import" element={<ImportsPage />} />
+          <Route path="import/create" element={<ImportsPage />} />
+          <Route path="import/update/:id" element={<ImportsPage />} />
+          <Route path="import/:id" element={<ImportsPage />} />
+          <Route path="export" element={<ExportsPage />} />
+          <Route path="export/create" element={<ExportsPage />} />
+          <Route path="export/update/:id" element={<ExportsPage />} />
+          <Route path="export/:id" element={<ExportsPage />} />
+          {isAdmin && <Route path="approve" element={<ApprovePage />} />}
+          <Route path="inventory" element={<InventoryPage />} />
+          <Route path="suppliers" element={<SuppliersPage />} />
+          <Route path="suppliers/:id" element={<SuppliersPage />} />
+          <Route path="customers" element={<CustomersPage />} />
+          <Route path="customers/:id" element={<CustomersPage />} />
+          {isAdmin && <Route path="reports" element={<ReportsPage />} />}
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </Suspense>
+  );
 }

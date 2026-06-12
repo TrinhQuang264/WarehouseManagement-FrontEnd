@@ -1,3 +1,5 @@
+import "../../imports/styles/Imports.css";
+
 export default function ReceiptStats({ stats, config }) {
   return (
     <div className="imports-stats-grid">

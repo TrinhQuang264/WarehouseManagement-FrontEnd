@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { useAuth } from '../../features/auth/hooks/useAuth.jsx';
@@ -6,6 +6,8 @@ import ToastContainer from '../ui/ToastContainer';
 
 export default function MainLayout() {
   const { user, logout } = useAuth();
+  const location = useLocation();
+  const isDashboard = location.pathname === '/';
 
   return (
     <div className="layout-wrapper">
@@ -17,8 +19,8 @@ export default function MainLayout() {
 
       {/* Khu vực chính (Header + Content) */}
       <main className="main-content">
-        {/* Header dính trên */}
-        <Header />
+        {/* Header dính trên (Ẩn ở trang Dashboard) */}
+        {!isDashboard && <Header />}
 
         {/* Nội dung trang — được render bởi react-router */}
         <div className="page-container">

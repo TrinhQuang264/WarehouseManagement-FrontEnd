@@ -6,6 +6,7 @@ import {
   useContext,
 } from "react";
 import authService from "../api/authService";
+import { decodeJWT } from "../../../utils/jwt";
 
 const AuthContext = createContext(null);
 
@@ -14,6 +15,37 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Silent Refresh Scheduler
+  useEffect(() => {
+    const checkAndRefreshToken = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      const decoded = decodeJWT(token);
+      if (!decoded || !decoded.exp) return;
+
+      const expirationTime = decoded.exp * 1000; // exp in seconds
+      const currentTime = Date.now();
+      const timeRemaining = expirationTime - currentTime;
+
+      // Nếu token còn hạn ít hơn 1.5 phút (90000ms), tự động refresh ngầm
+      if (timeRemaining > 0 && timeRemaining < 90000) {
+        console.log("[Silent Refresh] Access Token sắp hết hạn, đang làm mới ngầm...");
+        try {
+          await authService.refreshToken();
+        } catch (err) {
+          console.warn("[Silent Refresh] Không thể làm mới token ngầm:", err.message);
+        }
+      }
+    };
+
+    // Chạy kiểm tra định kỳ mỗi 15 giây
+    const interval = setInterval(checkAndRefreshToken, 15000);
+    checkAndRefreshToken(); // Kiểm tra ngay lập tức khi load app
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   useEffect(() => {
     const storedUser = authService.getStoredUser();

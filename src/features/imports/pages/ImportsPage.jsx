@@ -97,7 +97,6 @@ export default function ImportsPage() {
     setCurrentPage,
     totalCount,
     pageSize,
-    totalPages,
   } = useImports();
 
   const { setActionButton, setExtraActions, setOnSearch, setTitle, setSubtitle, resetHeader } =

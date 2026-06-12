@@ -264,7 +264,6 @@ export default function CustomersPage() {
         loading={loading}
         onEdit={openEditModal}
         onDelete={openDeleteModal}
-        onViewDetail={(customer) => navigate(CUSTOMER_URLS.detail(customer.id))}
         showDelete={isAdmin}
       />
 

@@ -73,15 +73,24 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
       hasError = true;
     }
 
+    if (!formData.fullName) {
+      formErrors.fullName = 'Họ và tên không được bỏ trống';
+      hasError = true;
+    }
+
     if (hasError) {
       setErrors(formErrors);
       toast.error('Vui lòng kiểm tra lại thông tin không hợp lệ.');
       return;
     }
 
+    const nameParts = formData.fullName.trim().split(/\s+/);
+    const firstName = nameParts.pop() || "";
+    const lastName = nameParts.join(" ") || "";
+
     const apiData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
+      firstName,
+      lastName,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
     };
@@ -99,7 +108,7 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
       const updatedUser = {
         ...currentStored,
         ...apiData,
-        fullName: `${formData.lastName} ${formData.firstName}`.trim() || currentStored?.userName,
+        fullName: formData.fullName.trim() || currentStored?.userName,
       };
       updateUser(updatedUser);
     }
@@ -143,29 +152,16 @@ export default function ProfileInfo({ profile, authUser, userId, updateUser, han
                   />
                 </>
               ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="profile-input-group mb-0">
-                    <label className="profile-label">Họ</label>
-                    <input
-                      name="lastName"
-                      className="profile-input profile-input-editable"
-                      type="text"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      placeholder="Họ"
-                    />
-                  </div>
-                  <div className="profile-input-group mb-0">
-                    <label className="profile-label">Tên</label>
-                    <input
-                      name="firstName"
-                      className="profile-input profile-input-editable"
-                      type="text"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      placeholder="Tên"
-                    />
-                  </div>
+                <div className="profile-input-group mb-0">
+                  <label className="profile-label">Họ và tên</label>
+                  <input
+                    name="fullName"
+                    className="profile-input profile-input-editable"
+                    type="text"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    placeholder="Họ và tên"
+                  />
                 </div>
               )}
             </div>

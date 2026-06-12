@@ -1,80 +1,28 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../../components/ui/ConfirmModal";
 import Breadcrumbs from "../../../components/ui/Breadcrumbs";
 import PaginationBar from "../../../components/ui/PaginationBar";
 import TrashBinDrawer from "../../../components/ui/TrashBinDrawer";
 import SupplierTable from "../components/SupplierTable";
 import SupplierModal from "../components/SupplierModal";
-import SupplierDetailPage from "./SupplierDetailPage.jsx";
 import { useSuppliers } from "../hooks/useSuppliers.jsx";
 import { useHeader } from "../../../contexts/HeaderContext";
 import { useAuth } from "../../auth/hooks/useAuth.jsx";
 import suppliersService from "../api/suppliersService";
-import {
-  COMMON_URLS,
-  IMPORT_URLS,
-  SUPPLIER_URLS,
-} from "../../../constants/urls.js";
+import { SUPPLIER_URLS } from "../../../constants/urls.js";
 import "../styles/Suppliers.css";
-
-function buildSupplierHistory(supplierId) {
-  const base = [
-    {
-      id: 1,
-      code: "PN-2024-001",
-      dateLabel: "14/03/2024",
-      totalAmount: 45000000,
-      status: "completed",
-      statusLabel: "Hoàn thành",
-    },
-    {
-      id: 2,
-      code: "PN-2024-005",
-      dateLabel: "10/03/2024",
-      totalAmount: 120000000,
-      status: "pending",
-      statusLabel: "Chờ thanh toán",
-    },
-    {
-      id: 3,
-      code: "PN-2024-012",
-      dateLabel: "02/03/2024",
-      totalAmount: 12500000,
-      status: "completed",
-      statusLabel: "Hoàn thành",
-    },
-    {
-      id: 4,
-      code: "PN-2023-998",
-      dateLabel: "25/02/2024",
-      totalAmount: 88200000,
-      status: "completed",
-      statusLabel: "Hoàn thành",
-    },
-  ];
-  return base.map((item, index) => ({
-    ...item,
-    id: `${supplierId}-${item.id}`,
-    totalAmount: item.totalAmount + supplierId * 220000 * index,
-    href: IMPORT_URLS.detail(index + 1),
-  }));
-}
 
 export default function SuppliersPage() {
   const { user } = useAuth();
   const isAdmin = user?.role?.toLowerCase() === "admin";
   const navigate = useNavigate();
-  const location = useLocation();
-  const params = useParams();
   const {
     suppliers,
-    allActiveSuppliers,
     loading,
     isSubmitting,
     isFirstFetch,
-    search,
     setSearch,
     currentPage,
     setCurrentPage,
@@ -103,29 +51,20 @@ export default function SuppliersPage() {
     setTitle,
     resetHeader,
   } = useHeader();
-  const isDetailMode =
-    location.pathname !== SUPPLIER_URLS.list && Boolean(params.id);
-  const currentSupplier = useMemo(
-    () =>
-      allActiveSuppliers.find(
-        (supplier) => String(supplier.id) === String(params.id),
-      ) || null,
-    [allActiveSuppliers, params.id],
-  );
-  const supplierHistory = useMemo(
-    () => (currentSupplier ? buildSupplierHistory(currentSupplier.id) : []),
-    [currentSupplier],
-  );
+
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedSupplier(null);
   }, [setIsModalOpen, setSelectedSupplier]);
+
   const openCreateModal = useCallback(() => {
     setSelectedSupplier(null);
     setIsModalOpen(true);
   }, [setIsModalOpen, setSelectedSupplier]);
+
   const closeTrash = useCallback(() => setIsTrashOpen(false), [setIsTrashOpen]);
   const openTrash = useCallback(() => setIsTrashOpen(true), [setIsTrashOpen]);
+
   const handleSaveSupplier = useCallback(
     (data) => {
       if (selectedSupplier)
@@ -134,69 +73,33 @@ export default function SuppliersPage() {
     },
     [handleAddSupplier, handleUpdateSupplier, selectedSupplier],
   );
-  const handleSaveDetailSupplier = useCallback(
-    (data) => handleUpdateSupplier(selectedSupplier?.id, data),
-    [handleUpdateSupplier, selectedSupplier],
-  );
-  const handleViewDetail = useCallback(
-    (supplier) => navigate(SUPPLIER_URLS.detail(supplier.id)),
-    [navigate],
-  );
 
   useEffect(() => {
-    if (isDetailMode) {
-      setActionButton({
-        label: "Chỉnh sửa",
-        onClick: () => openEditModal(currentSupplier),
-        className: "shadow-lg shadow-primary/20",
-      });
-      setExtraActions([
-        {
-          label: "Phiếu nhập mới",
-          icon: <Plus size={18} />,
-          onClick: () => {
-            navigate(IMPORT_URLS.new, {
-              state: { supplierId: currentSupplier?.id },
-            });
-          },
-          className: "shadow-lg shadow-primary/20 bg-primary text-white",
-        },
-      ]);
-      setOnSearch(null);
-      setTitle(
-        currentSupplier
-          ? `Chi tiết nhà cung cấp: ${currentSupplier.supplierName}`
-          : "Chi tiết nhà cung cấp",
-      );
-    } else {
-      setActionButton({
-        label: "Thêm nhà cung cấp",
-        icon: <Plus size={18} />,
-        onClick: () => {
-          openCreateModal();
-        },
-        searchPlaceholder: "Tìm kiếm nhà cung cấp...",
-        className: "shadow-lg shadow-primary/20",
-      });
-      setExtraActions(
-        isAdmin
-          ? [
-              {
-                label: "Thùng rác",
-                icon: <Trash2 size={18} />,
-                onClick: openTrash,
-                variant: "danger",
-              },
-            ]
-          : []
-      );
-      setOnSearch(() => setSearch);
-      setTitle("");
-    }
+    setActionButton({
+      label: "Thêm nhà cung cấp",
+      icon: <Plus size={18} />,
+      onClick: () => {
+        openCreateModal();
+      },
+      searchPlaceholder: "Tìm kiếm nhà cung cấp...",
+      className: "shadow-lg shadow-primary/20",
+    });
+    setExtraActions(
+      isAdmin
+        ? [
+            {
+              label: "Thùng rác",
+              icon: <Trash2 size={18} />,
+              onClick: openTrash,
+              variant: "danger",
+            },
+          ]
+        : []
+    );
+    setOnSearch(() => setSearch);
+    setTitle("");
     return () => resetHeader();
   }, [
-    isDetailMode,
-    currentSupplier,
     setActionButton,
     setExtraActions,
     setOnSearch,
@@ -208,6 +111,7 @@ export default function SuppliersPage() {
     setSearch,
     openCreateModal,
     openTrash,
+    isAdmin,
   ]);
 
   if (isFirstFetch && loading) {
@@ -215,53 +119,6 @@ export default function SuppliersPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
-    );
-  }
-
-  if (isDetailMode) {
-    if (!currentSupplier) {
-      return (
-        <div className="suppliers-page">
-          <div className="page-header">
-            <nav className="flex text-sm text-slate-500 mb-2">
-              <Link
-                to={COMMON_URLS.dashboard}
-                className="hover:text-primary transition-colors"
-              >
-                Tổng quan
-              </Link>
-              <span className="mx-2 text-slate-300">/</span>
-              <Link
-                to={SUPPLIER_URLS.list}
-                className="hover:text-primary transition-colors"
-              >
-                Nhà cung cấp
-              </Link>
-              <span className="mx-2 text-slate-300">/</span>
-              <span className="text-slate-900 font-medium">Không tìm thấy</span>
-            </nav>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500 shadow-sm">
-            Nhà cung cấp không tồn tại hoặc đã bị xóa.
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <>
-        <SupplierDetailPage
-          supplier={currentSupplier}
-          history={supplierHistory}
-          onEdit={openEditModal}
-        />
-        <SupplierModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onSave={handleSaveDetailSupplier}
-          editingSupplier={selectedSupplier}
-        />
-      </>
     );
   }
 
@@ -277,7 +134,6 @@ export default function SuppliersPage() {
           loading={loading}
           onEdit={openEditModal}
           onDelete={openDeleteModal}
-          onViewDetail={handleViewDetail}
           showDelete={isAdmin}
         />
 

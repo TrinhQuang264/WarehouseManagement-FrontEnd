@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Loading from "../../../components/ui/Loading";
 import { useHeader } from "../../../contexts/HeaderContext";
 import { useUsers } from "../hooks/useUsers.jsx";
+import { useAuth } from "../../auth/hooks/useAuth.jsx";
 import UsersPageLayout from "../components/UsersPageLayout";
 import UserAccountModal from "../components/UserAccountModal";
 import { ROLE_LABEL_TO_ID } from "../utils/roleUtils";
@@ -12,8 +13,7 @@ import "../styles/Users.css";
 const EMPTY_FORM = {
   email: "",
   phoneNumber: "",
-  firstName: "",
-  lastName: "",
+  fullName: "",
   userName: "",
   password: "",
 };
@@ -21,6 +21,7 @@ const EMPTY_FORM = {
 export default function UsersPage() {
   const { users, loading, setSearch, currentPage, setCurrentPage, totalUsers, pageSize, roles, createUserWithRoles, updateUserAccount, updateUserActive, updateUserRoles, deleteUser, userRolesMap } = useUsers();
   const { setActionButton, setOnSearch, resetHeader } = useHeader();
+  const { user: currentUser } = useAuth();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -51,11 +52,11 @@ export default function UsersPage() {
 
     setSelectedUser(user);
     setCheckedRoles(Array.isArray(currentRoles) && currentRoles.length ? [currentRoles[0]] : [fallbackRole]);
+    
     setEditForm({
       email: user.email || "",
       phoneNumber: user.phoneNumber || "",
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
+      fullName: user.fullName || "",
       userName: user.userName || user.username || "",
       password: "",
     });
@@ -63,13 +64,26 @@ export default function UsersPage() {
   };
 
   const handleCreate = async () => {
-    if (!createForm.email || !createForm.userName || !createForm.password) {
-      toast.error("Email, tên đăng nhập, mật khẩu là bắt buộc.");
+    if (!createForm.email || !createForm.userName || !createForm.password || !createForm.fullName) {
+      toast.error("Họ và tên, Email, tên đăng nhập, mật khẩu là bắt buộc.");
       return;
     }
     setSaving(true);
     try {
-      await createUserWithRoles(createForm, checkedRoles.length ? checkedRoles : ["User"]);
+      const nameParts = createForm.fullName.trim().split(/\s+/);
+      const firstName = nameParts.pop() || "";
+      const lastName = nameParts.join(" ") || "";
+
+      const payload = {
+        email: createForm.email,
+        phoneNumber: createForm.phoneNumber,
+        userName: createForm.userName,
+        password: createForm.password,
+        firstName,
+        lastName,
+      };
+
+      await createUserWithRoles(payload, checkedRoles.length ? checkedRoles : ["User"]);
       setCreateForm(EMPTY_FORM);
       setCheckedRoles(["User"]);
       setIsCreateOpen(false);
@@ -82,14 +96,22 @@ export default function UsersPage() {
 
   const handleUpdate = async () => {
     if (!selectedUser?.id) return;
+    if (!editForm.fullName) {
+      toast.error("Họ và tên là bắt buộc.");
+      return;
+    }
     setSaving(true);
     try {
+      const nameParts = editForm.fullName.trim().split(/\s+/);
+      const firstName = nameParts.pop() || "";
+      const lastName = nameParts.join(" ") || "";
+
       // Update account profile fields; password is optional when not provided.
       const payload = {
         email: editForm.email,
         phoneNumber: editForm.phoneNumber,
-        firstName: editForm.firstName,
-        lastName: editForm.lastName,
+        firstName,
+        lastName,
         userName: editForm.userName,
       };
       if (editForm.password) payload.password = editForm.password;
@@ -106,6 +128,13 @@ export default function UsersPage() {
 
   const handleToggleActive = async (user) => {
     if (!user?.id) return;
+    
+    // Check if user is locking their own account
+    if (currentUser && String(user.id) === String(currentUser.id)) {
+      toast.error("Bạn không thể tự khóa tài khoản của chính mình!");
+      return;
+    }
+
     const message = user.isActive
       ? `Bạn có muốn mở khoá tài khoản "${user.fullName}" không?`
       : `Bạn có muốn khoá tài khoản "${user.fullName}" không?`;
@@ -126,6 +155,13 @@ export default function UsersPage() {
 
   const handleDelete = async () => {
     if (!selectedUser?.id) return;
+
+    // Check if user is deleting their own account
+    if (currentUser && String(selectedUser.id) === String(currentUser.id)) {
+      toast.error("Bạn không thể tự xóa tài khoản của chính mình!");
+      return;
+    }
+
     if (!window.confirm(`Xóa tài khoản "${selectedUser.fullName}"?`)) return;
     setSaving(true);
     try {

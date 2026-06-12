@@ -44,16 +44,8 @@ const DATE_RANGE_FILTERS = {
   },
 };
 
-function formatUserName(user) {
-  if (!user) return "Chưa gán";
-  return (
-    `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-    user.userName ||
-    "Chưa gán"
-  );
-}
 
-function buildEmptyReceipt(products) {
+function buildEmptyReceipt() {
   return {
     id: null,
     code: "NK-DRAFT",
@@ -298,8 +290,8 @@ export function useImports() {
   );
 
   const createEmptyReceipt = useCallback(
-    () => buildEmptyReceipt(products),
-    [products],
+    () => buildEmptyReceipt(),
+    [],
   );
 
   const deleteReceipt = useCallback(async (id) => {

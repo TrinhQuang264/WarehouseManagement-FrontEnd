@@ -1,5 +1,5 @@
 import React from "react";
-import { Edit, Eye, Trash2, User } from "lucide-react";
+import { Edit, Trash2, User } from "lucide-react";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
 
 export default function CustomerTable({
@@ -7,7 +7,6 @@ export default function CustomerTable({
   loading,
   onEdit,
   onDelete,
-  onViewDetail,
   showDelete = true,
 }) {
   return (
@@ -58,13 +57,6 @@ export default function CustomerTable({
                   </td>
                   <td className="px-6 py-4 text-center">
                     <div className="action-buttons-group items-center justify-center gap-2 ">
-                      <button
-                        onClick={() => onViewDetail?.(customer)}
-                        className="action-btn text-slate-400 hover:text-primary"
-                        title="Chi tiết"
-                      >
-                        <Eye size={18} />
-                      </button>
                       <button
                         onClick={() => onEdit(customer)}
                         className="action-btn text-slate-400 hover:text-primary"
