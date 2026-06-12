@@ -287,11 +287,15 @@ export function useExports() {
     [products],
   );
 
-  const deleteReceipt = useCallback((id) => {
-    setReceipts((prev) =>
-      prev.filter((receipt) => String(receipt.id) !== String(id)),
-    );
-  }, []);
+  const deleteReceipt = useCallback(async (id) => {
+    try {
+      await purchasesService.softDelete(id);
+      await fetchData();
+    } catch (error) {
+      console.error("Error deleting export receipt:", error);
+      throw error;
+    }
+  }, [fetchData]);
 
   const createReceipt = async (receiptData, { submit = false } = {}) => {
     const customer = customers.find(

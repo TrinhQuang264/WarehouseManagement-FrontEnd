@@ -209,6 +209,14 @@ export default function Sidebar({ user, onLogout }) {
 
   const toggleCollapse = useCallback(() => setCollapsed((prev) => !prev), []);
 
+  const isAdmin = user?.role?.toLowerCase() === "admin";
+  const filteredMainMenu = mainMenu.filter(
+    (item) => isAdmin || item.to !== "/approve"
+  );
+  const filteredManagerMenu = managerMenu.filter(
+    (item) => isAdmin || item.to !== "/categories"
+  );
+
   const shellClass = [
     "sidebar",
     "sidebar-shell",
@@ -245,7 +253,7 @@ export default function Sidebar({ user, onLogout }) {
       {/* ── EXPANDED ── */}
       <div className="sidebar-expanded-content">
         <nav className="sidebar-nav" style={{ flex: 1, overflowY: "auto" }}>
-          {mainMenu.map((item) => (
+          {filteredMainMenu.map((item) => (
             <SidebarLink key={item.to} item={item} />
           ))}
 
@@ -264,26 +272,30 @@ export default function Sidebar({ user, onLogout }) {
             </span>
           </div>
           {expandedSections.manager &&
-            managerMenu.map((item) => (
+            filteredManagerMenu.map((item) => (
               <SidebarLink key={item.to} item={item} />
             ))}
 
-          <div
-            className="sidebar-section-title flex justify-between items-center cursor-pointer"
-            onClick={() => toggleSection("system")}
-            aria-expanded={expandedSections.system}
-          >
-            <span>Hệ thống</span>
-            <span className="icon-box">
-              {expandedSections.system ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              )}
-            </span>
-          </div>
-          {expandedSections.system &&
-            systemMenu.map((item) => <SidebarLink key={item.to} item={item} />)}
+          {isAdmin && (
+            <>
+              <div
+                className="sidebar-section-title flex justify-between items-center cursor-pointer"
+                onClick={() => toggleSection("system")}
+                aria-expanded={expandedSections.system}
+              >
+                <span>Hệ thống</span>
+                <span className="icon-box">
+                  {expandedSections.system ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronRight size={16} />
+                  )}
+                </span>
+              </div>
+              {expandedSections.system &&
+                systemMenu.map((item) => <SidebarLink key={item.to} item={item} />)}
+            </>
+          )}
         </nav>
 
         {/* User info */}
@@ -313,7 +325,7 @@ export default function Sidebar({ user, onLogout }) {
                     "Người dùng"}
                 </p>
                 <p className="text-xs text-slate-500 truncate">
-                  {user?.role || "Nhân viên"}
+                  {user?.role?.toLowerCase() === 'admin' ? 'Quản lý kho' : 'Nhân viên kho'}
                 </p>
               </div>
             </NavLink>
@@ -332,17 +344,21 @@ export default function Sidebar({ user, onLogout }) {
       {/* ── COLLAPSED ── */}
       <div className="sidebar-collapsed-content">
         <div className="sidebar-divider" />
-        {mainMenu.map((item) => (
+        {filteredMainMenu.map((item) => (
           <CollapsedLink key={item.to} item={item} />
         ))}
         <div className="sidebar-divider" />
-        {managerMenu.map((item) => (
+        {filteredManagerMenu.map((item) => (
           <CollapsedLink key={item.to} item={item} />
         ))}
-        <div className="sidebar-divider" />
-        {systemMenu.map((item) => (
-          <CollapsedLink key={item.to} item={item} />
-        ))}
+        {isAdmin && (
+          <>
+            <div className="sidebar-divider" />
+            {systemMenu.map((item) => (
+              <CollapsedLink key={item.to} item={item} />
+            ))}
+          </>
+        )}
         <div className="sidebar-spacer" />
         <div className="sidebar-divider" />
         <CollapsedProfile user={user} />

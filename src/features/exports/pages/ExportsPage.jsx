@@ -1,10 +1,12 @@
-import { Edit3, FileText, Plus, Printer } from "lucide-react";
+import { Edit3, FileText, Plus, Printer, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Breadcrumbs from "../../../components/ui/Breadcrumbs.jsx";
 import Button from "../../../components/ui/Button.jsx";
 import ConfirmModal from "../../../components/ui/ConfirmModal.jsx";
 import { useHeader } from "../../../contexts/HeaderContext.jsx";
+import TrashBinDrawer from "../../../components/ui/TrashBinDrawer.jsx";
+import purchasesService from "../../imports/api/purchasesService.js";
 import { COMMON_URLS, EXPORT_URLS } from "../../../constants/urls.js";
 import { toast } from "../../../utils/toast.js";
 import ExportFilters from "../components/ExportFilters.jsx";
@@ -15,6 +17,7 @@ import ExportReceiptForm from "../components/ExportReceiptForm.jsx";
 import ExportStats from "../components/ExportStats.jsx";
 import ExportTable from "../components/ExportTable.jsx";
 import { useExports } from "../hooks/useExports.jsx";
+import { useAuth } from "../../auth/hooks/useAuth.jsx";
 import "../styles/Exports.css";
 
 function getEditBasePath() {
@@ -63,6 +66,8 @@ function hydrateReceipt(receipt, products) {
 }
 
 export default function ExportsPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
@@ -92,7 +97,7 @@ export default function ExportsPage() {
     pageSize,
     totalPages,
   } = useExports();
-  const { setActionButton, setOnSearch, setTitle, setSubtitle, resetHeader } =
+  const { setActionButton, setExtraActions, setOnSearch, setTitle, setSubtitle, resetHeader } =
     useHeader();
 
   const isAddMode = location.pathname === EXPORT_URLS.new;
@@ -140,6 +145,9 @@ export default function ExportsPage() {
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPaperView, setIsPaperView] = useState(true);
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
+  const closeTrash = useCallback(() => setIsTrashOpen(false), []);
+  const openTrash = useCallback(() => setIsTrashOpen(true), []);
 
   useEffect(() => {
     if (isFormMode) {
@@ -218,6 +226,7 @@ export default function ExportsPage() {
           </div>
         ),
       });
+      setExtraActions([]);
       setOnSearch(null);
       setTitle(pageTitle);
       setSubtitle(
@@ -225,6 +234,7 @@ export default function ExportsPage() {
       );
     } else if (isFormMode) {
       setActionButton(null);
+      setExtraActions([]);
       setOnSearch(null);
       setTitle(pageTitle);
       setSubtitle("");
@@ -237,6 +247,18 @@ export default function ExportsPage() {
         className:
           "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
       });
+      setExtraActions(
+        isAdmin
+          ? [
+              {
+                label: "Thùng rác",
+                icon: <Trash2 size={18} />,
+                onClick: openTrash,
+                className: "border border-red-200 text-red-600 hover:bg-red-50",
+              },
+            ]
+          : []
+      );
       setOnSearch(() => setSearch);
       setTitle("");
       setSubtitle("");
@@ -247,6 +269,7 @@ export default function ExportsPage() {
     isDetailMode,
     pageTitle,
     setActionButton,
+    setExtraActions,
     setOnSearch,
     setTitle,
     setSubtitle,
@@ -256,6 +279,7 @@ export default function ExportsPage() {
     sourceReceipt,
     handlePreviewPdf,
     handlePrintReceipt,
+    openTrash,
   ]);
 
   const openEdit = useCallback(
@@ -271,14 +295,14 @@ export default function ExportsPage() {
     setDeleteConfirm({ isOpen: true, receipt });
   }, []);
 
-  const handleDeleteConfirm = useCallback(() => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!deleteConfirm.receipt) return;
     setIsDeleting(true);
     try {
-      deleteReceipt(deleteConfirm.receipt.id);
+      await deleteReceipt(deleteConfirm.receipt.id);
       setDeleteConfirm({ isOpen: false, receipt: null });
       toast.success(
-        `Xóa phiếu xuất "${deleteConfirm.receipt.code}" thành công.`,
+        `Xóa phiếu xuất "${deleteConfirm.receipt.code}" thành công. Dữ liệu đã được chuyển vào thùng rác.`,
       );
     } catch (error) {
       console.error("[ExportsPage] Error deleting receipt:", error);
@@ -585,7 +609,7 @@ export default function ExportsPage() {
           ]}
         />
       </div>
-      <ExportStats stats={stats} />
+      {isAdmin && <ExportStats stats={stats} />}
       <section className="imports-table-section">
         <ExportFilters
           customers={customers}
@@ -602,6 +626,8 @@ export default function ExportsPage() {
           onViewDetail={openDetail}
           onDelete={handleDeleteClick}
           onSubmit={submitReceipt}
+          showDelete={isAdmin}
+          isAdmin={isAdmin}
         />
       </section>
       <ExportPagination
@@ -616,10 +642,19 @@ export default function ExportsPage() {
         onClose={() => setDeleteConfirm({ isOpen: false, receipt: null })}
         onConfirm={handleDeleteConfirm}
         title="Xác nhận xóa phiếu xuất"
-        message={`Bạn có chắc chắn muốn xóa phiếu xuất "${deleteConfirm.receipt?.code}"? Hành động này không thể hoàn tác.`}
+        message={`Bạn có chắc chắn muốn xóa phiếu xuất "${deleteConfirm.receipt?.code}"? Dữ liệu sẽ được chuyển vào thùng rác.`}
         confirmLabel="Xóa"
         loading={isDeleting}
         variant="danger"
+      />
+
+      <TrashBinDrawer
+        isOpen={isTrashOpen}
+        onClose={closeTrash}
+        title="Thùng rác phiếu xuất kho"
+        service={purchasesService}
+        onDataChange={refreshList}
+        filterItems={(item) => item.type === 2 || item.receiptCode?.startsWith("SO")}
       />
     </div>
   );

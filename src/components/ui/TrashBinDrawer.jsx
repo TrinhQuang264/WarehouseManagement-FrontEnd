@@ -13,6 +13,7 @@ export default function TrashBinDrawer({
   service,
   columns = [],
   onDataChange, // Callback when data is restored or deleted
+  filterItems, // Callback to filter items on client side
 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,15 +33,21 @@ export default function TrashBinDrawer({
         response.data ||
         (Array.isArray(response) ? response : []);
 
+      // Filter items if filterItems is provided
+      if (filterItems) {
+        trashItems = trashItems.filter(filterItems);
+      }
+
       // Vẫn áp dụng tìm kiếm trong thùng rác (Client-side)
       if (search) {
         const searchLower = search.toLowerCase();
         trashItems = trashItems.filter((item) => {
           const itemName =
-            item.name || item.fullName || item.supplierName || "";
+            item.name || item.fullName || item.supplierName || item.customerName || "";
           return (
             itemName.toLowerCase().includes(searchLower) ||
-            (item.code && item.code.toLowerCase().includes(searchLower))
+            (item.code && item.code.toLowerCase().includes(searchLower)) ||
+            (item.receiptCode && item.receiptCode.toLowerCase().includes(searchLower))
           );
         });
       }
@@ -163,9 +170,11 @@ export default function TrashBinDrawer({
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-bold text-slate-900 truncate">
                           {idx + 1}.{" "}
-                          {item.name ||
+                          {item.receiptCode ||
+                            item.name ||
                             item.fullName ||
                             item.supplierName ||
+                            item.customerName ||
                             item.code}
                         </span>
                       </div>

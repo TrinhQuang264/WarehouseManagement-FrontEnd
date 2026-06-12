@@ -19,6 +19,7 @@ export default function ReceiptFilters({
   setSelectedStatus,
   selectedDateRange,
   setSelectedDateRange,
+  showStatusFilter = true,
 }) {
   const dateInputRef = useRef(null);
 
@@ -124,17 +125,19 @@ export default function ReceiptFilters({
           ))}
         </select>
 
-        <select
-          className="imports-select"
-          value={selectedStatus}
-          onChange={(event) => setSelectedStatus(event.target.value)}
-        >
-          {statusOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        {showStatusFilter && (
+          <select
+            className="imports-select"
+            value={selectedStatus}
+            onChange={(event) => setSelectedStatus(event.target.value)}
+          >
+            {statusOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
     </div>
   );

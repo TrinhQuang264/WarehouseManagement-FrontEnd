@@ -31,6 +31,9 @@ export default function ReceiptTable({
   partyNameKey,
   dateColumnLabel,
   emptyMessage,
+  showDelete = true,
+  showStatus = true,
+  isAdmin = true,
 }) {
   return (
     <DataTableCard className="relative min-h-[470px] flex flex-col">
@@ -43,7 +46,7 @@ export default function ReceiptTable({
               <th className="table-th px-6">{dateColumnLabel}</th>
               <th className="table-th px-6 text-center">Số lượng</th>
               <th className="table-th px-6 text-center">Tổng tiền</th>
-              <th className="table-th px-6">Trạng thái</th>
+              {showStatus && <th className="table-th px-6">Trạng thái</th>}
               <th className="table-th px-6 text-center">Thao tác</th>
             </tr>
           </thead>
@@ -83,13 +86,19 @@ export default function ReceiptTable({
                   <td className="px-6 py-4 text-right text-sm font-bold text-slate-900">
                     {formatCurrency(receipt.totalAmount)}
                   </td>
-                  <td className="px-6 py-4">
-                    <Badge variant={STATUS_VARIANTS[receipt.status] || "gray"}>
-                      {receipt.statusLabel}
-                    </Badge>
-                  </td>
+                  {showStatus && (
+                    <td className="px-6 py-4">
+                      <Badge variant={STATUS_VARIANTS[receipt.status] || "gray"}>
+                        {receipt.statusLabel}
+                      </Badge>
+                    </td>
+                  )}
                   <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    {(() => {
+                      const isDraft = receipt.status === 'draft' || receipt.status === 0 || receipt.status === '0';
+                      const canModify = isAdmin || isDraft;
+                      return (
+                        <div className="flex items-center justify-end gap-2">
                       <button
                         type="button"
                         onClick={(event) => {
@@ -101,20 +110,20 @@ export default function ReceiptTable({
                       >
                         <Eye size={18} />
                       </button>
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onEdit?.(receipt);
-                        }}
-                        className="action-btn text-slate-400 hover:text-primary"
-                        title="Chỉnh sửa"
-                      >
-                        <Edit size={18} />
-                      </button>
-                      {(receipt.status === "draft" ||
-                        receipt.status === 0 ||
-                        receipt.status === "0") &&
+                      {canModify && (
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onEdit?.(receipt);
+                          }}
+                          className="action-btn text-slate-400 hover:text-primary"
+                          title="Chỉnh sửa"
+                        >
+                          <Edit size={18} />
+                        </button>
+                      )}
+                      {isDraft &&
                         onSubmit && (
                           <button
                             type="button"
@@ -129,19 +138,23 @@ export default function ReceiptTable({
                             Gửi duyệt
                           </button>
                         )}
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onDelete?.(receipt);
-                        }}
-                        className="action-btn text-slate-400 hover:text-red-500"
-                        title="Xóa"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      {showDelete && canModify && (
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onDelete?.(receipt);
+                          }}
+                          className="action-btn text-slate-400 hover:text-red-500"
+                          title="Xóa"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
-                  </td>
+                  );
+                })()}
+              </td>
                 </tr>
               ))
             ) : (

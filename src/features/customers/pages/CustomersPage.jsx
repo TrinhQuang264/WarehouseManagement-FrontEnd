@@ -8,6 +8,7 @@ import CustomerModal from "../components/CustomerModal.jsx";
 import CustomerDetailPage from "../components/CustomerDetailPage.jsx";
 import { useCustomers } from "../hooks/useCustomers.jsx";
 import { useHeader } from "../../../contexts/HeaderContext.jsx";
+import { useAuth } from "../../auth/hooks/useAuth.jsx";
 import TrashBinDrawer from "../../../components/ui/TrashBinDrawer.jsx";
 import customersService from "../api/customersService.js";
 import {
@@ -69,6 +70,8 @@ function buildCustomerHistory(customerId) {
 }
 
 export default function CustomersPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
@@ -160,14 +163,18 @@ export default function CustomersPage() {
         className:
           "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
       });
-      setExtraActions([
-        {
-          label: "Thùng rác",
-          icon: <Trash2 size={18} />,
-          onClick: openTrash,
-          className: "bg-red-500 text-red-600 hover:bg-red-300",
-        },
-      ]);
+      setExtraActions(
+        isAdmin
+          ? [
+              {
+                label: "Thùng rác",
+                icon: <Trash2 size={18} />,
+                onClick: openTrash,
+                className: "bg-red-500 text-red-600 hover:bg-red-300",
+              },
+            ]
+          : []
+      );
       setOnSearch(() => setSearch); // Gắn hook state thay đổi text vào thanh tìm kiếm chung trên Header
       setTitle("");
     }
@@ -258,6 +265,7 @@ export default function CustomersPage() {
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onViewDetail={(customer) => navigate(CUSTOMER_URLS.detail(customer.id))}
+        showDelete={isAdmin}
       />
 
       <PaginationBar

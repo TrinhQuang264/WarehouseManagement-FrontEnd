@@ -302,13 +302,15 @@ export function useImports() {
     [products],
   );
 
-  const deleteReceipt = useCallback((id) => {
-    // We would call an API here if we had a DELETE endpoint
-    // purchasesService.delete(id);
-    setReceipts((prev) =>
-      prev.filter((receipt) => String(receipt.id) !== String(id)),
-    );
-  }, []);
+  const deleteReceipt = useCallback(async (id) => {
+    try {
+      await purchasesService.softDelete(id);
+      await fetchData();
+    } catch (error) {
+      console.error("Error deleting receipt:", error);
+      throw error;
+    }
+  }, [fetchData]);
 
   const createReceipt = async (receiptData, { submit = false } = {}) => {
     const supplier = suppliers.find(

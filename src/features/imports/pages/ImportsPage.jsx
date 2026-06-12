@@ -1,10 +1,12 @@
-import { Edit3, FileText, Plus, Printer } from "lucide-react";
+import { Edit3, FileText, Plus, Printer, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Breadcrumbs from "../../../components/ui/Breadcrumbs.jsx";
 import Button from "../../../components/ui/Button.jsx";
 import ConfirmModal from "../../../components/ui/ConfirmModal.jsx";
 import { useHeader } from "../../../contexts/HeaderContext.jsx";
+import TrashBinDrawer from "../../../components/ui/TrashBinDrawer.jsx";
+import purchasesService from "../api/purchasesService.js";
 import { COMMON_URLS, IMPORT_URLS } from "../../../constants/urls.js";
 import { toast } from "../../../utils/toast.js";
 import ImportFilters from "../components/ImportFilters.jsx";
@@ -15,6 +17,7 @@ import ImportReceiptForm from "../components/ImportReceiptForm.jsx";
 import ImportStats from "../components/ImportStats.jsx";
 import ImportTable from "../components/ImportTable.jsx";
 import { useImports } from "../hooks/useImports.jsx";
+import { useAuth } from "../../auth/hooks/useAuth.jsx";
 import "../styles/Imports.css";
 
 function getEditBasePath() {
@@ -66,6 +69,8 @@ function hydrateReceipt(receipt, products) {
 }
 
 export default function ImportsPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
@@ -95,7 +100,7 @@ export default function ImportsPage() {
     totalPages,
   } = useImports();
 
-  const { setActionButton, setOnSearch, setTitle, setSubtitle, resetHeader } =
+  const { setActionButton, setExtraActions, setOnSearch, setTitle, setSubtitle, resetHeader } =
     useHeader();
 
   const isAddMode = location.pathname === IMPORT_URLS.new;
@@ -134,6 +139,9 @@ export default function ImportsPage() {
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPaperView, setIsPaperView] = useState(true);
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
+  const closeTrash = useCallback(() => setIsTrashOpen(false), []);
+  const openTrash = useCallback(() => setIsTrashOpen(true), []);
 
   useEffect(() => {
     if (isFormMode) {
@@ -214,10 +222,12 @@ export default function ImportsPage() {
           </div>
         ),
       });
+      setExtraActions([]);
       setOnSearch(null);
       setTitle(pageTitle);
     } else if (isFormMode) {
       setActionButton(null);
+      setExtraActions([]);
       setOnSearch(null);
       setTitle(pageTitle);
       setSubtitle("");
@@ -230,6 +240,18 @@ export default function ImportsPage() {
         className:
           "shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]",
       });
+      setExtraActions(
+        isAdmin
+          ? [
+              {
+                label: "Thùng rác",
+                icon: <Trash2 size={18} />,
+                onClick: openTrash,
+                className: "border border-red-200 text-red-600 hover:bg-red-50",
+              },
+            ]
+          : []
+      );
       setOnSearch(() => setSearch);
       setTitle("");
       setSubtitle("");
@@ -241,6 +263,7 @@ export default function ImportsPage() {
     isDetailMode,
     pageTitle,
     setActionButton,
+    setExtraActions,
     setOnSearch,
     setTitle,
     setSubtitle,
@@ -250,6 +273,7 @@ export default function ImportsPage() {
     sourceReceipt,
     handlePreviewPdf,
     handlePrintReceipt,
+    openTrash,
   ]);
 
   const openEdit = useCallback(
@@ -279,15 +303,15 @@ export default function ImportsPage() {
     [submitReceipt],
   );
 
-  const handleDeleteConfirm = useCallback(() => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!deleteConfirm.receipt) return;
 
     setIsDeleting(true);
     try {
-      deleteReceipt(deleteConfirm.receipt.id);
+      await deleteReceipt(deleteConfirm.receipt.id);
       setDeleteConfirm({ isOpen: false, receipt: null });
       toast.success(
-        `Xóa phiếu nhập "${deleteConfirm.receipt.code}" thành công.`,
+        `Xóa phiếu nhập "${deleteConfirm.receipt.code}" thành công. Dữ liệu đã được chuyển vào thùng rác.`,
       );
     } catch (error) {
       console.error("[ImportsPage] Error deleting receipt:", error);
@@ -568,7 +592,7 @@ export default function ImportsPage() {
         />
       </div>
 
-      <ImportStats stats={stats} />
+      {isAdmin && <ImportStats stats={stats} />}
 
       <section className="imports-table-section">
         <ImportFilters
@@ -586,6 +610,8 @@ export default function ImportsPage() {
           onViewDetail={openDetail}
           onDelete={handleDeleteClick}
           onSubmit={handleSubmitReceipt}
+          showDelete={isAdmin}
+          isAdmin={isAdmin}
         />
       </section>
 
@@ -602,10 +628,19 @@ export default function ImportsPage() {
         onClose={() => setDeleteConfirm({ isOpen: false, receipt: null })}
         onConfirm={handleDeleteConfirm}
         title="Xác nhận xóa phiếu nhập"
-        message={`Bạn có chắc chắn muốn xóa phiếu nhập "${deleteConfirm.receipt?.code}"? Hành động này không thể hoàn tác.`}
+        message={`Bạn có chắc chắn muốn xóa phiếu nhập "${deleteConfirm.receipt?.code}"? Dữ liệu sẽ được chuyển vào thùng rác.`}
         confirmLabel="Xóa"
         loading={isDeleting}
         variant="danger"
+      />
+
+      <TrashBinDrawer
+        isOpen={isTrashOpen}
+        onClose={closeTrash}
+        title="Thùng rác phiếu nhập kho"
+        service={purchasesService}
+        onDataChange={refreshList}
+        filterItems={(item) => item.type === 1 || item.receiptCode?.startsWith("PO")}
       />
     </div>
   );

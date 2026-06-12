@@ -19,9 +19,9 @@ function UserRow({ user, onEditRoles, onToggleActive }) {
       </td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${!user.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
-          <span className={`text-sm font-medium ${!user.isActive ? "text-emerald-600" : "text-red-500"}`}>
-            {!user.isActive ? "Đang hoạt động" : "Đã khóa"}
+          <span className={`w-2 h-2 rounded-full ${user.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
+          <span className={`text-sm font-medium ${user.isActive ? "text-emerald-600" : "text-red-500"}`}>
+            {user.isActive ? "Đang hoạt động" : "Đã khóa"}
           </span>
         </div>
       </td>
@@ -31,7 +31,7 @@ function UserRow({ user, onEditRoles, onToggleActive }) {
             <Edit size={18} />
             <span className="text-xs">Chỉnh sửa</span>
           </button>
-          {!user.isActive ? (
+          {user.isActive ? (
             <button className="action-btn text-slate-400 hover:text-accent-red hover:bg-red-50" title="Khóa tài khoản" onClick={() => onToggleActive(user)}>
               <Ban size={18} />
             </button>

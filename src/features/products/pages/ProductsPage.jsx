@@ -4,6 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import usePageMode from "../../../hooks/usePageMode";
 import { useHeader } from "../../../contexts/HeaderContext";
 import { useProducts } from "../hooks/useProducts";
+import { useAuth } from "../../auth/hooks/useAuth.jsx";
 import TrashBinDrawer from "../../../components/ui/TrashBinDrawer";
 import productService from "../api/productsService";
 
@@ -50,6 +51,8 @@ const sanitizeImageUrlForPayload = (imageUrl) => {
 };
 
 export default function ProductsPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   // Route mode + page header controls
   const mode = usePageMode("/products");
   const {
@@ -109,14 +112,18 @@ export default function ProductsPage() {
         className: "shadow-lg shadow-primary/20",
       });
 
-      setExtraActions([
-        {
-          label: "Thùng rác",
-          icon: <Trash2 size={18} />,
-          onClick: () => setIsTrashOpen(true),
-          className: "bg-red-500 text-white hover:bg-red-600",
-        },
-      ]);
+      setExtraActions(
+        isAdmin
+          ? [
+              {
+                label: "Thùng rác",
+                icon: <Trash2 size={18} />,
+                onClick: () => setIsTrashOpen(true),
+                className: "bg-red-500 text-white hover:bg-red-600",
+              },
+            ]
+          : []
+      );
 
       setOnSearch(() => searchProducts);
 
@@ -385,6 +392,7 @@ export default function ProductsPage() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onViewDetail={handleViewDetail}
+            showDelete={isAdmin}
           />
 
           {totalCount > 0 && (

@@ -10,6 +10,7 @@ import SupplierModal from "../components/SupplierModal";
 import SupplierDetailPage from "./SupplierDetailPage.jsx";
 import { useSuppliers } from "../hooks/useSuppliers.jsx";
 import { useHeader } from "../../../contexts/HeaderContext";
+import { useAuth } from "../../auth/hooks/useAuth.jsx";
 import suppliersService from "../api/suppliersService";
 import {
   COMMON_URLS,
@@ -62,6 +63,8 @@ function buildSupplierHistory(supplierId) {
 }
 
 export default function SuppliersPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
@@ -175,14 +178,18 @@ export default function SuppliersPage() {
         searchPlaceholder: "Tìm kiếm nhà cung cấp...",
         className: "shadow-lg shadow-primary/20",
       });
-      setExtraActions([
-        {
-          label: "Thùng rác",
-          icon: <Trash2 size={18} />,
-          onClick: openTrash,
-          className: "bg-red-500 text-red-600 hover:bg-red-300",
-        },
-      ]);
+      setExtraActions(
+        isAdmin
+          ? [
+              {
+                label: "Thùng rác",
+                icon: <Trash2 size={18} />,
+                onClick: openTrash,
+                className: "bg-red-500 text-red-600 hover:bg-red-300",
+              },
+            ]
+          : []
+      );
       setOnSearch(() => setSearch);
       setTitle("");
     }
@@ -271,6 +278,7 @@ export default function SuppliersPage() {
           onEdit={openEditModal}
           onDelete={openDeleteModal}
           onViewDetail={handleViewDetail}
+          showDelete={isAdmin}
         />
 
         <PaginationBar

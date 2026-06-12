@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, Search, X } from "lucide-react";
-
+import { Check, ChevronDown, Package, Search, X } from "lucide-react";
+import { getProductImageUrl } from "../../utils/util.js";
 /**
  * SearchableSelect - Dropdown tùy chỉnh với ô tìm kiếm tích hợp
  *
  * Props:
- *  - options: [{ value, label }]
+ *  - options: [{ value, label, ...extra }]
  *  - value: giá trị đang chọn (string | number)
  *  - onChange: (value) => void
  *  - placeholder: string – text hiển thị khi chưa chọn
@@ -13,6 +13,9 @@ import { Check, ChevronDown, Search, X } from "lucide-react";
  *  - icon: ReactNode – icon hiển thị bên trái trigger
  *  - className: string – class bổ sung cho wrapper
  *  - maxVisible: number – số item hiển thị trước khi scroll (mặc định 7)
+ *  - renderOption: (option, isSelected) => ReactNode – custom option renderer
+ *  - renderTriggerLabel: (selectedOption) => ReactNode – custom trigger label renderer
+ *  - filterFn: (option, search) => boolean – custom filter function
  */
 export default function SearchableSelect({
   options = [],
@@ -23,6 +26,9 @@ export default function SearchableSelect({
   icon = null,
   className = "",
   maxVisible = 7,
+  renderOption = null,
+  renderTriggerLabel = null,
+  filterFn = null,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -35,11 +41,13 @@ export default function SearchableSelect({
   );
 
   // Lọc danh sách theo từ khóa tìm kiếm
-  const filteredOptions = options.filter((opt) =>
-    String(opt.label ?? "")
-      .toLowerCase()
-      .includes(search.toLowerCase().trim()),
-  );
+  const filteredOptions = filterFn
+    ? options.filter((opt) => filterFn(opt, search))
+    : options.filter((opt) =>
+        String(opt.label ?? "")
+          .toLowerCase()
+          .includes(search.toLowerCase().trim()),
+      );
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
@@ -79,8 +87,8 @@ export default function SearchableSelect({
     searchInputRef.current?.focus();
   };
 
-  // Chiều cao tối đa của list: 7 item × ~44px/item
-  const ITEM_HEIGHT = 44;
+  // Chiều cao tối đa của list: 7 item × ~44px/item (hoặc ~72px cho custom)
+  const ITEM_HEIGHT = renderOption ? 72 : 44;
   const maxHeight = maxVisible * ITEM_HEIGHT;
 
   return (
@@ -101,7 +109,11 @@ export default function SearchableSelect({
         <span
           className={`searchable-select-value ${!selectedOption ? "searchable-select-placeholder" : ""}`}
         >
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption
+            ? renderTriggerLabel
+              ? renderTriggerLabel(selectedOption)
+              : selectedOption.label
+            : placeholder}
         </span>
         <ChevronDown
           size={16}
@@ -146,8 +158,8 @@ export default function SearchableSelect({
             className="searchable-select-list"
             style={{ maxHeight: `${maxHeight}px`, overflowY: "auto" }}
           >
-            {/* Option "không chọn" */}
-            {!search && (
+            {/* Option "không chọn" – chỉ hiển thị khi không có renderOption */}
+            {!search && !renderOption && (
               <button
                 type="button"
                 role="option"
@@ -164,7 +176,23 @@ export default function SearchableSelect({
             ) : (
               filteredOptions.map((opt) => {
                 const isSelected = String(opt.value) === String(value);
-                return (
+                return renderOption ? (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    role="option"
+                    aria-selected={isSelected}
+                    data-out-of-stock={opt.isOutOfStock ? "true" : undefined}
+                    disabled={opt.isOutOfStock}
+                    className={`searchable-select-option searchable-select-option-custom ${isSelected ? "selected" : ""} ${opt.isOutOfStock ? "ss-option-disabled" : ""}`}
+                    onClick={() => !opt.isOutOfStock && handleSelect(opt.value)}
+                  >
+                    {renderOption(opt, isSelected)}
+                    {isSelected && (
+                      <Check size={14} className="searchable-select-check searchable-select-check-overlay" />
+                    )}
+                  </button>
+                ) : (
                   <button
                     key={opt.value}
                     type="button"
@@ -184,6 +212,37 @@ export default function SearchableSelect({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * ProductOption - Component hiển thị sản phẩm trong dropdown SearchableSelect
+ */
+export function ProductOption({ opt, showStock = true }) {
+  return (
+    <div className="ss-product-option">
+      <div className="ss-product-thumb">
+        {opt.imageUrl ? (
+          <img src={getProductImageUrl(opt.imageUrl)} alt={opt.label} className="ss-product-thumb-img" />
+        ) : (
+          <Package size={16} className="ss-product-thumb-fallback" />
+        )}
+      </div>
+      <div className="ss-product-info">
+        <p className="ss-product-name">{opt.label}</p>
+        <span className="ss-product-meta">
+          {opt.code && <span className="ss-product-sku">{opt.code}</span>}
+          {opt.categoryName && (
+            <span className="ss-product-category">{opt.categoryName}</span>
+          )}
+          {showStock && opt.stock != null && (
+            <span className={`ss-product-stock ${opt.stock <= 0 ? "out" : ""}`}>
+              SL: {opt.stock}
+            </span>
+          )}
+        </span>
+      </div>
     </div>
   );
 }

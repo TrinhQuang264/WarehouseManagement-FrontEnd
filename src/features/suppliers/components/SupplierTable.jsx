@@ -2,7 +2,7 @@ import React from "react";
 import { Edit, Eye, Trash2 } from "lucide-react";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
 
-function SupplierTable({ suppliers, loading, onEdit, onDelete, onViewDetail }) {
+function SupplierTable({ suppliers, loading, onEdit, onDelete, onViewDetail, showDelete = true }) {
     return (
         <DataTableCard className="min-h-[500px] flex flex-col relative">
             <div className="table-wrapper">
@@ -71,15 +71,17 @@ function SupplierTable({ suppliers, loading, onEdit, onDelete, onViewDetail }) {
                                             >
                                                 <Edit size={18} />
                                             </button>
-                                            <button
-                                                onClick={() =>
-                                                    onDelete(supplier)
-                                                }
-                                                className="action-btn text-slate-400 hover:text-red-500"
-                                                title="Xóa"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
+                                            {showDelete && (
+                                                <button
+                                                    onClick={() =>
+                                                        onDelete(supplier)
+                                                    }
+                                                    className="action-btn text-slate-400 hover:text-red-500"
+                                                    title="Xóa"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

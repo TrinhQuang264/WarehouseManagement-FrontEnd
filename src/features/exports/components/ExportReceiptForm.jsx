@@ -1,17 +1,19 @@
 import {
   CalendarDays,
   FileText,
+  Package,
   PackageMinus,
-  Search,
   Trash2,
   UserRound,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Button from "../../../components/ui/Button.jsx";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
-import SearchableSelect from "../../../components/ui/SearchableSelect.jsx";
-import { formatCurrency } from "../../../utils/util.js";
+import SearchableSelect, {
+  ProductOption,
+} from "../../../components/ui/SearchableSelect.jsx";
+import { formatCurrency, getProductImageUrl } from "../../../utils/util.js";
 
 function ReceiptSummary({ receipt }) {
   return (
@@ -30,10 +32,6 @@ function ReceiptSummary({ receipt }) {
           <div className="imports-summary-row">
             <span>Tổng tiền hàng:</span>
             <strong>{formatCurrency(receipt.subTotal)}</strong>
-          </div>
-          <div className="imports-summary-row">
-            <span>Chiết khấu:</span>
-            <strong>{formatCurrency(receipt.discountAmount || 0)}</strong>
           </div>
         </div>
         <div className="imports-summary-total">
@@ -80,51 +78,40 @@ export default function ExportReceiptForm({
   const selectedProductStock = Number(
     selectedProduct?.quantity ?? selectedProduct?.stock ?? 0,
   );
-  const selectedProductPrice =
-    selectedProduct?.sellingPrice ?? selectedProduct?.price ?? 0;
-  const selectedProductCategory =
-    selectedProduct?.categoryName ||
-    (selectedProduct?.categoryId
-      ? `#${selectedProduct.categoryId}`
-      : "Chưa xác định");
   const isSelectedProductOutOfStock = selectedProductStock <= 0;
   const isDraftQuantityTooLarge =
     selectedProduct && Number(draftItem.quantity || 0) > selectedProductStock;
 
-  const [productSearch, setProductSearch] = useState("");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  // Map products to SearchableSelect options
+  const productOptions = useMemo(
+    () =>
+      activeProducts.map((p) => ({
+        value: p.id,
+        label: p.name,
+        code: p.code,
+        categoryName:
+          p.categoryName || (p.categoryId ? `Danh mục ${p.categoryId}` : ""),
+        imageUrl: p.imageUrl,
+        stock: Number(p.quantity ?? p.stock ?? 0),
+        sellingPrice: p.sellingPrice,
+        price: p.price,
+        isOutOfStock: Number(p.quantity ?? p.stock ?? 0) <= 0,
+      })),
+    [activeProducts],
+  );
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setProductSearch(selectedProduct?.name || "");
-  }, [selectedProduct]);
-
-  const searchResults = useMemo(() => {
-    const keyword = String(productSearch ?? "")
-      .trim()
-      .toLowerCase();
-    if (!keyword) return activeProducts.slice(0, 6);
-    return activeProducts
-      .filter((product) =>
-        [product.name, product.code, product.description].some((value) =>
-          String(value ?? "")
-            .toLowerCase()
-            .includes(keyword),
-        ),
-      )
-      .slice(0, 6);
-  }, [activeProducts, productSearch]);
-
-  const handleSelectProduct = (product) => {
+  const handleSelectProduct = (productId) => {
+    const product = activeProducts.find(
+      (p) => String(p.id) === String(productId),
+    );
+    if (!product) {
+      onDraftItemChange("productId", "");
+      return;
+    }
+    const stock = Number(product.quantity ?? product.stock ?? 0);
+    if (stock <= 0) return;
     onDraftItemChange("productId", String(product.id));
     onDraftItemChange("unitPrice", product.sellingPrice || product.price || 0);
-    setProductSearch(product.name);
-    setIsSearchOpen(false);
-  };
-
-  const handleClearSearch = () => {
-    setProductSearch("");
-    setIsSearchOpen(true);
   };
 
   return (
@@ -208,90 +195,50 @@ export default function ExportReceiptForm({
             <div className="imports-entry-grid">
               <label className="imports-field imports-entry-product">
                 <span>Sản phẩm</span>
-                <div className="imports-product-search-box">
-                  <div className="imports-search-input-wrap">
-                    <Search size={18} className="imports-search-icon" />
-                    <input
-                      type="text"
-                      className="imports-input imports-search-input"
-                      value={productSearch}
-                      onChange={(event) => {
-                        setProductSearch(event.target.value);
-                        setIsSearchOpen(true);
-                      }}
-                      onFocus={() => setIsSearchOpen(true)}
-                      placeholder="Tìm tên sản phẩm hoặc mã SKU..."
-                    />
-                    {productSearch ? (
-                      <button
-                        type="button"
-                        className="imports-search-clear"
-                        onClick={handleClearSearch}
-                        aria-label="Xóa tìm kiếm"
-                      >
-                        <X size={16} />
-                      </button>
-                    ) : null}
-                  </div>
-                  {isSearchOpen && searchResults.length > 0 && (
-                    <div className="imports-search-results imports-product-search-results">
-                      {searchResults.map((product) => {
-                        const availableStock = Number(
-                          product.quantity ?? product.stock ?? 0,
-                        );
-                        const isOutOfStock = availableStock <= 0;
-                        return (
-                          <button
-                            key={product.id}
-                            type="button"
-                            className={`imports-search-result ${isOutOfStock ? "opacity-40 cursor-not-allowed" : ""}`}
-                            disabled={isOutOfStock}
-                            onMouseDown={(event) => event.preventDefault()}
-                            onClick={() =>
-                              !isOutOfStock && handleSelectProduct(product)
-                            }
-                          >
-                            <div className="imports-search-result-thumb">
-                              {product.imageUrl ? (
-                                <img
-                                  src={product.imageUrl}
-                                  alt={product.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : null}
-                            </div>
-                            <div className="imports-search-result-content">
-                              <p>
-                                {product.name} - SL: {availableStock}
-                              </p>
-                              <span>
-                                {product.code} -{" "}
-                                {product.categoryName ||
-                                  (product.categoryId
-                                    ? `Danh mục ${product.categoryId}`
-                                    : "")}
-                                {isOutOfStock ? " • Hết hàng" : ""}
-                              </span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                  {selectedProduct && isSelectedProductOutOfStock && (
-                    <p className="text-xs text-red-500 mt-2">
-                      Sản phẩm đã hết hàng.
+                {selectedProduct &&
+                  !isSelectedProductOutOfStock &&
+                  isDraftQuantityTooLarge && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Số lượng xuất không được vượt quá tồn kho (
+                      {selectedProductStock}).
                     </p>
                   )}
-                  {selectedProduct &&
-                    !isSelectedProductOutOfStock &&
-                    isDraftQuantityTooLarge && (
-                      <p className="text-xs text-red-500 mt-2">
-                        Số lượng xuất không được vượt quá tồn kho (
-                        {selectedProductStock}).
-                      </p>
-                    )}
-                </div>
+                <SearchableSelect
+                  options={productOptions}
+                  value={draftItem.productId}
+                  onChange={handleSelectProduct}
+                  placeholder="Chọn sản phẩm..."
+                  searchPlaceholder="Tìm tên, mã SKU..."
+                  icon={<Package size={16} />}
+                  maxVisible={5}
+                  filterFn={(opt, search) => {
+                    const kw = search.toLowerCase().trim();
+                    if (!kw) return true;
+                    return [opt.label, opt.code, opt.categoryName].some((v) =>
+                      String(v ?? "")
+                        .toLowerCase()
+                        .includes(kw),
+                    );
+                  }}
+                  renderOption={(opt) => (
+                    <ProductOption opt={opt} showStock={true} />
+                  )}
+                  renderTriggerLabel={(opt) => (
+                    <span className="ss-trigger-product-label">
+                      {opt.label}
+                      {opt.code && (
+                        <span className="ss-trigger-product-code">
+                          {opt.code}
+                        </span>
+                      )}
+                    </span>
+                  )}
+                />
+                {selectedProduct && isSelectedProductOutOfStock && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Sản phẩm đã hết hàng.
+                  </p>
+                )}
               </label>
               <label className="imports-field">
                 <span>Số lượng</span>
@@ -358,7 +305,7 @@ export default function ExportReceiptForm({
                           <div className="imports-product-thumb">
                             {item.imageUrl ? (
                               <img
-                                src={item.imageUrl}
+                                src={getProductImageUrl(item.imageUrl)}
                                 alt={item.productName}
                                 className="w-full h-full object-cover"
                               />

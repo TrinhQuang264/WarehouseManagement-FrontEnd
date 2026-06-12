@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 import Loading from "../components/ui/Loading";
+import { useAuth } from "../features/auth/hooks/useAuth.jsx";
 
 const MainLayout = lazy(() => import("../components/layout/MainLayout"));
 const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
@@ -32,6 +33,9 @@ const ProfilePage = lazy(() => import("../features/profile/pages/ProfilePage"));
 const ReportsPage = lazy(() => import("../features/reports/pages/ReportsPage"));
 
 export default function AppRouter() {
+    const { user } = useAuth();
+    const isAdmin = user?.role?.toLowerCase() === "admin";
+
     return (
         <Suspense fallback={<Loading text="Đang tải giao diện..." />}>
             <Routes>
@@ -52,7 +56,7 @@ export default function AppRouter() {
                     }
                 >
                     <Route index element={<DashboardPage />} />
-                    <Route path="users" element={<UsersPage />} />
+                    {isAdmin && <Route path="users" element={<UsersPage />} />}
                     <Route path="products" element={<ProductsPage />} />
                     <Route path="products/create" element={<ProductsPage />} />
                     <Route
@@ -60,16 +64,16 @@ export default function AppRouter() {
                         element={<ProductsPage />}
                     />
                     <Route path="products/:id" element={<ProductsPage />} />
-                    <Route path="categories" element={<CategoriesPage />} />
-                    <Route
+                    {isAdmin && <Route path="categories" element={<CategoriesPage />} />}
+                    {isAdmin && <Route
                         path="categories/create"
                         element={<CategoriesPage />}
-                    />
-                    <Route
+                    />}
+                    {isAdmin && <Route
                         path="categories/update/:id"
                         element={<CategoriesPage />}
-                    />
-                    <Route path="categories/:id" element={<CategoriesPage />} />
+                    />}
+                    {isAdmin && <Route path="categories/:id" element={<CategoriesPage />} />}
                     <Route path="import" element={<ImportsPage />} />
                     <Route path="import/create" element={<ImportsPage />} />
                     <Route path="import/update/:id" element={<ImportsPage />} />
@@ -78,13 +82,13 @@ export default function AppRouter() {
                     <Route path="export/create" element={<ExportsPage />} />
                     <Route path="export/update/:id" element={<ExportsPage />} />
                     <Route path="export/:id" element={<ExportsPage />} />
-                    <Route path="approve" element={<ApprovePage />} />
+                    {isAdmin && <Route path="approve" element={<ApprovePage />} />}
                     <Route path="inventory" element={<InventoryPage />} />
                     <Route path="suppliers" element={<SuppliersPage />} />
                     <Route path="suppliers/:id" element={<SuppliersPage />} />
                     <Route path="customers" element={<CustomersPage />} />
                     <Route path="customers/:id" element={<CustomersPage />} />
-                    <Route path="reports" element={<ReportsPage />} />
+                    {isAdmin && <Route path="reports" element={<ReportsPage />} />}
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Route>

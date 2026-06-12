@@ -1,6 +1,6 @@
 import ReceiptTable from '../../receipts/components/ReceiptTable.jsx';
 
-export default function ImportTable({ receipts, onEdit, onViewDetail, onDelete, onSubmit }) {
+export default function ImportTable({ receipts, onEdit, onViewDetail, onDelete, onSubmit, showDelete, showStatus, isAdmin }) {
   return (
     <ReceiptTable
       receipts={receipts}
@@ -12,6 +12,9 @@ export default function ImportTable({ receipts, onEdit, onViewDetail, onDelete, 
       partyNameKey="supplierName"
       dateColumnLabel="Ngày nhập"
       emptyMessage="Không có phiếu nhập phù hợp với bộ lọc hiện tại."
+      showDelete={showDelete}
+      showStatus={showStatus}
+      isAdmin={isAdmin}
     />
   );
 }

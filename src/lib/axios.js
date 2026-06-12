@@ -24,12 +24,16 @@ api.interceptors.response.use(
         const isChangePasswordRequest = requestUrl.includes(
             "/Authentication/change-password",
         );
+        const isLoginRequest = requestUrl.includes(
+            "/Authentication/login",
+        );
 
         // Nếu lỗi 401 và chưa từng thử refresh token (tránh lặp vô hạn)
         if (
             status === 401 &&
             !originalConfig?._retry &&
-            !isChangePasswordRequest
+            !isChangePasswordRequest &&
+            !isLoginRequest
         ) {
             originalConfig._retry = true;
 
@@ -77,7 +81,7 @@ api.interceptors.response.use(
 
         // Nếu lỗi không phải 401, hoặc đã retry mà vẫn lỗi thì log ra và trả về lỗi
         console.log("API ERROR:", status, data || err.message);
-        if (status === 401 && !isChangePasswordRequest) {
+        if (status === 401 && !isChangePasswordRequest && !isLoginRequest) {
             // Đảm bảo xóa session nếu bị 401 lần thứ 2
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");

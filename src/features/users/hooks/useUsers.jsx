@@ -102,7 +102,7 @@ export function useUsers() {
   const createUserWithRoles = useCallback(
     async (payload, roleNames = ["User"]) => {
       const payloadWithDefaults = {
-        isActive: false,
+        isActive: true,
         ...payload,
       };
       await userService.createUser(payloadWithDefaults);

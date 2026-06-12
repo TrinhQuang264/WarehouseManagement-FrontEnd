@@ -38,9 +38,20 @@ const authService = {
             const firstName = foundUser.firstName || '';
             const lastName = foundUser.lastName || '';
 
+            let rolesOfUser = [];
+            try {
+              const rolesResponse = await api.get(`/Users/${userId}/roles`);
+              rolesOfUser = rolesResponse.data || [];
+            } catch (rErr) {
+              console.warn('[Login] Cannot fetch user roles:', rErr.message);
+            }
+            const primaryRole = rolesOfUser[0] || 'User';
+
             user = {
               ...foundUser,
               fullName: `${lastName} ${firstName}`.trim() || foundUser.userName,
+              role: primaryRole,
+              roles: rolesOfUser,
             };
           }
         }
@@ -54,6 +65,9 @@ const authService = {
       return { accessToken, refreshToken, user };
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);
+      if (error.response) {
+        console.error('Chi tiết lỗi từ server (response data):', error.response.data);
+      }
       throw error;
     }
   },

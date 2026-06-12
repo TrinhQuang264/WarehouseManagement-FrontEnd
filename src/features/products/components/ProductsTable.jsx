@@ -33,6 +33,7 @@ export default function ProductsTable({
   onEdit,
   onDelete,
   onViewDetail,
+  showDelete = true,
 }) {
   const categoryNameById = new Map(
     categories.map((category) => [Number(category.id), category.name]),
@@ -136,16 +137,18 @@ export default function ProductsTable({
                       >
                         <Edit size={18} />
                       </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(product);
-                        }}
-                        className="p-1 hover:text-red-500 transition-colors text-slate-400"
-                        title="Xóa"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      {showDelete && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(product);
+                          }}
+                          className="p-1 hover:text-red-500 transition-colors text-slate-400"
+                          title="Xóa"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

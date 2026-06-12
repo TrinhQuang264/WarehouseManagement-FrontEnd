@@ -8,6 +8,7 @@ export default function CustomerTable({
   onEdit,
   onDelete,
   onViewDetail,
+  showDelete = true,
 }) {
   return (
     <DataTableCard className="min-h-[500px] flex flex-col relative">
@@ -71,13 +72,15 @@ export default function CustomerTable({
                       >
                         <Edit size={18} />
                       </button>
-                      <button
-                        onClick={() => onDelete(customer)}
-                        className="action-btn text-slate-400 hover:text-red-500"
-                        title="Xóa"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      {showDelete && (
+                        <button
+                          onClick={() => onDelete(customer)}
+                          className="action-btn text-slate-400 hover:text-red-500"
+                          title="Xóa"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

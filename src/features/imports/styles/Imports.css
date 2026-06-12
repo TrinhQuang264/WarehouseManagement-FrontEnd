@@ -1,7 +1,7 @@
 .imports-page {
   display: flex;
+  gap: 1.2rem;
   flex-direction: column;
-  gap: 1.5rem;
   animation: fadeInUp 0.5s ease-out both;
 }
 .imports-paper-wrap {
@@ -247,7 +247,7 @@
 .imports-input {
   width: 100%;
   min-width: 0;
-  padding: 0.45rem 2.25rem 0.45rem 0.85rem;
+  padding: 0.45rem 1.25rem 0.45rem 0.85rem;
   border-radius: 0.75rem;
   border: 1px solid #e2e8f0;
   background-color: #ffffff;
@@ -259,10 +259,6 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   transition: all 0.2s ease;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1rem;
 }
 
 .imports-select:hover,
@@ -530,10 +526,6 @@
   padding-left: 2.75rem;
 }
 
-.imports-input-right {
-  text-align: right;
-}
-
 .imports-product-search-box {
   position: relative;
 }
@@ -788,7 +780,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #94a3b8;
+  color: #000000;
 }
 
 .imports-paper-meta-col strong,
@@ -853,7 +845,7 @@
 .imports-paper-summary-total strong {
   font-size: 1.25rem;
   font-weight: 900;
-  color: #18181b;
+  color: #000000;
 }
 
 .imports-paper-signatures {
@@ -869,14 +861,14 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #94a3b8;
+  color: #000000;
 }
 
 .imports-paper-signatures strong {
   display: block;
   margin-top: 5rem;
   font-size: 0.875rem;
-  color: #0f172a;
+  color: #000000;
 }
 
 .imports-document {
@@ -908,7 +900,7 @@
 .imports-document-field span,
 .imports-document-summary span {
   font-size: 0.8125rem;
-  color: #71717a;
+  color: #1d1f22;
 }
 
 .imports-document-field strong,

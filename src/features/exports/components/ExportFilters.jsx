@@ -7,6 +7,6 @@ const STATUS_OPTIONS = [
   { value: 'cancelled', label: 'Đã hủy' },
 ];
 
-export default function ExportFilters({ customers, selectedCustomer, setSelectedCustomer, selectedStatus, setSelectedStatus, selectedDateRange, setSelectedDateRange }) {
-  return <ReceiptFilters entities={customers} entityLabel="Tất cả khách hàng" entityValue={selectedCustomer} onEntityChange={setSelectedCustomer} entityOptionLabel={(customer) => customer.fullName} statusOptions={STATUS_OPTIONS} selectedStatus={selectedStatus} setSelectedStatus={setSelectedStatus} selectedDateRange={selectedDateRange} setSelectedDateRange={setSelectedDateRange} />;
+export default function ExportFilters({ customers, selectedCustomer, setSelectedCustomer, selectedStatus, setSelectedStatus, selectedDateRange, setSelectedDateRange, showStatusFilter = true }) {
+  return <ReceiptFilters entities={customers} entityLabel="Tất cả khách hàng" entityValue={selectedCustomer} onEntityChange={setSelectedCustomer} entityOptionLabel={(customer) => customer.fullName} statusOptions={STATUS_OPTIONS} selectedStatus={selectedStatus} setSelectedStatus={setSelectedStatus} selectedDateRange={selectedDateRange} setSelectedDateRange={setSelectedDateRange} showStatusFilter={showStatusFilter} />;
 }

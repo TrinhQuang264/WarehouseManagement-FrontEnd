@@ -103,10 +103,54 @@ const purchasesService = {
   // POST /api/Purchases/{id}/cancel
   async cancel(id, reasonObj) {
     try {
-      const response = await api.post(`/Purchases/${id}/cancel`, reasonObj || { noteCancel: "Hủy bỏ bởi thủ kho" });
+      const response = await api.post(`/Purchases/${id}/cancel`, reasonObj);
       return response.data;
     } catch (error) {
       console.error('Error canceling purchase:', error);
+      throw error;
+    }
+  },
+
+  // DELETE /api/Purchases/{id}/soft-delete
+  async softDelete(id) {
+    try {
+      const response = await api.delete(`/Purchases/${id}/soft-delete`);
+      return response.data;
+    } catch (error) {
+      console.error('Error soft deleting purchase:', error);
+      throw error;
+    }
+  },
+
+  // GET /api/Purchases/trash
+  async getTrash() {
+    try {
+      const response = await api.get('/Purchases/trash');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching trash purchases:', error);
+      throw error;
+    }
+  },
+
+  // PUT /api/Purchases/{id}/restore
+  async restore(id) {
+    try {
+      const response = await api.put(`/Purchases/${id}/restore`);
+      return response.data;
+    } catch (error) {
+      console.error('Error restoring purchase:', error);
+      throw error;
+    }
+  },
+
+  // DELETE /api/Purchases/{id}
+  async permanentDelete(id) {
+    try {
+      const response = await api.delete(`/Purchases/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error permanently deleting purchase:', error);
       throw error;
     }
   }

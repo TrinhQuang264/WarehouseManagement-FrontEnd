@@ -15,6 +15,7 @@ export default function ImportFilters({
   setSelectedStatus,
   selectedDateRange,
   setSelectedDateRange,
+  showStatusFilter = true,
 }) {
-  return <ReceiptFilters entities={suppliers} entityLabel="Tất cả nhà cung cấp" entityValue={selectedSupplier} onEntityChange={setSelectedSupplier} entityOptionLabel={(supplier) => supplier.supplierName} statusOptions={STATUS_OPTIONS} selectedStatus={selectedStatus} setSelectedStatus={setSelectedStatus} selectedDateRange={selectedDateRange} setSelectedDateRange={setSelectedDateRange} />;
+  return <ReceiptFilters entities={suppliers} entityLabel="Tất cả nhà cung cấp" entityValue={selectedSupplier} onEntityChange={setSelectedSupplier} entityOptionLabel={(supplier) => supplier.supplierName} statusOptions={STATUS_OPTIONS} selectedStatus={selectedStatus} setSelectedStatus={setSelectedStatus} selectedDateRange={selectedDateRange} setSelectedDateRange={setSelectedDateRange} showStatusFilter={showStatusFilter} />;
 }

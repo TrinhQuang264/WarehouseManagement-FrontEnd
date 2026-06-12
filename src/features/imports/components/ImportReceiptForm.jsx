@@ -2,16 +2,18 @@ import {
   CalendarDays,
   FileText,
   PackagePlus,
-  Search,
+  Package,
   Store,
   Trash2,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Button from "../../../components/ui/Button.jsx";
 import DataTableCard from "../../../components/ui/DataTableCard.jsx";
-import SearchableSelect from "../../../components/ui/SearchableSelect.jsx";
-import { formatCurrency } from "../../../utils/util.js";
+import SearchableSelect, {
+  ProductOption,
+} from "../../../components/ui/SearchableSelect.jsx";
+import { formatCurrency, getProductImageUrl } from "../../../utils/util.js";
 
 function ReceiptSummary({ receipt }) {
   return (
@@ -30,10 +32,6 @@ function ReceiptSummary({ receipt }) {
           <div className="imports-summary-row">
             <span>Tổng tiền hàng:</span>
             <strong>{formatCurrency(receipt.subTotal)}</strong>
-          </div>
-          <div className="imports-summary-row">
-            <span>Thuế (VAT 0%):</span>
-            <strong>{formatCurrency(receipt.vatAmount)}</strong>
           </div>
         </div>
         <div className="imports-summary-total">
@@ -78,49 +76,32 @@ export default function ImportReceiptForm({
     [activeProducts, draftItem.productId],
   );
 
-  const selectedProductPrice =
-    selectedProduct?.importPrice ?? selectedProduct?.price ?? 0;
-  const selectedProductCategory =
-    selectedProduct?.categoryName ||
-    (selectedProduct?.categoryId
-      ? `#${selectedProduct.categoryId}`
-      : "Chưa xác định");
+  // Map products to SearchableSelect options
+  const productOptions = useMemo(
+    () =>
+      activeProducts.map((p) => ({
+        value: p.id,
+        label: p.name,
+        code: p.code,
+        categoryName: p.categoryName,
+        imageUrl: p.imageUrl,
+        stock: p.quantity,
+        importPrice: p.importPrice,
+        price: p.price,
+      })),
+    [activeProducts],
+  );
 
-  const [productSearch, setProductSearch] = useState("");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setProductSearch(selectedProduct?.name || "");
-  }, [selectedProduct]);
-
-  const searchResults = useMemo(() => {
-    const keyword = String(productSearch ?? "")
-      .trim()
-      .toLowerCase();
-    if (!keyword) return activeProducts.slice(0, 6);
-
-    return activeProducts
-      .filter((product) =>
-        [product.name, product.code, product.description].some((value) =>
-          String(value ?? "")
-            .toLowerCase()
-            .includes(keyword),
-        ),
-      )
-      .slice(0, 6);
-  }, [activeProducts, productSearch]);
-
-  const handleSelectProduct = (product) => {
+  const handleSelectProduct = (productId) => {
+    const product = activeProducts.find(
+      (p) => String(p.id) === String(productId),
+    );
+    if (!product) {
+      onDraftItemChange("productId", "");
+      return;
+    }
     onDraftItemChange("productId", String(product.id));
     onDraftItemChange("unitPrice", product.importPrice || product.price || 0);
-    setProductSearch(product.name);
-    setIsSearchOpen(false);
-  };
-
-  const handleClearSearch = () => {
-    setProductSearch("");
-    setIsSearchOpen(true);
   };
 
   return (
@@ -209,63 +190,37 @@ export default function ImportReceiptForm({
             <div className="imports-entry-grid">
               <label className="imports-field imports-entry-product">
                 <span>Sản phẩm</span>
-                <div className="imports-product-search-box">
-                  <div className="imports-search-input-wrap">
-                    <Search size={18} className="imports-search-icon" />
-                    <input
-                      type="text"
-                      className="imports-input imports-search-input"
-                      value={productSearch}
-                      onChange={(event) => {
-                        setProductSearch(event.target.value);
-                        setIsSearchOpen(true);
-                      }}
-                      onFocus={() => setIsSearchOpen(true)}
-                      placeholder="Tìm tên sản phẩm hoặc mã SKU..."
-                    />
-                    {productSearch ? (
-                      <button
-                        type="button"
-                        className="imports-search-clear"
-                        onClick={handleClearSearch}
-                        aria-label="Xóa tìm kiếm"
-                      >
-                        <X size={16} />
-                      </button>
-                    ) : null}
-                  </div>
-                  {isSearchOpen && searchResults.length > 0 && (
-                    <div className="imports-search-results imports-product-search-results">
-                      {searchResults.map((product) => (
-                        <button
-                          key={product.id}
-                          type="button"
-                          className="imports-search-result"
-                          onMouseDown={(event) => event.preventDefault()}
-                          onClick={() => handleSelectProduct(product)}
-                        >
-                          <div className="imports-search-result-thumb">
-                            {product.imageUrl ? (
-                              <img
-                                src={product.imageUrl}
-                                alt={product.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : null}
-                          </div>
-                          <div className="imports-search-result-content">
-                            <p>
-                              {product.name} - SL: {product.quantity}
-                            </p>
-                            <span>
-                              {product.code} - {product.categoryName}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
+                <SearchableSelect
+                  options={productOptions}
+                  value={draftItem.productId}
+                  onChange={handleSelectProduct}
+                  placeholder="Chọn sản phẩm..."
+                  searchPlaceholder="Tìm tên, mã SKU..."
+                  icon={<Package size={16} />}
+                  maxVisible={5}
+                  filterFn={(opt, search) => {
+                    const kw = search.toLowerCase().trim();
+                    if (!kw) return true;
+                    return [opt.label, opt.code, opt.categoryName].some((v) =>
+                      String(v ?? "")
+                        .toLowerCase()
+                        .includes(kw),
+                    );
+                  }}
+                  renderOption={(opt, isSelected) => (
+                    <ProductOption opt={opt} showStock={true} />
                   )}
-                </div>
+                  renderTriggerLabel={(opt) => (
+                    <span className="ss-trigger-product-label">
+                      {opt.label}
+                      {opt.code && (
+                        <span className="ss-trigger-product-code">
+                          {opt.code}
+                        </span>
+                      )}
+                    </span>
+                  )}
+                />
               </label>
 
               <label className="imports-field">
@@ -333,7 +288,7 @@ export default function ImportReceiptForm({
                           <div className="imports-product-thumb">
                             {item.imageUrl ? (
                               <img
-                                src={item.imageUrl}
+                                src={getProductImageUrl(item.imageUrl)}
                                 alt={item.productName}
                                 className="w-full h-full object-cover"
                               />
