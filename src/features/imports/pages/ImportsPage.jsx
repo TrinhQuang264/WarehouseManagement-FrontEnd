@@ -455,6 +455,24 @@ export default function ImportsPage() {
 
   const handleSubmit = useCallback(async () => {
     try {
+      if (isEditMode && sourceReceipt) {
+        const status = sourceReceipt.status;
+        const statusLabel = sourceReceipt.statusLabel;
+        if (status === 2 || status === "completed" || statusLabel === "Đã duyệt") {
+          toast.error("Phiếu không được sửa đổi khi đã duyệt.");
+          return;
+        }
+        if (status === 3 || status === "cancelled" || statusLabel === "Đã huỷ") {
+          toast.error("Phiếu không được sửa đổi khi đã huỷ.");
+          return;
+        }
+      }
+
+      if (!formReceipt.supplierId || !formReceipt.referenceCode || !formReceipt.items || formReceipt.items.length === 0) {
+        toast.error("Vui lòng nhập các thông tin bắt buộc (nhà cung cấp, mã tham chiếu, sản phẩm).");
+        return;
+      }
+
       console.log(
         "[ImportsPage] handleSubmit called, formReceipt:",
         formReceipt,

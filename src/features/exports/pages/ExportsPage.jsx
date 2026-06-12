@@ -469,16 +469,35 @@ export default function ExportsPage() {
   );
   const handleSubmit = useCallback(async () => {
     try {
+      if (isEditMode && params.id) {
+        const sourceReceipt = getReceiptById(params.id);
+        if (sourceReceipt) {
+          const status = sourceReceipt.status;
+          const statusLabel = sourceReceipt.statusLabel;
+          if (status === 2 || status === "completed" || statusLabel === "Đã duyệt") {
+            toast.error("Phiếu không được sửa đổi khi đã duyệt.");
+            return;
+          }
+          if (status === 3 || status === "cancelled" || statusLabel === "Đã huỷ") {
+            toast.error("Phiếu không được sửa đổi khi đã huỷ.");
+            return;
+          }
+        }
+      }
+
       // Ensure a valid customer is selected
       let receiptData = { ...formReceipt };
       if (!receiptData.customerId) {
         if (customers && customers.length > 0) {
           receiptData.customerId = String(customers[0].id);
-        } else {
-          toast.error("Vui lòng chọn khách hàng trước khi lưu phiếu.");
-          return;
         }
       }
+
+      if (!receiptData.customerId || !receiptData.referenceCode || !receiptData.items || receiptData.items.length === 0) {
+        toast.error("Vui lòng nhập các thông tin bắt buộc (khách hàng, mã tham chiếu, sản phẩm).");
+        return;
+      }
+
       console.log(
         "[ExportsPage] handleSubmit called, receiptData:",
         receiptData,
