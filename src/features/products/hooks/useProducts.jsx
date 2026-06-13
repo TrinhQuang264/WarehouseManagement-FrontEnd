@@ -194,6 +194,17 @@ export function useProducts(defaultPageSize = PAGE_SIZE) {
   const handleUpdateProduct = async (id, data) => {
     setIsSubmitting(true);
     try {
+      const productCode = String(data?.code ?? data?.Code ?? "").trim().toLowerCase();
+      if (productCode) {
+        const existingResponse = await productService.getAll();
+        const existingItems = Array.isArray(existingResponse) ? existingResponse : (existingResponse?.data || []);
+        const isDuplicateCode = existingItems.some((item) => String(item?.code ?? "").trim().toLowerCase() === productCode && String(item?.id) !== String(id));
+        if (isDuplicateCode) {
+          toast.error("Mã sản phẩm đã tồn tại. Vui lòng nhập mã khác.");
+          return null;
+        }
+      }
+
       const updated = await productService.update(id, data);
       toast.success("Cập nhật thông tin sản phẩm thành công!");
       setSelectedProduct(null);

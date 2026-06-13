@@ -64,8 +64,8 @@ export default function DashboardMainChart({
         </select>
       </div>
 
-      <div className="w-full flex-1">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="w-full flex-1 min-w-0 min-h-0">
+        <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
           <BarChart
             data={data}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}

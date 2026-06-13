@@ -5,11 +5,7 @@ export default function ProductSpecs({ formData, setFormData, errors = {} }) {
   };
 
   return (
-    <div className="space-y-6 pt-6 border-t border-slate-100">
-      <h3 className="text-lg font-semibold text-slate-900">
-        Mô Tả & Thông Số Kỹ Thuật
-      </h3>
-
+    <div className="space-y-6">
       {/* Description */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">

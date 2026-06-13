@@ -336,6 +336,7 @@ export default function ProductsPage() {
                 categories={categories}
                 onSubmit={onSubmit}
                 onCancel={() => navigate(PRODUCT_URLS.list)}
+                productId={mode.edit ? mode.id : null}
               />
             </div>
           </div>

@@ -24,9 +24,7 @@ export default function ProductPricing({ formData, setFormData, errors = {} }) {
   const sellPrice = Number(formData.price ?? formData.sellingPrice) || 0;
 
   return (
-    <div className="space-y-4 pt-6 border-t border-slate-100">
-      <h3 className="text-lg font-semibold text-slate-900">Định Giá</h3>
-
+    <div className="space-y-4 ">
       <div className="grid grid-cols-1 gap-6">
         {/* Sell Price */}
         <div className="space-y-2">

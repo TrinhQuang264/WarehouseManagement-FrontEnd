@@ -46,8 +46,8 @@ export default function DashboardSubCharts({ allocationData, lineChartData }) {
       <div className="bg-white rounded-xl p-3 shadow-sm border border-slate-100 flex-1">
         <h3 className="font-bold text-[13px] text-slate-900 mb-2">Tồn kho theo danh mục</h3>
         <div className="flex items-center justify-center gap-2 h-[130px]">
-          <div className="w-1/2 h-full relative">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="w-1/2 h-full relative min-w-0 min-h-0">
+            <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
               <PieChart>
                 <Pie
                   data={allocationData}
@@ -96,8 +96,8 @@ export default function DashboardSubCharts({ allocationData, lineChartData }) {
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-bold text-[13px] text-slate-900">Xu hướng xuất kho 30 ngày</h3>
         </div>
-        <div className="w-full h-[130px]">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="w-full h-[130px] min-w-0 min-h-0">
+          <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
             <LineChart data={lineChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <XAxis 
                 dataKey="day" 
