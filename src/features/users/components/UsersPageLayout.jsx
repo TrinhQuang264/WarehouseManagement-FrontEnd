@@ -22,19 +22,15 @@ export default function UsersPageLayout({
             Tổng quan
           </Link>
           <span className="mx-2 text-slate-300">/</span>
-          <span className="text-slate-900  font-medium">
-            Tài khoản
-          </span>
+          <span className="text-slate-900  font-medium">Tài khoản</span>
         </nav>
       </div>
-      {/* <div className="search-filter-bar">
-        <div className="flex items-center gap-3">
-          <Button variant="secondary" icon={<Filter size={18} className="text-slate-400" />}>Bộ lọc</Button>
-          <Button variant="secondary" icon={<FileDown size={18} className="text-slate-400" />}>Xuất Excel</Button>
-        </div>
-      </div> */}
       <DataTableCard>
-        <UsersTable users={users} onEditRoles={onEditRoles} onToggleActive={onToggleActive} />
+        <UsersTable
+          users={users}
+          onEditRoles={onEditRoles}
+          onToggleActive={onToggleActive}
+        />
       </DataTableCard>
       <PaginationBar
         currentPage={currentPage}

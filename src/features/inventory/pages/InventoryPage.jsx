@@ -11,6 +11,7 @@ import PaginationBar from "../../../components/ui/PaginationBar.jsx";
 import Loading from "../../../components/ui/Loading.jsx";
 import { toast } from "../../../utils/toast.js";
 import "../styles/Inventory.css";
+import Breadcrumb from "../../../components/ui/Breadcrumbs.jsx";
 
 export default function InventoryPage() {
   const {
@@ -95,6 +96,7 @@ export default function InventoryPage() {
 
   return (
     <div className="inventory-page">
+      <Breadcrumb />
       <InventoryStats stats={stats} />
 
       <InventoryFilters

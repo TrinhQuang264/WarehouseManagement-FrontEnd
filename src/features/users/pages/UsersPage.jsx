@@ -19,7 +19,22 @@ const EMPTY_FORM = {
 };
 
 export default function UsersPage() {
-  const { users, loading, setSearch, currentPage, setCurrentPage, totalUsers, pageSize, roles, createUserWithRoles, updateUserAccount, updateUserActive, updateUserRoles, deleteUser, userRolesMap } = useUsers();
+  const {
+    users,
+    loading,
+    setSearch,
+    currentPage,
+    setCurrentPage,
+    totalUsers,
+    pageSize,
+    roles,
+    createUserWithRoles,
+    updateUserAccount,
+    updateUserActive,
+    updateUserRoles,
+    deleteUser,
+    userRolesMap,
+  } = useUsers();
   const { setActionButton, setOnSearch, resetHeader } = useHeader();
   const { user: currentUser } = useAuth();
 
@@ -31,7 +46,10 @@ export default function UsersPage() {
   const [checkedRoles, setCheckedRoles] = useState(["User"]);
   const [saving, setSaving] = useState(false);
 
-  const roleNames = useMemo(() => (roles || []).map((r) => r.name || r.id).filter(Boolean), [roles]);
+  const roleNames = useMemo(
+    () => (roles || []).map((r) => r.name || r.id).filter(Boolean),
+    [roles],
+  );
 
   useEffect(() => {
     // Header action/search binding for users page.
@@ -48,11 +66,17 @@ export default function UsersPage() {
   const openEditModal = (user) => {
     // Resolve current role from API role map first, then fallback from current row data.
     const currentRoles = userRolesMap?.[user.id];
-    const fallbackRole = ROLE_LABEL_TO_ID[user.roleLabel] || (String(user.role || "").toLowerCase() === "admin" ? "Admin" : "User");
+    const fallbackRole =
+      ROLE_LABEL_TO_ID[user.roleLabel] ||
+      (String(user.role || "").toLowerCase() === "admin" ? "Admin" : "User");
 
     setSelectedUser(user);
-    setCheckedRoles(Array.isArray(currentRoles) && currentRoles.length ? [currentRoles[0]] : [fallbackRole]);
-    
+    setCheckedRoles(
+      Array.isArray(currentRoles) && currentRoles.length
+        ? [currentRoles[0]]
+        : [fallbackRole],
+    );
+
     setEditForm({
       email: user.email || "",
       phoneNumber: user.phoneNumber || "",
@@ -64,7 +88,12 @@ export default function UsersPage() {
   };
 
   const handleCreate = async () => {
-    if (!createForm.email || !createForm.userName || !createForm.password || !createForm.fullName) {
+    if (
+      !createForm.email ||
+      !createForm.userName ||
+      !createForm.password ||
+      !createForm.fullName
+    ) {
       toast.error("Họ và tên, Email, tên đăng nhập, mật khẩu là bắt buộc.");
       return;
     }
@@ -83,12 +112,19 @@ export default function UsersPage() {
         lastName,
       };
 
-      await createUserWithRoles(payload, checkedRoles.length ? checkedRoles : ["User"]);
+      await createUserWithRoles(
+        payload,
+        checkedRoles.length ? checkedRoles : ["User"],
+      );
       setCreateForm(EMPTY_FORM);
       setCheckedRoles(["User"]);
       setIsCreateOpen(false);
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message || "Không thể tạo tài khoản.");
+      toast.error(
+        error?.response?.data?.message ||
+          error.message ||
+          "Không thể tạo tài khoản.",
+      );
     } finally {
       setSaving(false);
     }
@@ -120,7 +156,9 @@ export default function UsersPage() {
       await updateUserRoles(selectedUser.id, checkedRoles);
       setIsEditOpen(false);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Không thể cập nhật tài khoản.");
+      toast.error(
+        error?.response?.data?.message || "Không thể cập nhật tài khoản.",
+      );
     } finally {
       setSaving(false);
     }
@@ -128,7 +166,7 @@ export default function UsersPage() {
 
   const handleToggleActive = async (user) => {
     if (!user?.id) return;
-    
+
     // Check if user is locking their own account
     if (currentUser && String(user.id) === String(currentUser.id)) {
       toast.error("Bạn không thể tự khóa tài khoản của chính mình!");
@@ -147,7 +185,10 @@ export default function UsersPage() {
     try {
       await updateUserActive(user.id);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Không thể cập nhật trạng thái tài khoản.");
+      toast.error(
+        error?.response?.data?.message ||
+          "Không thể cập nhật trạng thái tài khoản.",
+      );
     } finally {
       setSaving(false);
     }
